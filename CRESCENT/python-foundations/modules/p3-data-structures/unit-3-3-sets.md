@@ -6,45 +6,77 @@
 
 By the end of this unit, you will be able to:
 
-✓ Create a set and explain exactly what "uniqueness" means for the values inside it.  
-✓ Explain why checking membership in a set is fast, in plain terms — no math background needed.  
-✓ Compare two sets using union, intersection, difference, and symmetric difference.  
-✓ Add, remove, and safely discard elements from a set, and write a simple set comprehension.  
-✓ Compare two sets as wholes with subset, superset, and disjoint checks, and know when a `frozenset` is the right choice.  
-✓ Recognize a "silent duplicate" bug caused by treating two different-looking values as the same, and fix it.
+✓ Create a set from literals and from an iterable, and explain the uniqueness guarantee that removes duplicates automatically.  
+✓ Choose a set over a list when the task is about uniqueness, membership testing, or overlap between collections.  
+✓ Apply the four core set operations — union, intersection, difference, and symmetric difference — using both operator and method forms, and their in-place variants.  
+✓ Compare two sets with the subset, superset, and disjoint relations.  
+✓ Mutate a set safely with `add`, `remove`, and `discard`, and describe how `remove` and `discard` differ on a missing element.  
+✓ Explain why set membership (`in`) is fast — roughly constant time via hashing — compared with scanning a list.  
+✓ Use `frozenset` when you need an immutable set, and write a simple set comprehension.
 
 ---
 
 ## 2. Overview
 
-The last unit closed with a promise: sets give you a guarantee neither the list nor the tuple does. A Python **set** is an unordered collection where every value can appear at most once — put a duplicate in, and it's simply dropped, automatically, with no effort from you. Because a set doesn't care about position, the question you ask it is almost always "is this in here?" rather than "what's in position 3?"
+You already have lists and tuples, and both keep every item you put in — duplicates and all — and both remember order. But a lot of real data work isn't about order at all; it's about *which distinct things are present* and *whether two collections overlap*: "Which unique tags did users apply?" "Which emails appear in both mailing lists?" A **set** is Python's built-in answer — think of it as "like a list, but unordered and with no duplicates." Reaching for a set instead of a hand-rolled list loop is exactly the kind of judgment that separates clean code from slow, brittle code.
 
-Picture a stamp collector's album. Each page has exactly one slot per design — you'd never paste two identical "Gandhi Centenary" stamps into the same album; a duplicate just gets set aside for trading. The album doesn't care what order the stamps went in, either — flipping to a page, you only ever ask "do I have this one or not?" That's exactly the guarantee a Python set gives you.
-
-This unit covers creating sets, why membership checks on them are fast, the four ways to compare two sets, adding and removing values safely, set comprehensions, comparing sets as wholes, and the frozen, unchangeable version of a set.
+This unit covers what a set actually is, creating one, the four operations for comparing two sets, mutating one safely, the subset/superset/disjoint relations, why membership checks stay fast at any size, `frozenset`, and set comprehensions.
 
 ---
 
 ## 3. Description
 
-### 3.1 Creating a Set — the Uniqueness Guarantee
+### 3.1 What a Set Is
 
-A set is written with comma-separated values inside curly braces `{ }`. If you write the same value twice, Python keeps only one copy — no error, no warning, it just quietly enforces the rule.
+A set is an **unordered collection of unique, immutable elements**. Three words carry the weight:
+
+- **Unordered** — a set doesn't track position. There's no `my_set[0]`; indexing and slicing simply don't apply, and the print order can change between runs.
+- **Unique** — a set never holds two equal elements. This is the *uniqueness guarantee*, and it's the whole point.
+- **Immutable elements** — every item you store must itself be immutable (hashable). Numbers, strings, and tuples are fine. A list is not, because lists can change — try to put one in a set and Python raises `TypeError`. (The set *itself* is mutable — you can add and remove elements — but each element must be an unchangeable value.)
+
+Placed against the structures you already know:
+
+| | List | Tuple | Set |
+|---|---|---|---|
+| Ordered / indexable | yes | yes | **no** |
+| Allows duplicates | yes | yes | **no** |
+| Mutable container | yes | no | yes |
+| Elements must be immutable | no | no | **yes** |
+| Written with | `[ ]` | `( )` | `{ }` or `set()` |
+
+Read the "no" column top to bottom and you have the definition of a set at a glance: it drops order and duplicates in exchange for the uniqueness guarantee and fast membership. Everything else — looping with `for`, testing with `in`, building with a comprehension — is deliberately the same as lists and tuples, so there's very little new syntax to absorb. The novelty is entirely in *what a set promises*, not in how you type it.
+
+### 3.2 Creating Sets and the Uniqueness Guarantee
+
+Write a set with curly braces around comma-separated values, or build one from any iterable with `set()`:
 
 ```python
-collector_a = {"India Independence", "Gandhi Centenary", "Wildlife of India", "India Independence"}
-print(collector_a)
+colors = {"red", "green", "blue"}
+digits = set([1, 2, 3, 2, 1])   # from a list
+letters = set("hello")          # from a string
+```
+
+The uniqueness guarantee is enforced *at construction*. Duplicates collapse the moment the set is built — you don't ask for it, and there's no way to switch it off:
+
+```python
+digits = {1, 2, 3, 2, 1}
+print(digits)
+letters = set("hello")
+print(letters)
 ```
 
 Output:
 
 ```
-{'India Independence', 'Gandhi Centenary', 'Wildlife of India'}
+{1, 2, 3}
+{'h', 'e', 'l', 'o'}
 ```
 
-`"India Independence"` was typed twice but appears once — that's the uniqueness guarantee doing its job, not a mistake in the output.
+Notice two things. First, `set("hello")` produced individual *characters*, not the whole word — `set()` iterates whatever you pass it. Second, the elements printed in an order that has nothing to do with how you typed them; never write code that depends on it.
 
-**A trap worth knowing now, before it costs you a debugging session:** empty curly braces do **not** make an empty set.
+This gives the single most common one-liner involving sets: **de-duplicate a list** by round-tripping it through a set — `unique_names = list(set(names))`. It removes duplicates but *discards order* in the process; if you need the original order preserved, this is the wrong tool.
+
+One trap worth knowing now, before it costs you a debugging session: `{}` is an **empty dictionary**, not an empty set.
 
 ```python
 empty_set = set()
@@ -61,98 +93,97 @@ Output:
 <class 'dict'>
 ```
 
-`{}` was claimed by dictionaries (the next unit) long before sets existed as a separate idea, so Python reads bare `{}` as an empty dictionary. To get an empty set, you must write `set()` explicitly.
+`{}` was claimed by dictionaries long before sets existed as a separate idea, so Python reads bare `{}` as an empty dictionary. To get an empty set, you must write `set()` explicitly.
 
-### 3.2 Why Membership Checks Are Fast
+### 3.3 Membership Testing
 
-With a list, asking "is this value in here?" means Python checks the first element, then the second, then the third — one at a time — until it finds a match or runs out of elements. For a list of ten items that's instant either way; for a list of ten million, it genuinely matters.
-
-A set avoids that scan entirely. Instead of storing values in a plain sequence, Python keeps them in an internal lookup structure — similar to how a library catalogs books by a call number instead of making you walk every shelf. Give the set a value, and it computes where that value *should* live in its internal structure and checks straight there. That's why `in` on a set stays fast even as the set grows, while `in` on a list gets slower as the list grows.
+Because a set is built around uniqueness, its headline query is "is this element present?" — the same `in` operator you already use on lists and strings:
 
 ```python
-collector_b = {"Gandhi Centenary", "Space Missions", "Wildlife of India"}
-print("Space Missions" in collector_b)
-print("Moon Landing" in collector_b)
+colors = {"red", "green", "blue"}
+print("red" in colors)
+print("purple" not in colors)
 ```
 
 Output:
 
 ```
 True
-False
+True
 ```
 
-### 3.3 Comparing Two Sets
+You can also loop over a set with a `for` loop exactly as you would a list, remembering only that the order you visit elements in is never guaranteed.
 
-This is where sets earn their keep — the moment you have two collections and need to know how they relate.
+### 3.4 The Four Set Operations — Operators and Methods
 
-```python
-collector_a = {"India Independence", "Gandhi Centenary", "Wildlife of India"}
-collector_b = {"Gandhi Centenary", "Space Missions", "Wildlife of India"}
+This is where sets earn their place. Each operation has two spellings: a **method** (which accepts any iterable) and an **operator** (which requires both sides to be sets). They mean the same thing — the operator form reads like math, the method form is handy when your other side happens to be a list.
+
+```mermaid
+---
+title: Set operations on A and B
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#a5d8ff"
+    primaryBorderColor: "#4a9eed"
+    lineColor: "#555"
+  flowchart:
+    htmlLabels: true
+    curve: basis
+    nodeSpacing: 55
+    rankSpacing: 70
+---
+flowchart TD
+    A["<b>Set A</b><br/><span style='font-size:11px;color:#6d28d9'>{1, 2, 3, 4}</span>"]
+    B["<b>Set B</b><br/><span style='font-size:11px;color:#6d28d9'>{3, 4, 5, 6}</span>"]
+
+    U["<b>Union</b><br/><span style='font-size:11px;color:#6d28d9'>A | B — in A or B</span>"]
+    I["<b>Intersection</b><br/><span style='font-size:11px;color:#6d28d9'>A &amp; B — in both</span>"]
+    D["<b>Difference</b><br/><span style='font-size:11px;color:#6d28d9'>A - B — in A not B</span>"]
+    S["<b>Symmetric difference</b><br/><span style='font-size:11px;color:#6d28d9'>A ^ B — in exactly one</span>"]
+
+    A --> U
+    A --> I
+    A --> D
+    A --> S
+    B --> U
+    B --> I
+    B --> D
+    B --> S
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px;
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px;
+    class A,B start;
+    class U,I,D,S auto;
 ```
 
-| **Operation** | **Syntax** | **Meaning, in stamp-album terms** |
-|---|---|---|
-| Union | `collector_a \| collector_b` | Every stamp either collector owns — the combined album if they merged collections. |
-| Intersection | `collector_a & collector_b` | Stamps **both** already own — no point trading for these. |
-| Difference | `collector_a - collector_b` | Stamps A owns that B doesn't — what A could offer in a trade. |
-| Symmetric difference | `collector_a ^ collector_b` | Stamps owned by exactly **one** of them — everything either could still want. |
+Given `a = {1, 2, 3, 4}` and `b = {3, 4, 5, 6}`:
 
-```python
-print(collector_a | collector_b)
-print(collector_a & collector_b)
-print(collector_a - collector_b)
-print(collector_a ^ collector_b)
-```
+| Operation | Operator | Method | Meaning |
+|---|---|---|---|
+| Union | `a \| b` | `a.union(b)` | Everything in either set: `{1,2,3,4,5,6}` |
+| Intersection | `a & b` | `a.intersection(b)` | Only what's in both: `{3, 4}` |
+| Difference | `a - b` | `a.difference(b)` | In `a`, not in `b`: `{1, 2}` |
+| Symmetric difference | `a ^ b` | `a.symmetric_difference(b)` | In exactly one: `{1, 2, 5, 6}` |
 
-Output:
+All four return a **new** set and leave the originals untouched, so you can chain them: `(a | b) - c`. The operator-versus-method choice is the one place the two spellings genuinely diverge: the **operator requires a set on both sides** (`a & [3, 4]` raises `TypeError`), while the **method iterates any iterable** (`a.intersection([3, 4])` works). Real data usually arrives as a list, so the method form lets you compare against it without a `set()` conversion first.
 
-```
-{'India Independence', 'Gandhi Centenary', 'Wildlife of India', 'Space Missions'}
-{'Gandhi Centenary', 'Wildlife of India'}
-{'India Independence'}
-{'India Independence', 'Space Missions'}
-```
+### 3.5 In-Place Update Forms
 
-Notice `collector_a - collector_b` and `collector_b - collector_a` would give *different* results — difference isn't symmetric, direction matters. Symmetric difference (`^`) is the one operation that doesn't care about direction.
+Each of the four operations also has an **in-place** form that modifies the left-hand set directly instead of building a new one:
 
-### 3.4 Adding, Removing, and Discarding
+| Builds a new set | Updates in place |
+|---|---|
+| `a \| b` | `a \|= b` (or `a.update(b)`) |
+| `a & b` | `a &= b` (or `a.intersection_update(b)`) |
+| `a - b` | `a -= b` (or `a.difference_update(b)`) |
+| `a ^ b` | `a ^= b` (or `a.symmetric_difference_update(b)`) |
 
-```python
-collector_a.add("Cybersecurity Stamps")
-collector_a.discard("Wildlife of India")
+Reach for the in-place form when you're **accumulating into one set over time**: `all_seen |= batch` is clearer and cheaper than `all_seen = all_seen | batch`, because it avoids allocating a fresh set on every pass. Use the plain forms from §3.4 when you need to keep the original set intact.
 
-print(collector_a)
-```
+### 3.6 Subset, Superset, and Disjoint Relations
 
-Output:
-
-```
-{'India Independence', 'Gandhi Centenary', 'Cybersecurity Stamps'}
-```
-
-`discard()` removes a value **if it's present**, and does nothing (no error) if it isn't. `remove()` does the same job but raises a `KeyError` if the value doesn't exist. Default to `discard()` unless you specifically want your program to stop and complain when something expected turns out to be missing.
-
-### 3.5 Set Comprehensions
-
-A set comprehension builds a set in one line, using the same `{ }` shape you write a set literal in:
-
-```python
-name_lengths = {len(name) for name in collector_a}
-print(name_lengths)
-```
-
-Output:
-
-```
-{16, 15, 20}
-```
-
-Duplicates collapse automatically here too — if two names in `collector_a` happened to have the same length, that length would still only appear once in `name_lengths`.
-
-### 3.6 Comparing Sets as Wholes — Subset, Superset, Disjoint
-
-Section 3.3 compared sets by combining them. Sometimes what you actually want to know is simpler: does one album sit entirely inside another?
+Beyond combining sets, you often need to *compare* them: does one set sit entirely inside another?
 
 ```python
 required = {"read", "write"}
@@ -162,28 +193,43 @@ print(required <= user_has)          # True — every item on the left is also o
 print(required.issubset(user_has))   # same check, spelled as a method
 ```
 
-`<=` (or `issubset()`) asks "is everything on the left also on the right?" `>=` (or `issuperset()`) asks the mirror question. `<` and `>` add one more condition — the two sets must not be exactly equal — so a set is always a subset of itself, but never a *proper* subset of itself.
-
-One more relation has no operator at all: `isdisjoint()` asks whether two sets share **nothing**:
+`<=` (or `issubset()`) asks "is everything on the left also on the right?" `>=` (or `issuperset()`) asks the mirror question. `<` and `>` add one more condition — the two sets must not be exactly equal — so a set is always a subset of itself, but never a *proper* subset of itself. One relation has no operator at all: `isdisjoint()` asks whether two sets share **nothing**.
 
 ```python
 morning = {"asha", "rohan"}
 evening = {"priya", "zara"}
-print(morning.isdisjoint(evening))   # True — no overlap
+print(morning.isdisjoint(evening))
 ```
 
-### 3.7 Updating a Set in Place
+Output:
 
-Every operation in §3.3 builds a brand-new set and leaves the originals untouched. Each one also has an in-place twin that updates the left-hand set directly instead of building a new one:
+```
+True
+```
 
-| Builds a new set | Updates in place |
-|---|---|
-| `a \| b` | `a \|= b` (or `a.update(b)`) |
-| `a & b` | `a &= b` |
-| `a - b` | `a -= b` |
-| `a ^ b` | `a ^= b` |
+### 3.7 Mutating a Set — `add`, `remove`, `discard`
 
-Reach for the in-place form when you're accumulating into one running set over time — `all_seen |= new_batch` updates `all_seen` directly, instead of building a fresh set on every pass the way `all_seen = all_seen | new_batch` would.
+```python
+collector = {"red", "green"}
+collector.add("blue")
+collector.discard("pink")   # no-op, "pink" was never there
+
+print(collector)
+```
+
+Output:
+
+```
+{'red', 'green', 'blue'}
+```
+
+`discard()` removes a value **if it's present**, and does nothing if it isn't. `remove()` does the same job but raises a `KeyError` if the value doesn't exist. Default to `discard()` unless a missing element would genuinely be a bug you want to hear about. Because `add()` silently ignores repeats, it's the natural fit for a "collect the distinct things I encounter" loop:
+
+```python
+seen = set()
+for word in stream_of_words:
+    seen.add(word)
+```
 
 ### 3.8 `frozenset` — a Set That Can Never Change
 
@@ -200,76 +246,163 @@ Output:
 AttributeError: 'frozenset' object has no attribute 'add'
 ```
 
-Because it can never change, a `frozenset` is allowed to live *inside* another set — a plain `set` isn't, for the same reason a list isn't (§3.1). Reach for one whenever the thing you're tracking uniqueness of is itself an unordered group, like a pair of teammates who shouldn't count twice no matter which order they're listed in.
+Because it can never change, a `frozenset` is hashable — which means it's allowed to live *inside* another set, something a plain `set` can't do:
+
+```python
+teams = set()
+teams.add(frozenset({"ana", "ben"}))
+teams.add(frozenset({"ben", "ana"}))   # same pair, unordered — collapses
+teams.add(frozenset({"cara", "dan"}))
+print(len(teams))
+```
+
+Output:
+
+```
+2
+```
+
+`frozenset({"ana","ben"})` and `frozenset({"ben","ana"})` are equal — sets ignore order — so the second `add` is a no-op. You couldn't do this with plain sets as elements at all; Python would raise `TypeError: unhashable type: 'set'`.
+
+### 3.9 Why Set Membership Is Fast — Hashing
+
+With a list, `x in my_list` means Python checks the first element, then the second, and so on until it finds a match or runs out — a linear scan that gets slower as the list grows.
+
+A set avoids that scan entirely. It stores each element in a location computed from the element's **hash**, so `x in my_set` hashes `x`, jumps straight to that location, and checks only there — roughly constant time, no matter how large the set is. That's exactly why every element must be immutable: the hash has to stay stable while the element sits in the set.
+
+```python
+big_list = list(range(1_000_000))
+big_set = set(range(1_000_000))
+
+print(999_999 in big_list)   # correct, but may scan ~1,000,000 items
+print(999_999 in big_set)    # correct, and effectively instant
+```
+
+Any time you test membership **repeatedly** — inside a loop, once per incoming record — converting a list to a set once, up front, is often the single biggest speed-up you can make.
+
+### 3.10 Set Comprehensions
+
+A set comprehension is a list comprehension with curly braces instead of square brackets — the result is unordered and de-duplicated:
+
+```python
+nums = [1, 2, 2, 3, 3, 3, 4]
+evens = {x for x in nums if x % 2 == 0}
+print(evens)
+```
+
+Output:
+
+```
+{2, 4}
+```
+
+It shines at **de-dup-while-transforming**, since the transform can map several different inputs to the same output and the set silently keeps just one:
+
+```python
+raw_names = ["Ana", "ANA", "ana", "Ben", "BEN"]
+distinct = {name.lower() for name in raw_names}
+print(distinct)
+```
+
+Output:
+
+```
+{'ana', 'ben'}
+```
+
+Five differently-cased inputs collapse to two distinct lowercase names — the transform and the de-duplication happen together.
 
 ---
 
 ## 4. Real-World Application
 
-A spellchecker flagging your typo as "not a word" the instant you finish typing it is §3.2's fast membership check at work — the dictionary is stored as a set of valid words, so checking your typed word against it never means scanning entries one by one.
+**De-duplication.** Log processing and import pipelines routinely funnel a messy list through `set()` to get the distinct values before doing anything else — `unique = set(rows)` replaces a hand-written duplicate-checking loop. When you must transform while de-duplicating (lower-casing emails, stripping whitespace), a set comprehension does both at once: `{e.strip().lower() for e in raw_emails}`.
 
-Set comparisons show up wherever two collections need relating rather than just merging: a music app merging two playlists into one with no duplicate tracks is §3.1/3.3's union with automatic dedup; LinkedIn's "12 mutual connections" is the same **intersection** operation from §3.3, just counted instead of listed; and two QA teams comparing bug reports to see which bugs only one of them caught is **symmetric difference** — exactly the entries that showed up in one list but not the other, which is precisely what deserves a second look.
+**Fast "have I seen this already?" tracking.** Crawlers and cycle-detection code keep a `seen = set()` and check `if item in seen` before processing — fast even when `seen` grows to millions of entries, precisely because set membership doesn't slow down the way list membership does. If `seen` were a list, that check inside a loop would turn the whole job quadratic — this is the single most common reason a working program swaps a list for a set.
+
+**Finding overlap and uniques between two collections.** Comparing "roles a user has" against "roles an action requires" is an intersection; "which required roles are missing" is a difference; "does the user have everything required?" is a subset check. Audience overlap between two mailing lists, or items in a new inventory but not the old one, are one- or two-line set operations rather than nested loops.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** You're building a signup form's backend, and you need to count how many *distinct* people actually registered — except the raw data has a hidden problem sets don't fix automatically.
+**Goal:** Find how two articles' tags relate, then catch a case-sensitivity bug that a naive set doesn't fix on its own.
 
-**1. Start with the raw signups, exactly as they came in.**
-
-```python
-signups = ["priya@mail.com", "Rahul@mail.com", "priya@mail.com", "RAHUL@mail.com", "asha@mail.com"]
-```
-
-**2. Naively convert to a set and count.**
+**1. Compare two articles' tag sets.**
 
 ```python
-unique_emails = set(signups)
-print(unique_emails)
-print("Unique signups:", len(unique_emails))
+tags_a = {"python", "data", "sets", "python"}   # duplicate collapses to one
+tags_b = {"data", "sql", "sets"}
+
+shared = tags_a & tags_b
+only_a = tags_a - tags_b
+all_tags = tags_a | tags_b
+one_only = tags_a ^ tags_b
+
+print("Shared:", shared)
+print("Only in A:", only_a)
+print("All tags:", all_tags)
+print("In exactly one:", one_only)
 ```
 
 Output:
 
 ```
-{'priya@mail.com', 'Rahul@mail.com', 'RAHUL@mail.com', 'asha@mail.com'}
-Unique signups: 4
+Shared: {'data', 'sets'}
+Only in A: {'python'}
+All tags: {'python', 'data', 'sets', 'sql'}
+In exactly one: {'python', 'sql'}
 ```
 
-**3. Spot the bug.** There are really only **3** distinct people — Priya, Rahul, and Asha. `"Rahul@mail.com"` and `"RAHUL@mail.com"` look like the same person to you, but a set compares values *exactly*, character by character, and `"R"` is not the same character as `"r"`. The set has no idea these refer to the same email address — it isn't wrong, it's doing precisely what you asked it to do.
+Four readable expressions replace four hand-written loops.
 
-**4. Fix it by normalizing before deduplicating**, using a set comprehension:
+**2. Now deduplicate a messier list — raw signups from a form.**
 
 ```python
-unique_emails = {email.lower() for email in signups}
-print(unique_emails)
-print("Unique signups:", len(unique_emails))
+raw_names = ["Ana", "ANA", "ana", "Ben", "BEN"]
+unique_names = set(raw_names)
+
+print(unique_names)
+print("Unique count:", len(unique_names))
 ```
 
 Output:
 
 ```
-{'priya@mail.com', 'rahul@mail.com', 'asha@mail.com'}
-Unique signups: 3
+{'Ana', 'ANA', 'ana', 'Ben', 'BEN'}
+Unique count: 5
 ```
 
-Lowercasing every email *before* it goes into the set means two spellings of the same address collapse into one, exactly the way `"India Independence"` collapsed earlier in §3.1.
+**3. Spot the bug.** There are really only **2** distinct names — Ana and Ben. A set compares values *exactly*, character by character, and `"A"` is not the same character as `"a"`. The set isn't wrong; it's doing precisely what you asked it to do.
 
-*Common mistake: assuming a set will catch "obvious" duplicates on its own. A set only ever compares values exactly as they are — if two values should be treated as equal, it's your job to make them look identical (same case, same spacing, same formatting) before they go in.*
+**4. Fix it by normalizing before deduplicating.**
+
+```python
+unique_names = {name.lower() for name in raw_names}
+print(unique_names)
+print("Unique count:", len(unique_names))
+```
+
+Output:
+
+```
+{'ana', 'ben'}
+Unique count: 2
+```
+
+*Common mistake: assuming a set will catch "obvious" duplicates on its own. A set only ever compares values exactly as they are — if two values should be treated as equal, it's your job to make them look identical (same case, same spacing) before they go in.*
 
 ---
 
 ## 6. Summary
 
-- A **set** is an unordered collection, written with `{ }`, where every value can appear at most once — duplicates are dropped automatically, silently.
-- `set()` makes an empty set; bare `{}` makes an empty **dictionary** — a trap worth remembering.
-- Membership checks (`in`) are fast on a set because Python looks values up directly instead of scanning one by one, the way it must for a list.
-- **Union (`|`), intersection (`&`), difference (`-`), and symmetric difference (`^`)** compare two sets — difference is directional, the other three are not.
+- A **set** is an unordered collection of unique, immutable elements; the uniqueness guarantee removes duplicates automatically at construction.
+- Sets are the right choice for **membership testing, de-duplication, and overlap** — not for ordered or position-based data.
+- The four operations — **union (`|`), intersection (`&`), difference (`-`), symmetric difference (`^`)** — each have a method form that accepts any iterable, and an **in-place** variant (`|=`, `&=`, `-=`, `^=`) that mutates the left set.
+- **Subset (`<=`), superset (`>=`), and `isdisjoint()`** compare two sets as wholes.
 - **`discard()`** removes a value safely if present; **`remove()`** raises an error if it's missing.
-- **Subset (`<=`), superset (`>=`), and `isdisjoint()`** compare two sets as wholes; every set operation from §3.3 also has an **in-place** twin (`|=`, `&=`, `-=`, `^=`) that updates a set directly instead of building a new one.
-- A **`frozenset`** is a set that can never be edited after creation — which is exactly what lets it live inside another set, something a regular `set` can't do.
-- A set only ever compares values exactly as written — normalize your data (like lowercasing text) *before* deduplicating, or look-alike values will be treated as different.
+- **Set membership (`in`) is roughly constant-time via hashing**, staying fast at any size, while list membership slows as the list grows.
+- A **`frozenset`** is a set that can never be edited after creation — which is exactly what lets it live inside another set. A **set comprehension** is a list comprehension with `{ }`.
 
 Up next: dictionaries — a structure that pairs every value with its own key, instead of just a position or a bare presence check.
 

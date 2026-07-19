@@ -6,342 +6,296 @@
 
 By the end of this unit, you will be able to:
 
-✓ Create a list and access elements using positive and negative indices.  
-✓ Slice a list, including with a step, to pull out part of it.  
-✓ Explain mutability, and predict when changing a list through one variable affects another.  
-✓ Use the core list methods to add, remove, and search for elements.  
-✓ Sort a list with `sort()` and `sorted()`, and explain why they behave differently.  
-✓ Build nested lists and write a list comprehension.
+✓ Create a list literal and access any element using positive and negative indexing.  
+✓ Slice a list with a start, stop, and step — including the `[::2]` and `[::-1]` idioms.  
+✓ Explain what mutability means and modify a list in place.  
+✓ Apply the core list methods (`append`, `insert`, `remove`, `pop`, `extend`, `index`, `count`, `clear`) to the right task.  
+✓ Iterate over a list with a `for`-loop, and sort it with `sort()` versus `sorted()`, using the `reverse` and `key=` arguments.  
+✓ Build a nested list and write a list comprehension that maps and/or filters in a single expression.
 
 ---
 
 ## 2. Overview
 
-Every variable you've used so far has held exactly one value — one mark, one name. Real data rarely comes in ones. A class has thirty students, not one; an order has a dozen items, not one. Python's **list** is what you use to hold many values under a single name, in a specific order.
+Almost every real program juggles *collections* of things, not single values: a shopping cart of items, the scores in a game, the rows returned from a query. A **list** is Python's everyday container for holding many values in order, in a single variable. Lists are the workhorse of the language — ordered, able to hold anything, and, crucially, changeable after you create them, a property called **mutability**.
 
-Think of a list like a whiteboard to-do list stuck on a fridge. You can add a new task at the bottom, cross one out, squeeze an urgent one in at the top, or erase the whole thing and start over — the list is meant to be rewritten. Compare that to a printed grocery receipt: once it's printed, it's fixed, and if you want a different set of items you print a new receipt rather than editing the old one. Lists behave like the whiteboard. (You'll meet the "printed receipt" kind of collection — the tuple — in the next unit, once you've seen exactly why the whiteboard's flexibility is a double-edged sword.)
-
-This unit covers creating and indexing a list, slicing out part of it, changing it in place, the handful of methods you'll use constantly, sorting, nesting lists inside each other, and writing a list comprehension — a compact one-line way to build a list.
+Master lists and you can store a batch of values, reach into it by position, carve out sub-sections, grow and shrink it, sort it, and transform it into a new list with one compact line.
 
 ---
 
 ## 3. Description
 
-### 3.1 Creating and Indexing a List
+### 3.1 Creating a List
 
-A list is written as comma-separated values inside square brackets `[ ]`. Each value has a position, called an **index**, starting at `0` — not `1`.
-
-```python
-students = ["Priya", "Rohan", "Arjun", "Meera"]
-
-print(students[0])
-print(students[2])
-```
-
-Output:
-
-```
-Priya
-Arjun
-```
-
-**Negative indices** count backward from the end, so you don't have to know a list's length to reach its last item: `-1` is always the last element, `-2` the second-last.
+A list is written as a comma-separated sequence of values inside **square brackets** `[ ]`. It is a single value of type `list` that happens to contain other values — the elements — and it keeps them in the order you wrote them, an order that does not shuffle on its own:
 
 ```python
-print(students[-1])
+fruits = ["apple", "banana", "cherry"]
+numbers = [10, 20, 30, 40, 50]
+mixed = ["Bob", 42, True, 3.14]   # items can be of different types
+empty = []                         # a list with no items
+
+print(type(fruits))   # <class 'list'>
+print(len(fruits))    # 3  — len() gives the number of items
 ```
 
-Output:
+### 3.2 Indexing — Positive and Negative
 
+Each element has a numbered position called its **index**. Python indexes from **zero** — the first element is at index `0`, the second at `1`, and so on — and you reach an element with the list name followed by the index in square brackets. Python also supports **negative indexing**, which counts from the *end*: `-1` is the last element, `-2` the second-to-last, saving you from computing `len(list) - 1` every time.
+
+The diagram below shows both numbering schemes over the same three slots — positive indices running left to right, negative indices running right to left:
+
+```mermaid
+flowchart LR
+    A["<b>'apple'</b><br/>index 0 / -3"]
+    B["<b>'banana'</b><br/>index 1 / -2"]
+    C["<b>'cherry'</b><br/>index 2 / -1"]
+
+    A --> B --> C
 ```
-Meera
-```
-
-### 3.2 Slicing — Taking a Piece of a List
-
-A **slice** pulls out a sub-list without changing the original, using `list[start:stop:step]`. `start` is included; `stop` is not.
 
 ```python
-print(students[1:3])
-print(students[::2])
-print(students[::-1])
-print(students[0:4:2])
+fruits = ["apple", "banana", "cherry"]
+print(fruits[0])   # apple  — first element
+print(fruits[-1])  # cherry — last element
+print(fruits[-3])  # apple  — same as fruits[0]
 ```
 
-Output:
+Asking for an index that does not exist (for example `fruits[3]` on a three-element list) raises an `IndexError`. Positive and negative indices point at the same physical slots from opposite directions — for a list of length `n`, index `0` and index `-n` are the same element.
 
-```
-['Rohan', 'Arjun']
-['Priya', 'Arjun']
-['Meera', 'Arjun', 'Rohan', 'Priya']
-['Priya', 'Arjun']
-```
+### 3.3 Slicing with a Step
 
-- `students[1:3]` — from index 1 up to (not including) index 3.
-- `students[::2]` — every second element, start to end (`step=2`).
-- `students[::-1]` — a step of `-1` walks backward, which is the standard trick for reversing a list.
-- `students[0:4:2]` — all three parts together: start at 0, stop before 4, step by 2. `start`/`stop` pick the range; `step` picks which elements inside it you actually keep.
-
-### 3.3 Mutability — and Its Sharp Edge
-
-A number or a string can't be changed in place — `"hi"` is always `"hi"`; to get different text you make a *new* string. A list is different: it's **mutable**, meaning you can change its contents without creating a new list at all.
+**Slicing** pulls out a *range* of elements and returns them as a **new list**. The syntax is `list[start:stop:step]`, where `start` is included, `stop` is excluded, and `step` is how far to jump each time. `start` defaults to `0`, `stop` to `len(list)`, so `a[:]` is a full copy:
 
 ```python
-students[1] = "Kavya"
-print(students)
+a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+print(a[1:5])     # [1, 2, 3, 4]     — 5 excluded
+print(a[:3])      # [0, 1, 2]        — start defaults to 0
+print(a[7:])      # [7, 8, 9]        — stop defaults to len(a)
+print(a[::2])     # [0, 2, 4, 6, 8]  — every 2nd element
+print(a[1:5:2])   # [1, 3]           — from 1 to 5, stepping by 2
+print(a[::-1])    # [9, 8, ... 0]    — reversed copy
 ```
 
-Output:
+Two idioms are worth memorizing: `a[::2]` takes every second item, and `a[::-1]` produces a reversed copy of the list — a negative step walks backward. Because a slice always builds a *new* list, slicing never changes the original.
 
-```
-['Priya', 'Kavya', 'Arjun', 'Meera']
-```
+### 3.4 Mutability
 
-That flexibility is exactly what makes lists useful — and exactly what can bite you. If two variables end up pointing at the *same* list, a change made through one shows up through the other too, because there's only ever one list sitting in memory; both names just point at it.
+Lists are **mutable** — you can change their contents after creation without making a new list. Assigning to an index replaces one element in place, and assigning to a slice replaces several at once:
 
 ```python
-scores_a = [78, 82, 90]
-scores_b = scores_a          # scores_b points to the exact same list, not a copy
-
-scores_b.append(100)
-print(scores_a)              # scores_a changed too — nobody touched it directly!
+colors = ["red", "green", "blue"]
+colors[1] = "yellow"              # ['red', 'yellow', 'blue']
+colors[0:2] = ["black", "white"]  # ['black', 'white', 'blue']
 ```
 
-Output:
-
-```
-[78, 82, 90, 100]
-```
-
-This is called **aliasing**, and it's one of the most common sources of "but I never changed that variable!" bugs. If you actually want an independent copy, say so explicitly: `scores_b = scores_a.copy()`.
-
-### 3.4 Core List Methods
-
-| **Method** | **What it does** |
-|---|---|
-| `append(x)` | Adds `x` to the end of the list. |
-| `insert(i, x)` | Inserts `x` at position `i`, shifting everything after it along. |
-| `remove(x)` | Removes the first occurrence of the *value* `x` (not a position). |
-| `pop(i)` | Removes **and returns** the item at index `i` — the last item if `i` is left out. |
-| `extend(iterable)` | Adds every element of another list onto the end of this one. |
-| `index(x)` | Returns the position of the first occurrence of `x`. |
-| `count(x)` | Returns how many times `x` appears. |
-| `clear()` | Empties the list completely, leaving `[]`. |
+Mutability has a consequence worth understanding early. A variable holding a list holds a *reference* to that list, not a private copy — so if two names point at the same list, a change through one is visible through the other:
 
 ```python
-students.append("Sara")
-students.remove("Arjun")
-print(students)
+a = [1, 2, 3]
+b = a            # b and a refer to the SAME list
+b.append(4)
+print(a)         # [1, 2, 3, 4]  — a changed too!
 ```
 
-Output:
+For an independent copy, slice it (`b = a[:]`) or call `a.copy()`. The takeaway: lists can be changed in place, and sharing a list means sharing its changes.
 
-```
-['Priya', 'Kavya', 'Meera', 'Sara']
-```
+### 3.5 List Methods
 
-`remove()` and `pop()` are easy to mix up: `remove("Sara")` deletes by *value* — it searches for that name — while `pop(0)` deletes by *position*, regardless of what's stored there.
+Lists carry built-in **methods** — functions attached to the list, called with the dot syntax `list.method(...)`. The everyday eight fall into three groups.
 
-### 3.5 Looping Through a List
+**Methods that add elements:**
+
+- `append(x)` — add `x` as a single new element at the end.
+- `insert(i, x)` — insert `x` so it lands at index `i`, shifting later items right.
+- `extend(iterable)` — add *each* item of another sequence to the end.
+
+**Methods that remove elements:**
+
+- `remove(x)` — delete the first element equal to `x` (raises `ValueError` if absent).
+- `pop(i)` — remove and **return** the element at index `i`; with no argument, removes and returns the last element.
+- `clear()` — remove every element, leaving `[]`.
+
+**Methods that search and count:**
+
+- `index(x)` — return the index of the first element equal to `x` (raises `ValueError` if absent).
+- `count(x)` — return how many times `x` appears.
 
 ```python
-for name in students:
-    print("Student:", name)
+nums = [1, 2, 3]
+nums.append(4)        # [1, 2, 3, 4]
+nums.insert(0, 99)    # [99, 1, 2, 3, 4]
+nums.extend([5, 6])   # [99, 1, 2, 3, 4, 5, 6]
 ```
 
-Output:
+Note the difference between `append` and `extend`: `nums.append([5, 6])` adds the *list* `[5, 6]` as one nested element, whereas `extend` unpacks it into individual elements. All of `append`, `insert`, `extend`, `remove`, `pop`, and `clear` change the list *in place* and rely on mutability; `index` and `count` only read from it.
 
-```
-Student: Priya
-Student: Kavya
-Student: Meera
-Student: Sara
-```
+### 3.6 Looping Through a List
 
-`for name in students` reads each element in order and hands it to `name`, one at a time — you never need to touch an index unless you specifically need the position too.
-
-### 3.6 Sorting: `sort()` vs. `sorted()`
-
-`sort()` rearranges the list **in place** — it changes the original and gives back nothing (`None`). `sorted()` leaves the original list exactly as it was and hands you back a **brand-new**, sorted list.
+Because a list is ordered and iterable, a `for`-loop visits each element in turn. When you also need the position, pair the loop with `range(len(...))`; otherwise iterate directly for the values:
 
 ```python
-marks = [78, 45, 92, 60]
+fruits = ["apple", "banana", "cherry"]
 
-marks.sort()
-print(marks)
+for fruit in fruits:
+    print(f"I like {fruit}")
 
-print(sorted(marks, reverse=True))
+for i in range(len(fruits)):
+    print(f"{i}: {fruits[i]}")
 ```
 
-Output:
+Walking the items, testing each with a conditional, and accumulating a result is the most common thing you will do with a list — and the foundation the comprehension in §3.9 compresses into one line.
 
-```
-[45, 60, 78, 92]
-[92, 78, 60, 45]
-```
+### 3.7 Sorting: `sort()` vs. `sorted()`
 
-Mixing these up is a classic bug: `marks = marks.sort()` looks reasonable but actually throws your data away, because `sort()`'s return value is `None`. If you need the sorted list *as a value* (to print it, pass it somewhere, etc.), reach for `sorted()`.
+There are two ways to order a list, and the difference matters:
 
-The `key` argument controls what gets compared — `sorted(students, key=len)` sorts names by how many characters they have, not alphabetically.
-
-### 3.7 Nested Lists
-
-A list can hold other lists as its elements — the natural way to represent a table, where each inner list is one row.
+- **`list.sort()`** is a *method* that sorts the list **in place** and returns `None` — the original is rearranged.
+- **`sorted(list)`** is a *built-in function* that returns a **new** sorted list and leaves the original untouched.
 
 ```python
-class_marks = [
-    ["Priya", 78],
-    ["Rohan", 65],
-    ["Arjun", 90],
-]
+nums = [3, 1, 2]
+nums.sort()                 # nums is now [1, 2, 3]; sort() returns None
 
-print(class_marks[2][0])
-print(class_marks[2][1])
+result = sorted([3, 1, 2])  # result == [1, 2, 3]; original unchanged
 ```
 
-Output:
+A common mistake is writing `nums = nums.sort()`, which assigns `None` to `nums` because `sort()` returns nothing. Use the method when you don't need the original order back, the function when you do.
 
-```
-Arjun
-90
-```
+Both accept the same two keyword arguments:
 
-`class_marks[2]` reaches the third row (`["Arjun", 90]`); adding a second `[0]` or `[1]` reaches into that row for a specific column.
-
-### 3.8 List Comprehension
-
-A **list comprehension** builds a new list in one line — it's shorthand for a `for` loop that would otherwise take several lines to build up a list one `append()` at a time.
+- **`reverse=True`** sorts from largest to smallest (descending).
+- **`key=`** takes a function applied to each element to decide the sort order — the list is sorted by the *result* of that function, not the element itself.
 
 ```python
-squares = [n * n for n in range(1, 6)]
-print(squares)
+words = ["banana", "apple", "kiwi"]
 
-high_scorers = [name for name, mark in class_marks if mark >= 70]
-print(high_scorers)
+print(sorted(words, reverse=True))  # ['kiwi', 'banana', 'apple']
+print(sorted(words, key=len))       # ['kiwi', 'apple', 'banana'] — by length
 ```
 
-Output:
+The `key` function can be `len`, or any function you define with `def` that takes one element and returns a comparable value.
 
-```
-[1, 4, 9, 16, 25]
-['Priya', 'Arjun']
+### 3.8 Nested Lists
+
+A list element can itself be a list, giving you a **nested list** — a natural way to represent a grid, a table, or rows of data. The first index selects a row; the second reaches inside that row:
+
+```python
+grid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+print(grid[0])       # [1, 2, 3]  — the first row (a list)
+print(grid[0][2])    # 3          — row 0, then column 2
+
+for row in grid:
+    for value in row:
+        print(value, end=" ")
+    print()
 ```
 
-Read it left to right as "give me `n * n`, for every `n` in that range" — and, when there's an `if` at the end, "...but only keep the ones where this is true."
+Each inner list is a full-fledged list with all the methods and slicing you already know. To visit every cell, nest one loop inside another, exactly as above.
+
+### 3.9 List Comprehension
+
+A **list comprehension** builds a new list from an existing sequence in a single expression, replacing the "create an empty list, loop, append" pattern with one line. Read `[expression for item in iterable]` left to right: "the expression, for each item in the iterable." The part before `for` is what each new element becomes. A comprehension can map, filter, or do both:
+
+- **Map** — transform every item: `[n * n for n in range(5)]` gives `[0, 1, 4, 9, 16]`.
+- **Filter** — add an `if` clause to keep only items that pass a condition: `[n for n in range(10) if n % 2 == 0]` gives `[0, 2, 4, 6, 8]`.
+- **Both at once** — transform *and* select: `[n * 2 for n in nums if n % 2 == 0]` gives `[4, 8, 12]`.
+
+Comprehensions are idiomatic Python — shorter, faster to read once you know the pattern, and they always return a fresh list without touching the source.
 
 ---
 
 ## 4. Real-World Application
 
-A food delivery app's order history, newest first, is almost certainly a plain list under the hood — a new order gets `insert(0, ...)`'d at the front, exactly like §3.4's `insert()`, so everything else just shifts down.
+**Accumulating results.** Start with `results = []`, loop over some input, and `append` each computed value — the pattern behind reports, parsed files, and API responses.
 
-Ever notice two browser tabs of the same shopping cart both update the instant you add an item in one of them? That's §3.3's aliasing in the wild — both tabs are holding a reference to the *same* underlying cart list on the server's side, so a change made through one is visible through the other without either tab "syncing" anything; they were never two separate lists to begin with.
+**Ranking and top-N.** `sorted(scores, reverse=True)[:3]` composes sorting and slicing in one line to pull out the top three, without ever building a separate leaderboard structure.
 
-A leaderboard that re-sorts itself the moment a new high score comes in is `sort()` from §3.6, doing exactly what it did in this unit — the same list, rearranged in place, not a new leaderboard rebuilt from scratch each time.
+**A stack.** `append` to push and `pop()` to remove the most recent item gives you a last-in-first-out stack with no extra machinery — the same two methods you already know, used for a new purpose.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Store five students' marks, compute the class average, find the topper, and along the way, deliberately trigger the aliasing bug from §3.3 so you recognize it if it happens to you later.
+**Goal:** Work through the core list operations end to end on a week of temperature readings, then deliberately trigger the mutability/aliasing bug so you recognize it later.
 
-**1. Store the data.**
+**1. Index into the list, positive and negative, and take a step slice.**
 
 ```python
-students = ["Priya", "Rohan", "Arjun", "Meera", "Kavya"]
-marks = [78, 65, 90, 55, 82]
+temps = [68, 71, 65, 74, 69, 72, 66]
+
+print(temps[0])     # 68  — first reading
+print(temps[-1])    # 66  — last reading
+print(temps[::2])   # [68, 65, 69, 66]  — every other day
 ```
 
-**2. Loop through both lists together.**
+**2. Grow the list, then find the three warmest days.**
 
 ```python
-for i in range(len(students)):
-    print(students[i], "scored", marks[i])
+temps.append(70)
+print(sorted(temps, reverse=True)[:3])  # [74, 72, 71]
+```
+
+`sorted(..., reverse=True)` ranks the readings highest first without disturbing `temps`; `[:3]` then slices off just the top three.
+
+**3. Filter and map with comprehensions.**
+
+```python
+warm = [t for t in temps if t > 70]              # [71, 74, 72]
+labels = [f"Day reading: {t}F" for t in temps]   # one label per reading
+print(warm)
+print(labels)
 ```
 
 Output:
 
 ```
-Priya scored 78
-Rohan scored 65
-Arjun scored 90
-Meera scored 55
-Kavya scored 82
+[71, 74, 72]
+['Day reading: 68F', 'Day reading: 71F', 'Day reading: 65F', 'Day reading: 74F', 'Day reading: 69F', 'Day reading: 72F', 'Day reading: 66F', 'Day reading: 70F']
 ```
 
-**3. Compute the class average.**
+**4. Now trigger the aliasing bug on purpose.** Suppose you want to try a "what if a bonus reading is added" experiment, so you grab what looks like a safe copy:
 
 ```python
-average = sum(marks) / len(marks)
-print("Class average:", average)
+trial = temps          # looks like a copy — it is NOT
+trial.append(100)
+
+print("Trial:", trial)
+print("Original:", temps)   # temps changed too!
 ```
 
 Output:
 
 ```
-Class average: 74.0
+Trial: [68, 71, 65, 74, 69, 72, 66, 70, 100]
+Original: [68, 71, 65, 74, 69, 72, 66, 70, 100]
 ```
 
-**4. Find the topper using the index of the highest mark.**
+**5. Fix it with an actual copy.**
 
 ```python
-topper_index = marks.index(max(marks))
-print("Topper:", students[topper_index])
+trial = temps.copy()
+trial.append(100)
+
+print("Trial:", trial)
+print("Original:", temps)   # unaffected this time
 ```
 
-Output:
-
-```
-Topper: Arjun
-```
-
-**5. Now trigger the aliasing bug on purpose.** Suppose you want to try a "what-if a bonus mark is added" scenario, so you grab what looks like a safe copy:
-
-```python
-trial_marks = marks          # looks like a copy — it is NOT
-trial_marks.append(100)
-
-print("Trial:", trial_marks)
-print("Original marks:", marks)   # marks changed too!
-```
-
-Output:
-
-```
-Trial: [78, 65, 90, 55, 82, 100]
-Original marks: [78, 65, 90, 55, 82, 100]
-```
-
-**6. Fix it with an actual copy.**
-
-```python
-trial_marks = marks.copy()
-trial_marks.append(100)
-
-print("Trial:", trial_marks)
-print("Original marks:", marks)   # unaffected this time
-```
-
-Output:
-
-```
-Trial: [78, 65, 90, 55, 82, 100]
-Original marks: [78, 65, 90, 55, 82]
-```
-
-*Common mistake: assuming `list index [5]` is valid on a 5-item list. Indices run `0` to `4` for five items, not `1` to `5` — `students[5]` raises `IndexError: list index out of range`. And, separately: assuming `new_list = old_list` makes a copy. It doesn't — it makes a second name for the same list.*
+*Common mistake: assuming `new_list = old_list` makes a copy. It doesn't — it makes a second name for the same list. Use `.copy()` or a full slice (`old_list[:]`) whenever you need an independent list.*
 
 ---
 
 ## 6. Summary
 
-- **Lists** are ordered, mutable collections written inside `[ ]`, indexed from `0`, with negative indices counting from the end.
-- **Slicing** (`list[start:stop:step]`) reads out part of a list without touching the original.
-- **Mutability cuts both ways** — it's what makes `append()`/`remove()`/sorting-in-place possible, and it's also why two variables pointing at the same list can silently affect each other (aliasing). Use `.copy()` when you actually need an independent copy.
-- **`sort()` changes the list and returns nothing; `sorted()` returns a new list and leaves the original alone** — confusing the two is a very common bug.
-- **Nested lists** model tables of records; **list comprehensions** build a filtered list in one readable line instead of a multi-line loop.
+- A **list** is an ordered, mutable collection written with `[ ]`; elements are reached by index, with `0` as the first and `-1` as the last.
+- **Slicing** (`a[start:stop:step]`) returns a *new* list; `a[::2]` takes every second item and `a[::-1]` reverses.
+- In-place methods (`append`, `insert`, `extend`, `remove`, `pop`, `clear`) change the list itself and return `None`, while `sorted()` and slices produce new lists.
+- **`sort()` reorders in place; `sorted()` returns a new sorted list** — both accept `reverse=` and `key=`.
+- A **list comprehension** maps and/or filters in one expression, replacing the empty-list-loop-`append` pattern; a **nested list** models two-dimensional data.
 
-Next up: tuples — a collection that looks similar to a list but makes exactly the opposite trade-off: no mutability, in exchange for a guarantee that its contents can never change out from under you.
+Next up: tuples — a collection that looks similar to a list but makes the opposite trade-off: no mutability, in exchange for a guarantee that its contents can never change out from under you.
 
 ---
 

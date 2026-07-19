@@ -133,6 +133,8 @@ with open("invalid_rows.csv", "w") as error_file:
 
 Now anyone — a teammate, or you, a week from now — can open `invalid_rows.csv` and see exactly what got rejected, without having to re-run the whole program.
 
+*A design choice worth knowing about: this unit reads rows as plain lists (`row[0]`, `row[1]`), but `csv.DictReader` and `csv.DictWriter` from unit 5.1 do the exact same job addressing columns by name instead — `row["Marks"]` instead of `row[1]`. That reads more clearly and survives a reordered column, at the cost of one extra concept. Either approach is legitimate; pick whichever your row shape and team convention favor.*
+
 ---
 
 ## 4. Real-World Application

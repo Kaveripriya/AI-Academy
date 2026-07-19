@@ -6,214 +6,27 @@
 
 By the end of this unit, you will be able to:
 
-✓ Create a subclass that extends a parent class using inheritance.  
-✓ Use `super()` to call a parent class's constructor or method, and explain what happens if you forget to.  
-✓ Describe what Method Resolution Order (MRO) means when a class extends more than one parent.  
-✓ Apply the single- and double-underscore naming conventions to signal which attributes outside code shouldn't touch.  
-✓ Explain, honestly, how much protection Python's encapsulation actually gives you — and how much it doesn't.
+✓ Define a subclass that extends a superclass using single-level inheritance, and explain what a subclass inherits automatically versus what it must override.  
+✓ Use `super()` inside a subclass's `__init__` and its methods to extend the superclass's behavior instead of duplicating it, across a chain of more than one level.  
+✓ Explain, at a basic level, what Method Resolution Order (MRO) is, why it matters once a class has more than one direct base, and how to inspect it.  
+✓ Distinguish the single-underscore naming convention from double-underscore name mangling, and explain what each one actually does — and doesn't do — to attribute access.  
+✓ Build a small multi-level class hierarchy that correctly threads shared state and behavior through every level.
 
 ---
 
 ## 2. Overview
 
-**Inheritance** lets you build a new class on top of an existing one: the new class automatically gets everything the original already does, and only needs to add or adjust what's actually different. The class being extended is the **superclass** (or parent class); the new class built on top is the **subclass** (or child class).
+The previous unit left you with a `Student` class — `name`, `roll_number`, `marks`, and a `has_passed()` method. **Inheritance** is Python's mechanism for saying "this class is a `Student`, plus a little more," without copying a single line of `Student`'s own code. The class being extended is the **superclass** (or parent class); the new class built on top is the **subclass** (or child class).
 
-Here's a real-world parallel: picture how job roles work at a company. Every employee — regardless of title — has a base employment contract: a name, an ID, a way their base pay gets calculated. A **Manager** doesn't get a brand-new contract written from scratch; they get the same base contract, *plus* extra clauses for team budgets and performance reviews bolted on top. The base contract didn't change — the Manager's role just extends it, exactly the way a subclass extends a superclass.
-
-This unit also covers **encapsulation** — deciding which parts of an object's data are safe for outside code to touch directly, and which parts should stay off-limits. Think of an ATM: you can check your balance and withdraw cash through its defined buttons, but you can't reach past the screen and rewire the cash dispenser yourself, even though the wiring is right there behind the panel. Python's version of that "panel" is softer than a real ATM's, though — which is exactly the honest nuance this unit gets into.
+The same idea scales past one level — a `GraduateStudent` is a `Student`, plus a thesis topic, and something built on top of `GraduateStudent` would still carry everything `Student` already provides. Once classes stack that way, two more questions become unavoidable: how do you call up to a specific ancestor's version of a method (`super()`), and what happens if a class has more than one direct ancestor (Method Resolution Order)? This unit also covers **encapsulation** — the naming conventions Python gives you to signal which attributes are meant to stay internal to a class.
 
 ---
 
 ## 3. Description
 
-### 3.1 Single-Level Inheritance
+### 3.1 Single-Level Inheritance: A Subclass Extends a Superclass
 
-- **Superclass (parent class)** — the class being extended.
-- **Subclass (child class)** — the new class that extends the superclass, written as `class Child(Parent):`.
-- A subclass automatically has every attribute and method the superclass has, and can add new ones without touching the original class's code at all.
-
-```python
-class Employee:
-    def __init__(self, name, employee_id):
-        self.name = name
-        self.employee_id = employee_id
-
-    def summary(self):
-        return f"{self.name} (ID: {self.employee_id})"
-
-class Manager(Employee):
-    def __init__(self, name, employee_id, team_size):
-        super().__init__(name, employee_id)
-        self.team_size = team_size
-
-priya = Manager("Priya", "E1042", team_size=6)
-print(priya.summary())
-print(priya.team_size)
-```
-
-Output:
-
-```
-Priya (ID: E1042)
-6
-```
-
-`Manager` never redefines `summary()` — it inherits that method directly from `Employee`, exactly like a Manager's employment contract inherits the base pay-calculation clause without rewriting it.
-
-**`super()`** is the line `super().__init__(name, employee_id)` above — it means "run the parent class's own version of this method first," so you don't have to copy-paste `self.name = name` and `self.employee_id = employee_id` into every subclass by hand.
-
-### 3.2 Chaining Several Levels of Inheritance
-
-Inheritance can stack more than one level deep — a class can extend a class that itself extends another class, the same way a "Senior Manager" role could sit on top of "Manager," which itself sits on top of "Employee."
-
-```mermaid
-classDiagram
-    Employee <|-- Manager
-    Manager <|-- SeniorManager
-    class Employee {
-        +string name
-        +summary()
-    }
-    class Manager {
-        +int team_size
-    }
-    class SeniorManager {
-        +int budget_authority
-    }
-```
-
-```python
-class SeniorManager(Manager):
-    def __init__(self, name, employee_id, team_size, budget_authority):
-        super().__init__(name, employee_id, team_size)
-        self.budget_authority = budget_authority
-
-    def summary(self):
-        base = super().summary()
-        return f"{base} — approves budgets up to ₹{self.budget_authority}"
-
-rohan = SeniorManager("Rohan", "E2091", team_size=12, budget_authority=500000)
-print(rohan.summary())
-```
-
-Output:
-
-```
-Rohan (ID: E2091) — approves budgets up to ₹500000
-```
-
-Notice `SeniorManager.summary()` doesn't rewrite the greeting from scratch — it calls `super().summary()` to get `Manager`'s version (which itself came from `Employee`), then adds its own sentence on top. This is the pattern to reach for whenever a subclass needs to *extend* a parent's behavior rather than fully replace it.
-
-### 3.3 Extending More Than One Parent — and the Order That Decides Ties
-
-- **Multiple inheritance** — a class can extend more than one parent at once: `class Child(ParentA, ParentB):`.
-- **Method Resolution Order (MRO)** — the fixed left-to-right order Python searches through parent classes to find a method, used whenever more than one parent defines something with the same name.
-
-Imagine an employee who's officially "dual-hatted" — both a certified Trainer and a Manager at the same time. If both roles define a `run_session()` method with different behavior, company policy has to say which one wins.
-
-```python
-class Trainer:
-    def lead(self):
-        return "runs a training session"
-
-class TeamLead:
-    def lead(self):
-        return "runs a status meeting"
-
-class DualRole(Trainer, TeamLead):
-    pass
-
-print(DualRole().lead())
-print(DualRole.__mro__)
-```
-
-Output:
-
-```
-runs a training session
-(<class '__main__.DualRole'>, <class '__main__.Trainer'>, <class '__main__.TeamLead'>, <class 'object'>)
-```
-
-Because `Trainer` is listed first in `class DualRole(Trainer, TeamLead)`, Python checks `Trainer` before `TeamLead` and its `lead()` wins. Multiple inheritance is powerful but easy to make confusing — if you ever find yourself unsure which parent's method will run, `.__mro__` tells you the exact search order Python will use, left to right.
-
-### 3.4 Encapsulation — and What Python Actually Enforces
-
-- **Public attribute** — a plain attribute name, freely readable and writable from outside the object. This is the default.
-- **Single leading underscore (`_balance`)** — a *convention*, nothing more: it signals "this is internal, please don't touch it from outside," but Python does not stop you from touching it anyway.
-- **Double leading underscore (`__pin`)** — triggers **name mangling**: Python internally renames the attribute (to something like `_BankAccount__pin`) so a casual `account.__pin` from outside the class fails. This raises the difficulty, but a determined piece of code that knows the mangled name can still reach it.
-
-Be honest with yourself about what this buys you: Python's encapsulation is a set of speed bumps and social contracts among developers, not a locked vault. Compare this to a real ATM, where the panel genuinely is bolted shut — Python's "panel" is more like a sign that says "staff only," sitting on an unlocked door. Most of the time that's enough, because most bugs come from accidents, not attackers, and a clear signal that "you're not supposed to touch this" prevents the vast majority of those accidents.
-
-```python
-class BankAccount:
-    def __init__(self, balance, pin):
-        self._balance = balance   # "staff only" sign — not enforced
-        self.__pin = pin          # name-mangled — harder to reach by accident
-
-    def check_balance(self, entered_pin):
-        if entered_pin == self.__pin:
-            return self._balance
-        return "Incorrect PIN"
-
-account = BankAccount(15000, "4321")
-print(account.check_balance("4321"))
-print(account.check_balance("0000"))
-print(account._balance)  # works — Python never actually stopped you
-```
-
-Output:
-
-```
-15000
-Incorrect PIN
-15000
-```
-
-That last line is the honest part: `account._balance` printed successfully. Nothing crashed. The underscore didn't lock a door — it posted a sign on one. Respecting that sign is a professional habit you're building now, not a rule Python enforces for you.
-
-Name mangling, on the other hand, is a real mechanism — not just a stronger-sounding warning sign. Try reaching for `__pin` by its original name from outside the class:
-
-```python
-print(account.__pin)
-```
-
-Output:
-
-```
-AttributeError: 'BankAccount' object has no attribute '__pin'
-```
-
-That fails because the attribute `__pin` was never actually created — Python silently rewrote it, at the moment the class body compiled, to `_BankAccount__pin`. That rewritten name still works:
-
-```python
-print(account._BankAccount__pin)
-```
-
-Output:
-
-```
-4321
-```
-
-So double-underscore mangling raises the difficulty (you'd have to know the exact rewritten name), but it's still just a renamed attribute, not a locked one.
-
----
-
-## 4. Real-World Application
-
-A college ERP's `Student`, `Faculty`, and `Admin` accounts, or a ride-hailing app's `Rider` and `Driver` profiles, are almost never written as three or four unrelated classes. They're subclasses of one shared `User`/`Account` base class (§3.1) — login, profile fields, and password logic get written once in the parent and inherited everywhere, exactly like `Manager` adding `team_size` on top of `Employee` without rewriting `summary()`.
-
-scikit-learn's classifier and regressor classes work the same way one level deeper: every specific model type extends a common base estimator, reusing its shared training/prediction scaffolding and calling `super()` where it needs the parent's setup (§3.2) — the same chaining pattern as `SeniorManager` building on `Manager`.
-
-And your online banking app never letting you edit your balance directly through its interface is §3.4's encapsulation in production: the balance is kept as an internal attribute, changed only through verified methods like `deposit()` or `withdraw()` — buttons only, no reaching behind the panel.
-
----
-
-## 5. Worked Example
-
-**Goal:** Extend a `Student` class into a `GraduateStudent` class, then deliberately break it by skipping `super().__init__()`, so the failure this causes is something you've *seen*, not just been warned about.
-
-**1. Start from the existing `Student` class.**
+A **subclass** (child/derived class) is defined in terms of another class, its **superclass** (base/parent class), using `class Subclass(Superclass):`. The subclass automatically gets every attribute-setting and method the superclass has:
 
 ```python
 class Student:
@@ -224,29 +37,192 @@ class Student:
 
     def has_passed(self):
         return self.marks >= 40
+
+
+class GraduateStudent(Student):
+    pass
 ```
 
-**2. Extend it into `GraduateStudent` — correctly, calling `super().__init__()`.**
+Even with only `pass` in its body, `GraduateStudent("Arjun", 301, 88.0)` works immediately. Python looks for `__init__` on `GraduateStudent`, finds nothing, walks up to `Student`, and runs `Student.__init__` there — binding the new object as `self` and assigning `name`, `roll_number`, `marks`. `has_passed()` is found and run the same way. Nothing about inheriting a method requires rewriting it; the subclass just doesn't define its own version, so lookup continues upward.
+
+`isinstance(gs, Student)` returns `True` — a `GraduateStudent` is usable anywhere a `Student` is expected. `issubclass(GraduateStudent, Student)` is the same check at the class level. `type(gs)` still reports `GraduateStudent`, never `Student` — `type()` always reports the exact class an object was built from.
+
+**Overriding** happens when a subclass defines its own version of a method the superclass already has; since lookup checks the instance's own class first, the subclass's version wins:
+
+```python
+class GraduateStudent(Student):
+    def has_passed(self):
+        return self.marks >= 50   # graduate-level pass mark is higher
+```
+
+But `GraduateStudent` still needs a `thesis_topic` that `Student` doesn't have. Overriding `__init__` by re-typing `Student.__init__`'s body works, but any future change to `Student.__init__` won't propagate to the copy — exactly the duplication problem `super()` exists to solve.
+
+### 3.2 `super()`: Extending Behavior Across Multiple Levels
+
+`super()`, called inside a subclass method, is a proxy for "whatever comes next in the hierarchy," letting you call the superclass's version without naming it explicitly:
 
 ```python
 class GraduateStudent(Student):
     def __init__(self, name, roll_number, marks, thesis_topic):
         super().__init__(name, roll_number, marks)
         self.thesis_topic = thesis_topic
+```
 
-arjun = GraduateStudent("Arjun", 301, 88.0, "Computer Vision for Traffic Systems")
-print(arjun.has_passed())
-print(arjun.thesis_topic)
+`super().__init__(name, roll_number, marks)` runs `Student.__init__` on the object under construction, setting `name`/`roll_number`/`marks`; control returns and `GraduateStudent.__init__` adds only `thesis_topic`. Nothing from `Student.__init__` was retyped.
+
+The pattern holds across more than two levels, and each level only needs to know about the level directly above it — a `SeniorGraduateStudent` extending `GraduateStudent` would only ever call `super().__init__()` once, with no idea `Student` exists two levels up. The same logic applies to ordinary methods, not just `__init__`: a method can call `super().some_method()` to get the superclass's return value and build on top of it — that's **extending** behavior, as distinct from the plain overriding in §3.1, which replaces it outright.
+
+Attribute lookup follows the same order but starts in a different place. A class attribute defined on `Student` (say, `institution = "SRMIST"`) isn't in any instance's `__dict__` unless an `__init__` explicitly set it there — so Python walks the classes, `GraduateStudent` then `Student`, and finds it on `Student`'s class body. Contrast an instance attribute like `name`: the search never leaves the instance dictionary at all, because `Student.__init__` assigned `self.name` directly. Instance attributes shadow class attributes at every level of a chain, not just within one class.
+
+### 3.3 Multiple Inheritance and the Diamond Problem
+
+Every example so far is a **single-inheritance chain** — one direct base per class — so `super()` has only one place to go. **Multiple inheritance** (`class Sub(BaseA, BaseB):`) raises a real question: if `BaseA` and `BaseB` both define the same method, which does `super()` find first? Python answers this with the **Method Resolution Order (MRO)** — a fixed order over every class in the hierarchy, computed once when the subclass is defined. You rarely compute an MRO by hand; you need to know it exists and how to inspect it with `ClassName.__mro__`.
+
+The **diamond problem** makes MRO visible: `Left` and `Right` both extend `Base`, and `Diamond` extends both `Left` and `Right`.
+
+```mermaid
+flowchart BT
+    BASE["<b>Base</b><br/><span style='font-size:11px;color:#6d28d9'>describe() base case</span>"]:::done
+    LEFT["<b>Left</b><br/><span style='font-size:11px;color:#6d28d9'>extends Base</span>"]:::auto
+    RIGHT["<b>Right</b><br/><span style='font-size:11px;color:#6d28d9'>extends Base</span>"]:::auto
+    DIAMOND["<b>Diamond</b><br/><span style='font-size:11px;color:#6d28d9'>class Diamond(Left, Right)</span>"]:::start
+    MRO["<b>MRO order</b><br/><span style='font-size:11px;color:#6d28d9'>Diamond, Left, Right, Base, object</span>"]:::ghost
+
+    DIAMOND -- "inherits" --> LEFT
+    DIAMOND -- "inherits" --> RIGHT
+    LEFT -- "inherits" --> BASE
+    RIGHT -- "inherits" --> BASE
+    LEFT -. "super() -> next in MRO (Right, not Base)" .-> RIGHT
+    DIAMOND -. "__mro__" .-> MRO
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px
+    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px
+    classDef ghost fill:none,stroke:none,color:#6d28d9
+```
+
+```python
+class Base:
+    def describe(self):
+        return "Base"
+
+class Left(Base):
+    def describe(self):
+        return f"Left -> {super().describe()}"
+
+class Right(Base):
+    def describe(self):
+        return f"Right -> {super().describe()}"
+
+class Diamond(Left, Right):
+    pass
+
+print(Diamond().describe())
+print(Diamond.__mro__)
 ```
 
 Output:
 
 ```
-True
-Computer Vision for Traffic Systems
+Left -> Right -> Base
+(<class '__main__.Diamond'>, <class '__main__.Left'>, <class '__main__.Right'>, <class '__main__.Base'>, <class 'object'>)
 ```
 
-**3. Now break it on purpose — write a version that forgets to call `super().__init__()`.**
+This is the detail that trips people up: `super()` inside `Left` does **not** mean "go to `Base`." It means "continue to whatever's next in the MRO," which is `Right`, not `Base`. `Right.describe` runs, its own `super().describe()` continues to `Base`, and the result assembles back up the chain. `super()` always means "the next class in the computed MRO," never "my literal parent." Multiple inheritance and the full MRO algorithm are topics for later coursework; what matters here is recognizing the diamond shape and knowing `__mro__` exists to inspect it.
+
+### 3.4 Encapsulation: Underscores and Name Mangling
+
+**Encapsulation** controls which parts of an object's state outside code may rely on versus treat as internal detail. Python has no `private` keyword — it uses two naming conventions, one purely social and one with a real mechanism behind it.
+
+A **single leading underscore** (`_balance`) is convention only: "internal use — don't rely on this from outside code." Python does not enforce it:
+
+```python
+class BankAccount:
+    def __init__(self, balance):
+        self._balance = balance   # convention: internal, not enforced
+
+account = BankAccount(15000)
+print(account._balance)   # 15000 — works, nothing stopped you
+```
+
+A **double leading underscore** (`__pin`) triggers **name mangling**: Python rewrites `self.__pin` inside a class body to `self._ClassName__pin`, using the literal class name:
+
+```python
+class SecureAccount:
+    def __init__(self, pin):
+        self.__pin = pin
+
+    def verify_pin(self, attempt):
+        return attempt == self.__pin
+
+account = SecureAccount(4477)
+print(account.verify_pin(4477))          # True
+print(account.__pin)                     # AttributeError
+print(account._SecureAccount__pin)       # 4477 — the mangled name, still reachable
+```
+
+`account.__pin` raises `AttributeError` — not because Python enforced privacy, but because that exact attribute name was never created. The real attribute is `_SecureAccount__pin`, and reaching it directly proves it's an ordinary attribute under a rewritten name.
+
+The real reason double-underscore mangling exists is **collision avoidance across a hierarchy**, not secrecy. If a base class sets `self.__secret` and a subclass, entirely unaware, also sets `self.__secret`, mangling rewrites them to two genuinely separate attributes — `_Base__secret` and `_Derived__secret` — so neither class's internal bookkeeping can silently clobber the other's just because they happened to pick the same name. Default to single underscore; reach for double underscore specifically when a subclass reusing the same attribute name would actually break something.
+
+---
+
+## 4. Real-World Application
+
+**Web frameworks and GUI toolkits** model shared plumbing this way: a `TextField` and an `IntegerField` both extend a shared `Field` base that handles validation machinery common to every field type; a `Button` and a `Checkbox` both extend a shared `Widget` base that handles positioning and rendering. Each subclass overrides only what's genuinely different.
+
+**Exception hierarchies** are a clean real-world use of the exact single- and multi-level mechanics from §3.1–3.2. Python's own built-in error types form a hierarchy — `ValueError` and `TypeError` both extend `Exception` — and application code routinely extends that same base further: a `MissingFieldError(ValidationError)` extending `ValidationError(Exception)` means `isinstance(some_error, ValidationError)` reports `True` for either, without checking every specific error type by name.
+
+**ORMs** (object-relational mappers) ask every model class to extend one shared `Model` base handling save/load plumbing, so each specific model (`User`, `Product`) only declares its own fields and extends `save()` via `super()` — the identical pattern built in §3.2.
+
+---
+
+## 5. Worked Example
+
+**Goal:** Build a `GraduateStudent` from `Student` end to end, then see exactly what breaks if `super().__init__()` is skipped.
+
+**1. Start from the existing `Student` class, and decide what's new.** `name`, `roll_number`, and `marks` stay on `Student`; only `thesis_topic` is new to `GraduateStudent`.
+
+**2. Declare the subclass and extend `__init__` with `super()`.**
+
+```python
+class Student:
+    def __init__(self, name, roll_number, marks):
+        self.name = name
+        self.roll_number = roll_number
+        self.marks = marks
+
+    def has_passed(self):
+        return self.marks >= 40
+
+
+class GraduateStudent(Student):
+    def __init__(self, name, roll_number, marks, thesis_topic):
+        super().__init__(name, roll_number, marks)
+        self.thesis_topic = thesis_topic
+
+    def describe(self):
+        base = f"{self.name} ({self.roll_number})"
+        return f"{base} — thesis: {self.thesis_topic}"
+
+
+gs = GraduateStudent("Arjun", 301, 88.0, "Computer Vision for Traffic Systems")
+print(gs.describe())
+print(gs.has_passed())
+print(isinstance(gs, Student))
+```
+
+Output:
+
+```
+Arjun (301) — thesis: Computer Vision for Traffic Systems
+True
+True
+```
+
+**3. Verify the mechanics.** `class GraduateStudent(Student):` fixed `GraduateStudent.__mro__` at `(GraduateStudent, Student, object)` the instant it was defined. `super().__init__(name, roll_number, marks)` resolved by finding `GraduateStudent`'s position in that MRO and calling the `__init__` belonging to whatever comes immediately after — `Student.__init__`. `has_passed()` was never redefined on `GraduateStudent`, so it's still `Student`'s version, found by walking the same MRO. `isinstance(gs, Student)` reports `True` because Python checks whether `Student` appears anywhere in `GraduateStudent`'s full MRO, not just whether it's the one immediate base.
+
+**4. Now break it on purpose — skip `super().__init__()` entirely.**
 
 ```python
 class BrokenGraduateStudent(Student):
@@ -267,17 +243,17 @@ AttributeError: 'BrokenGraduateStudent' object has no attribute 'marks'
 
 `broken.thesis_topic` works fine, because that line ran. But `has_passed()` needs `self.marks` — and nothing ever set it, because `Student.__init__` never ran. `super().__init__()` isn't boilerplate you can skip when you're in a hurry; it's the only line that actually builds the parent's part of the object.
 
-*Common mistake: assuming a subclass "automatically" has the parent's attributes just because it inherits the parent's methods. Inheriting a method only makes the method available — the object's actual data (`self.marks`, `self.name`, …) only exists if `__init__` genuinely ran and set it, which is exactly what a missing `super().__init__()` call skips.*
+*Common mistake: assuming a subclass "automatically" has the parent's attributes just because it inherits the parent's methods. Inheriting a method only makes the method available — the object's actual data only exists if `__init__` genuinely ran and set it, which is exactly what a missing `super().__init__()` call skips.*
 
 ---
 
 ## 6. Summary
 
-- **Inheritance** lets a subclass reuse a superclass's attributes and methods, adding or extending only what's new — like a Manager role sitting on top of the base Employee contract.
-- **`super()`** calls the parent class's own version of a method (often `__init__`) instead of duplicating its logic — and skipping it means the parent's attributes never get set, causing an `AttributeError` later.
-- **Multiple inheritance** lets a class extend more than one parent at once; **MRO** (`ClassName.__mro__`) is the exact left-to-right order Python uses to decide whose method wins when both parents define the same name.
-- **Single underscore (`_name`) is a convention**, not a lock — Python lets you access it anyway. **Double underscore (`__name`)** triggers name mangling, raising the difficulty but still not creating a hard boundary.
-- Python's encapsulation is a professional courtesy backed by naming conventions, not a security feature — know the difference before you rely on it for anything sensitive.
+- A subclass (`class Sub(Super):`) inherits every attribute-setting and method automatically; it only needs to define what's new or different.
+- `super()` calls the next class in the object's Method Resolution Order — not necessarily a hardcoded parent — letting a subclass extend inherited logic instead of duplicating it, across any number of chained levels.
+- MRO is the fixed order Python searches classes in, computed once per class definition; it matters most once a class has more than one direct base (the diamond problem), and is inspectable via `ClassName.__mro__`.
+- A single leading underscore (`_name`) is a non-enforced convention meaning "internal use only"; a double leading underscore (`__name`) triggers real name mangling to `_ClassName__name`, preventing attribute collisions across a hierarchy — not providing security.
+- Skipping `super().__init__()` in a subclass means the parent's attributes never get set, surfacing later as an `AttributeError` the moment code tries to use them.
 
 Up next: special methods and dataclasses — controlling how your objects are printed and compared, and cutting down the boilerplate needed to define them.
 

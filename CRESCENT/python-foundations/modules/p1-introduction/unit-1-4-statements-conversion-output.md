@@ -6,32 +6,51 @@
 
 By the end of this unit, you will be able to:
 
-✓ Tell a statement apart from an expression, and write chained assignment and tuple unpacking correctly.  
-✓ Convert values between `int`, `float`, `str`, and `bool`, and explain why float-to-int truncates instead of rounding.  
-✓ Build formatted output with f-strings and format specifiers.  
-✓ Recognize what a type hint and a basic `match-case` statement look like, and why comments and PEP 8 matter.
+✓ Distinguish an assignment statement from an expression statement, and use chained assignment and tuple unpacking.  
+✓ Convert values between types with `int()`, `float()`, `str()`, and `bool()`, and predict truncation and truthiness results.  
+✓ Build readable output with f-strings, embedding expressions and applying format specifiers such as `:.2f`, `:d`, `:>10`, and `:^15`.  
+✓ Recognize variable type-hint syntax (e.g. `count: int = 0`) and read a simple `match`/`case` block.  
+✓ Write clear comments and apply the basics of PEP 8 style.
 
 ---
 
 ## 2. Overview
 
-You already know how to store a value (unit 1.2) and combine values with operators (unit 1.3). This unit covers the last three basics before Part 1 wraps up.
+Across units 1.1 through 1.3 you learned to run code in Colab, store values in variables, know their types, and combine them with operators. That gives you raw capability, but a snippet that computes a number and never shows it clearly is not yet a program. This unit is the module closer: it turns that capability into code that *communicates*.
 
-First, what actually counts as one complete instruction to Python, versus just a value sitting there (a **statement**). Second, how to convert a value from one type to another when you need to — turning the text `"25"` you get from a form into the number `25` you can do math with, without changing what quantity it actually represents (**type conversion**). Third, how to control exactly how a value looks when you show it to someone — because the raw way Python stores a number is rarely how you'd want to display it (**formatted output**). You'll also get a quick first look at two tools you'll use more seriously later: type hints and `match-case`.
+Three everyday problems come together here. Real data rarely arrives in the type you want — a number typed by a user comes in as text (`"42"`, not `42`), and text can't be added to a number. That's what **type conversion** fixes. A finished result also needs to be *shown nicely* — two decimals for a price, values lined up in a column — which is what **f-strings** are for. And growing programs need to be *read*, by you and by teammates, through comments, consistent style, and a couple of newer syntax forms (type hints, `match`/`case`) you'll increasingly meet in real Python.
 
-Here's a real-world parallel for the second and third ideas, now that you know what they mean: 37°C and 98.6°F are the same temperature — converting between them doesn't change how hot it actually is, only how that heat gets written down. That's type conversion. Formatting works the same way once you're already in the right type: a price stored internally as `8.7` and a price *displayed* as `₹8.70` are the same amount — formatting just decides how many digits show up and where the symbol goes.
-
-Every later topic in this program comes back to the same pattern this unit builds: get a value, make sure it's the right type, then show it properly. Reading a file, checking what a user typed into a form, displaying a model's prediction on a screen — all of it is this same toolbox at work.
+None of this is exotic. It's the everyday glue that connects "I computed something" to "I displayed it clearly to a human" — the difference between a snippet and a program.
 
 ---
 
 ## 3. Description
 
-### 3.1 Statements vs. Expressions
+### 3.1 Statements: Assignment vs. Expression
 
-An **expression** is anything that produces a value — `2 + 3` is an expression; it evaluates to `5`. A **statement** is a complete instruction — it does something, and an assignment is the most common example: `age = 21` uses the expression `21` but also performs an action (storing it). Every line of runnable Python code is a statement; not every statement contains something worth calling an expression on its own, and not every expression is a statement (typing `2 + 3` alone at the REPL evaluates it but doesn't store anything).
+A **statement** is a complete instruction Python executes. You've already been writing them: `x = 5` is a statement, and so is `print(x)`. Two kinds matter here:
 
-**Chained assignment** puts the same value into several variables in a single line — useful when multiple things genuinely start out equal:
+- **Assignment statement** — binds a value to a name using `=`; it doesn't produce a value of its own, it *stores* one: `total = 10 + 5`.
+- **Expression statement** — an expression written on its own line, evaluated for its result or its side effect; `print(total)` is the one you'll write most.
+
+```python
+total = 10 + 5
+print(total)
+```
+
+Output:
+
+```
+15
+```
+
+The key difference: an assignment *saves* a value for later use, while an expression statement *does* something now (like printing) — in a script, its value is discarded unless you capture it.
+
+### 3.2 Chained Assignment and Tuple Unpacking
+
+Python offers two compact assignment forms that save typing and make intent clear.
+
+**Chained assignment** binds the same value to several names at once:
 
 ```python
 a = b = 5
@@ -44,7 +63,9 @@ Output:
 5 5
 ```
 
-**Tuple unpacking** assigns several different values to several variables in one line, matched left to right in order:
+Both `a` and `b` now refer to `5` — handy when several variables should start out equal.
+
+**Tuple unpacking** assigns several values in one statement by matching them position-by-position, left side to right side:
 
 ```python
 x, y = 1, 2
@@ -57,7 +78,7 @@ Output:
 1 2
 ```
 
-It also gives you Python's classic one-line variable swap, with no temporary variable needed:
+The counts must match — two names, two values. Unpacking also powers a clean trick: swapping two variables with no temporary holder.
 
 ```python
 x, y = y, x
@@ -70,72 +91,103 @@ Output:
 2 1
 ```
 
-### 3.2 Type Conversion — Same Value, Different Container
+Python evaluates the whole right side first, then assigns — so the swap just works, with no third variable needed. (Tuples as a full data structure come later in this course; here you're just seeing the `x, y` form used as an assignment mechanism.)
 
-**Type conversion** changes a value's type without changing the real quantity it represents — the underlying value survives, only its container changes. It's the same idea as converting inches to centimeters: `30 cm` and `11.8 inches` describe the exact same physical length; nothing about the object changed, only the unit used to write it down.
+### 3.3 Type Conversion
 
-This matters immediately because of one fact worth memorizing now: **anything typed into a form, read from a keyboard, or read from a file arrives as a `str` — always**, even if it visually looks like a number. Python will not silently guess that `"21"` means the number 21; you must convert it yourself.
+Every value has a type (unit 1.2). **Type conversion** — also called casting — produces a *new* value of a different type from an existing one, without changing the original; you get a converted copy back. Python gives you one conversion function per basic type:
 
-| Function | Converts to | Example |
-|---|---|---|
-| `int()` | Whole number | `int("21")` → `21` |
-| `float()` | Decimal number | `float("21")` → `21.0` |
-| `str()` | Text | `str(21)` → `"21"` |
-| `bool()` | True/False | `bool(0)` → `False` |
+- **`str()`** — turns any value into its text form; the one you'll use most, because output is text. `str(42)` gives the text `"42"`, which looks the same when printed but is now a `str`, not an `int`.
+- **`int()`** — turns a value into a whole number: from a string of digits it parses the number; from a float it **truncates**, chopping off the decimal part rather than rounding. `int(3.9)` is `3`, not `4`, and because truncation always moves *toward zero*, `int(-3.9)` is `-3`. `int("5")` works because `"5"` is a clean integer string, but `int("3.14")` raises a `ValueError` — `"3.14"` isn't a whole number in text form.
+- **`float()`** — turns a value into a floating-point number, either by parsing text (`float("3.14")` → `3.14`) or by adding a decimal point to an integer (`float(42)` → `42.0`).
+- **`bool()`** — converts using the truthiness rules from unit 1.3: the falsy values `0`, `0.0`, and `""` (empty string) convert to `False`; almost everything else — `42`, `"hi"` — converts to `True`.
 
 ```python
-age_text = "21"
-age_number = int(age_text)
-print(age_number + 1)
+print(int("5"))
+print(int(3.9))
+print(int(-3.9))
+print(bool(0))
+print(bool("hi"))
 ```
 
 Output:
 
 ```
-22
+5
+3
+-3
+False
+True
 ```
 
-One conversion behaves in a way beginners consistently get wrong: converting a `float` to an `int` does **not** round to the nearest whole number — it **truncates**, meaning it simply chops off everything after the decimal point, regardless of which way the number was leaning.
+The classic problem conversion solves: text that *looks* like a number is still text, so `"5" + 3` is a `TypeError`. Convert first, and `int("5") + 3` gives `8`.
+
+Here's how the four basic types connect once you can move between them — each arrow is the conversion function you'd call, with the behaviors worth remembering attached:
+
+```mermaid
+---
+title: Type Conversion Map
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#a5d8ff"
+    primaryBorderColor: "#4a9eed"
+    lineColor: "#555"
+  flowchart:
+    htmlLabels: true
+    curve: basis
+    nodeSpacing: 70
+    rankSpacing: 90
+---
+flowchart LR
+    STR["<b>str</b><br/><span style='font-size:11px;color:#6d28d9'>text form</span>"]
+    INT["<b>int</b><br/><span style='font-size:11px;color:#6d28d9'>whole number</span>"]
+    FLOAT["<b>float</b><br/><span style='font-size:11px;color:#6d28d9'>decimal number</span>"]
+    BOOL["<b>bool</b><br/><span style='font-size:11px;color:#6d28d9'>True / False</span>"]
+
+    STR -->|"int() (digits only)"| INT
+    STR -->|"float()"| FLOAT
+    FLOAT -->|"int() (truncates)"| INT
+    INT -->|"float()"| FLOAT
+    INT -->|"str()"| STR
+    FLOAT -->|"str()"| STR
+    INT -->|"bool() (0 -> False)"| BOOL
+    STR -->|"bool() ('' -> False)"| BOOL
+
+    STR:::start
+    INT:::auto
+    FLOAT:::auto
+    BOOL:::done
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px
+    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px
+```
+
+### 3.4 String Basics: Quotes, Concatenation, Indexing
+
+A **string** (`str`) is text in quotes. Python accepts **single or double quotes** with no difference in meaning — pick one and be consistent. Both exist so you can avoid escaping: use double quotes when the text contains an apostrophe (`"it's fine"`), and single quotes when it contains a double quote.
+
+**Concatenation** joins strings with `+` — both sides must already be strings, which is exactly why `str()` matters:
 
 ```python
-print(int(9.9))
-print(int(-9.9))
+first = "Ada"
+last = "Lovelace"
+print(first + " " + last)
 ```
 
 Output:
 
 ```
-9
--9
+Ada Lovelace
 ```
 
-`int(9.9)` becomes `9`, not `10` — Python cut the decimal off rather than rounding up. If you actually want rounding, that's a different tool (`round()`), not `int()`.
-
-### 3.3 String Basics
-
-A **string** (`str`) is text, always written inside quotes — single or double, it makes no difference to Python: `'hello'` and `"hello"` are identical. Double quotes are handy when the text itself contains an apostrophe, like `"it's fine"`, so you don't have to escape it.
-
-**Concatenation** joins strings together with `+`:
+**Indexing** reads one character out of a string by its position, in square brackets. Positions start at **0**, not 1:
 
 ```python
-first_name = "Arjun"
-last_name = "Mehta"
-full_name = first_name + " " + last_name
-print(full_name)
-```
-
-Output:
-
-```
-Arjun Mehta
-```
-
-Every character in a string sits at a numbered position, called an **index**, starting at `0` — not `1`:
-
-```python
-word = "Python"
-print(word[0])
-print(word[1])
+name = "Python"
+print(name[0])
+print(name[1])
 ```
 
 Output:
@@ -145,139 +197,141 @@ P
 y
 ```
 
-You'll use indexing constantly once you reach lists in Part 3 — strings are your first exposure to the idea that "position 0 is the first item," which trips up almost everyone exactly once.
+That's enough to grab a character by position — slicing and the full string toolkit come later.
 
-### 3.4 Formatted Output with f-strings
+### 3.5 Formatted Output with f-strings
 
-An **f-string** embeds a variable or expression directly inside a piece of text, by putting an `f` right before the opening quote — it's how you build formatted output. This is the same "stored value vs. displayed value" idea from the Overview: a value tracked internally as `78.456000001` can still be shown to someone as `78.46`, and an f-string is the tool that controls that:
+The best way to build readable output is the **f-string** (formatted string literal): a string prefixed with the letter `f`, in which anything inside curly braces `{}` is evaluated and its result dropped into the text.
 
 ```python
-name = "Priya"
-marks = 78.456
-print(f"Student: {name}, Marks: {marks}")
+name = "Ada"
+age = 42
+print(f"{name} is {age} years old")
 ```
 
 Output:
 
 ```
-Student: Priya, Marks: 78.456
+Ada is 42 years old
 ```
 
-That printed the raw value. To control *how* it's displayed, add a **format specifier** — extra formatting instructions after a colon `:` inside the curly braces:
-
-| Specifier | Meaning | Example | Result |
-|---|---|---|---|
-| `:.2f` | Round to 2 decimal places | `f"{marks:.2f}"` | `78.46` |
-| `:d` | Display as a whole number | `f"{25:d}"` | `25` |
-| `:>10` | Right-align within 10 characters | `f"{'hi':>10}"` | `        hi` |
-| `:^15` | Center-align within 15 characters | `f"{'hi':^15}"` | `      hi       ` |
-| `:,` | Insert thousands separators | `f"{1000000:,}"` | `1,000,000` |
+No `+`, no `str()` calls — Python converts each embedded value to text for you. Because the braces hold an *expression*, you can embed any expression, including the operators from unit 1.3:
 
 ```python
-print(f"Marks: {marks:.2f}")
+price = 20
+qty = 3
+print(f"Total: {price * qty}")
+print(f"Cheaper? {price < 25}")
 ```
 
 Output:
 
 ```
-Marks: 78.46
+Total: 60
+Cheaper? True
 ```
 
-### 3.5 A First Look at Type Hints and `match-case`
+**Format specifiers** go after a colon inside the braces and control *how* the value is displayed. The four you need:
 
-A **type hint** is a note attached to a variable or function that says what type of value belongs there — it doesn't physically stop you from putting in something else, but it tells the next person (or a tool checking your code) what was intended. Python never enforces it at runtime; think of it as documentation with structure, not a rule. You'll see hints on plain variables, and on function parameters and return values:
+- `:.2f` — a float shown to 2 decimal places. Ideal for money.
+- `:d` — an integer in plain decimal form.
+- `:>10` — right-align the value in a field 10 characters wide.
+- `:^15` — center the value in a field 15 characters wide.
+
+```python
+price = 19.5
+print(f"{price:.2f}")
+print(f"{42:d}")
+print(f"{'hi':>10}")
+print(f"{'hi':^15}")
+```
+
+Output:
+
+```
+19.50
+42
+        hi
+      hi
+```
+
+The alignment specifiers pad with spaces to make columns line up — invaluable when printing tables of data. You can combine width and precision too: `{price:>10.2f}` right-aligns a two-decimal number in a 10-wide field.
+
+### 3.6 Type Hints (Introduction)
+
+A **type hint**, also called an annotation, records what type a variable is *expected* to hold. You write it with a colon after the name:
 
 ```python
 count: int = 0
-
-def celsius_to_fahrenheit(c: float) -> float:
-    return (c * 9 / 5) + 32
+name: str = "Ada"
+price: float = 9.99
 ```
 
-`match-case` compares an incoming value against a list of known categories, one by one, and routes it to whichever one matches — like a sorting station where each item gets sent to the right bin.
+The hint after the colon is documentation for humans and tools. Python does **not** enforce it — assigning a string to `count` above would still run — but editors and type-checkers use hints to catch mistakes and to autocomplete, which makes code self-describing.
+
+You'll also see hints on functions, on their parameters and return type, which look like `def area(w: float, h: float) -> float:`. You'll meet functions properly in a later part of this course; for now, just recognize the shape when you see it.
+
+### 3.7 `match-case` (Introduction)
+
+`match`/`case` is **structural pattern matching**: you give it a value, and it runs the first `case` whose pattern matches.
 
 ```python
-status = "Task"
+status = "active"
 
 match status:
-    case "Task":
-        print("This is a task")
-    case "Bug":
-        print("This is a bug")
+    case "active":
+        print("User is active")
+    case "banned":
+        print("Access denied")
     case _:
-        print("Unknown category")
+        print("Unknown status")
 ```
 
 Output:
 
 ```
-This is a task
+User is active
 ```
 
-`case _:` matches anything that didn't fit an earlier category — the catch-all bin at the end of the sorting station. Both of these get much more use later in the program; for now, just recognize the shape when you see it.
+Python compares `status` against each `case` top-to-bottom. `case "active"` matches, so its block runs and the rest are skipped. The underscore `case _` is the **wildcard** — it matches anything, acting as a catch-all "none of the above." This is an introduction: recognize the shape (`match value:` then indented `case pattern:` blocks) — pattern matching on richer shapes comes later.
 
-### 3.6 Comments and PEP 8
+### 3.8 Comments and Readability (PEP 8 Intro)
 
-A **comment** starts with `#`. Python skips it entirely when running your code — it exists purely so a human reading the file later (often you, in three weeks) understands *why* a line exists, not just what it does.
+A **comment** is text Python ignores — it's for humans reading the code. A line comment starts with `#`; everything after it on that line is skipped:
 
 ```python
-# Convert form input to a number before doing math on it
-age = int(age_text)
+tax_rate = 0.08  # 8% sales tax
+subtotal = 50    # before tax
 ```
 
-**PEP 8** is Python's official style guide — a shared set of conventions (clear names, consistent spacing, `snake_case` for variables, which you met in Unit 1.2) that most Python code in the world follows. Nothing forces you to follow it, but code that doesn't tends to be much harder for anyone else — including future you — to read.
+Good comments explain *why*, not the obvious *what*. `# add tax` above `total = subtotal * 1.08` says nothing the code doesn't; `# state law requires rounding up` earns its place.
+
+**PEP 8** is Python's official style guide (you met its `snake_case` rule in unit 1.2). A few basics: use spaces around operators (`x = 5`, not `x=5`); one statement per line; keep lines reasonably short; use blank lines to separate logical chunks. Consistent style makes code readable to every Python programmer — which matters the moment more than one person touches it.
 
 ---
 
 ## 4. Real-World Application
 
-A food delivery app's final bill always shows exactly two decimals — `247.699999` internally, `₹247.70` on your screen — because it ran through an f-string with `:.2f` (§3.4) before ever reaching the display. The same idea shows up any time you see `12,438 steps` instead of `12438`: that's the `:,` specifier inserting thousands separators purely for readability, not a different underlying number.
-
-Conversion shows up just as constantly on the input side. A signup form checking that you're old enough only works because your typed age arrived as a `str` and got passed through `int()` (§3.2) before anything compared it to a minimum age — skip that step, and the form would be comparing text to a number and failing outright, exactly like §5's broken Cell 4.
+A food delivery app's final bill always shows exactly two decimals — `247.699999` internally, `₹247.70` on your screen — because it ran through an f-string with `:.2f` before ever reaching the display. Conversion shows up just as constantly on the input side: a signup form checking that you're old enough only works because your typed age arrived as a `str` and got passed through `int()` before anything compared it to a minimum age — skip that step, and the form would be comparing text to a number and failing outright.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a small ticket-price calculator for a college fest — take a price the way it would actually arrive from a web form (as text), convert it, apply a discount, and print a properly formatted receipt line.
+**Goal:** Turn a raw, text-shaped value into a correctly formatted receipt line — the same pattern of get → convert → compute → format → print that this whole unit builds toward.
 
-**Cell 1 — simulate the form input.** Form data always arrives as text, so start there on purpose:
-
-```python
-price_text = "499"
-```
-
-**Cell 2 — convert it to something you can do math on.**
+**1. Start with the values exactly as they'd arrive in a real program.**
 
 ```python
-price = float(price_text)
-print(price)
+item: str = "Coffee"        # type hint documents intent
+price_text: str = "4.5"     # imagine this came in as text
+quantity: int = 3
 ```
 
-Output:
-
-```
-499.0
-```
-
-**Cell 3 — apply a 10% student discount and format the receipt line.**
+**2. Try the math without converting first — on purpose.**
 
 ```python
-final_price = price * 0.9
-print(f"Final ticket price: Rs. {final_price:.2f}")
-```
-
-Output:
-
-```
-Final ticket price: Rs. 449.10
-```
-
-**Cell 4 — now break it on purpose.** Skip the conversion step and try the same math directly on the text:
-
-```python
-price_text = "499"
-final_price = price_text * 0.9
+total = price_text * quantity
 ```
 
 Output:
@@ -286,7 +340,35 @@ Output:
 TypeError: can't multiply sequence by non-int of type 'float'
 ```
 
-Python isn't confused about what you meant — it's refusing to guess. `price_text` is still a `str`, and Python will not silently treat text as a number just because it looks like one. The fix isn't different math; it's remembering to convert first, exactly like Cell 2 did.
+Python isn't confused about what you meant — it's refusing to guess. `price_text` is still a `str`; Python will not silently treat text as a number just because it looks like one.
+
+**3. Fix it with the conversion, then compute.**
+
+```python
+price = float(price_text)   # convert text -> float
+total = price * quantity    # compute with unit 1.3 operators
+print(total)
+```
+
+Output:
+
+```
+13.5
+```
+
+**4. Format the result into a clean receipt line.**
+
+```python
+print(f"{item:>10}: {quantity:d} x {price:.2f} = {total:.2f}")
+```
+
+Output:
+
+```
+    Coffee: 3 x 4.50 = 13.50
+```
+
+Every piece from this unit appears here: a type hint, a conversion, arithmetic, and an f-string carrying three specifiers — `{item:>10}` right-aligns `"Coffee"` in a 10-wide field (note the leading spaces), `{quantity:d}` shows the count as a plain integer, and `{price:.2f}`/`{total:.2f}` pin the money values to two decimals.
 
 *Common mistake: assuming a value that "looks like a number" already behaves like one. Anything from a form, a file, or user input is text until you convert it yourself — every single time.*
 
@@ -294,11 +376,11 @@ Python isn't confused about what you meant — it's refusing to guess. `price_te
 
 ## 6. Summary
 
-- A **statement** is a complete instruction Python carries out; chained assignment and tuple unpacking both let you write more than one assignment on a single line.
-- **Type conversion** (`int()`, `float()`, `str()`, `bool()`) changes a value's container, not the value itself — and anything from a form, file, or keyboard starts out as `str`, full stop.
-- **Float-to-int truncates, it doesn't round** — `int(9.9)` is `9`, not `10`.
-- **f-strings** embed values directly in text, and format specifiers like `:.2f` or `:,` control exactly how those values are displayed.
-- **Type hints** are unenforced notes about expected types; **`match-case`** routes a value to the branch matching its pattern — both are worth recognizing now, even before you use them heavily.
+- Assignment statements store a value; expression statements (like `print()`) act now. Chained assignment (`a = b = 5`) and tuple unpacking (`x, y = 1, 2`, including the swap `x, y = y, x`) are compact assignment forms.
+- `int()`, `float()`, `str()`, and `bool()` convert between types; `int()` truncates toward zero, `int("3.14")` raises `ValueError`, and `bool()` follows truthiness (`0`, `0.0`, `""` → `False`).
+- Strings use single or double quotes, join with `+`, and index from position `0` with `[]`.
+- f-strings embed expressions in `{}` and format with specifiers — `:.2f`, `:d`, `:>10`, `:^15` — for clean, aligned output.
+- Type hints (`count: int = 0`) and `match`/`case` are readable modern syntax worth recognizing now, not yet mastering; comments and PEP 8 style keep code readable for everyone.
 
 That's the end of Part 1. Part 2 moves from single instructions into control structures — starting with conditionals, where your programs make their first real decisions.
 

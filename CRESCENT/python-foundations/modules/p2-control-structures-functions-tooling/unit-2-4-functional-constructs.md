@@ -6,20 +6,19 @@
 
 By the end of this unit, you will be able to:
 
-✓ Write a `lambda` — and know when it's the right call and when a regular function is actually clearer.  
-✓ Explain what a "higher-order function" is, using `map()`, `filter()`, and `sorted(key=...)`.  
-✓ Read and write a simple decorator, and explain what `@decorator` is really shorthand for.  
-✓ Write a generator with `yield`, and explain why it can handle data a normal function can't.
+✓ Write a `lambda` expression and explain when it is preferable to a named `def` function.  
+✓ Use a lambda as the `key` argument to `sorted()` to control how a list is ordered.  
+✓ Explain what a higher-order function is and describe what `map()` and `filter()` do conceptually.  
+✓ Write a simple decorator using the `@decorator` syntax, including a `@timer` that measures a function's run time.  
+✓ Write a generator function using `yield` and explain lazy evaluation — why a generator does not compute all its values up front.
 
 ---
 
 ## 2. Overview
 
-Every function you've written so far runs the same way: Python calls it, it runs top to bottom, and it hands back one final answer. This unit is about four ways Python bends that pattern — a function so small it doesn't even get a name, functions that take *other functions* as their input, functions that quietly wrap extra behavior around a function without touching its code, and functions that pause mid-run instead of finishing in one go.
+You have three everyday problems: order a list of words by length instead of alphabetically, time a slow function without littering it with `print(time.time())` calls, and produce a huge — maybe infinite — sequence of values without building the whole thing in memory first. Python solves all three with one small, reusable idea: a function is just a value, so you can pass it around, wrap one function around another, or have a function hand back its values one at a time instead of all at once.
 
-A useful mental model for most of this unit is a photo-editing app on your phone. When you apply a brightness edit to every photo in an album at once, you're not manually opening each photo — you're telling the app "run this one adjustment across all of them." When the app hides everything except photos with a detected face, it's testing each photo and keeping only the ones that pass. That's exactly the shape of `map()` and `filter()`, just applied to numbers and text instead of pixels.
-
-This unit covers lambda functions, higher-order functions (`map()`, `filter()`, `sorted(key=...)`), a light introduction to decorators, and generators. All four show up constantly in real AI/ML code — sorting model predictions by confidence score, filtering out bad data rows, timing how long a training step takes, and streaming a dataset too large to fit in memory all at once.
+This unit covers four constructs built on that idea — lambda expressions, higher-order functions like `sorted(key=...)`, decorators, and generators — and none of them need new syntax beyond what `def`, `return`, and `*args`/`**kwargs` from the functions unit were already preparing you for.
 
 ---
 
@@ -27,91 +26,180 @@ This unit covers lambda functions, higher-order functions (`map()`, `filter()`, 
 
 ### 3.1 Lambda (Anonymous) Functions
 
-A **lambda** is a function with no name, written on a single line, meant to be used once and thrown away — like a quick edit you swipe onto one photo and never save as a reusable preset.
+A **lambda** is a small, unnamed function written on a single line: `lambda parameters: expression` — no parentheses around the parameters, no `return`, and no name unless you choose to assign one.
 
 ```python
-square = lambda x: x * x
-print(square(6))
+square = lambda n: n * n
+square(5)          # 25
 ```
 
-Output:
+`square` behaves exactly like `def square(n): return n * n` — the expression after the colon is returned automatically. A lambda's real value is not naming it and calling it later; it is passing it, unnamed, directly into another function that expects a function as an argument. That is the pattern the rest of this unit builds on: `sorted(words, key=lambda w: len(w))` reads as "sort `words`, and for each one, use its length as the thing to compare."
 
-```
-36
-```
+A lambda can hold only a single expression — no loops, no multiple statements, no assignment. If the logic needs more than one line, write a regular `def` function instead and pass its name.
 
-Lambdas are almost never written to be called by name like that, though — you'll mostly see them passed *directly into* another function, right where they're needed:
+### 3.2 Higher-Order Functions: `map()`, `filter()`, `sorted(key=...)`
+
+A **higher-order function** is a function that takes another function as an argument, returns one, or both — possible only because functions are values in Python, storable in a variable or a list and passable to another function exactly like a number or string.
+
+Three higher-order functions matter here:
+
+**`sorted(iterable, key=...)`** returns a new, sorted list. Without `key`, items are compared directly. With `key`, Python calls your function once per item and sorts by *that result* instead of the item itself:
 
 ```python
-students = [("Priya", 92), ("Rohan", 68), ("Arjun", 81)]
-
-students.sort(key=lambda student: student[1])
-print(students)
+words = ["banana", "fig", "kiwi", "watermelon"]
+sorted(words, key=lambda w: len(w))
+# ['fig', 'kiwi', 'banana', 'watermelon']  -- shortest to longest
 ```
 
-Output:
-
-```
-[('Rohan', 68), ('Arjun', 81), ('Priya', 92)]
-```
-
-`key=lambda student: student[1]` tells `sort()` which part of each tuple to compare — the mark, at index `1` — without you having to write and name a separate function just for this one use.
-
-**Where the line is.** A lambda can only hold a single expression — no loops, no multiple lines, no `if`/`elif`/`else` chains. That's not a small technical detail; it's a readability guardrail. The moment your one-off logic needs more than a single simple expression, write a normal, named `def` function instead. A lambda crammed with nested conditions to avoid "wasting" a `def` is harder to read, not more efficient — terseness that costs clarity is a bad trade.
-
-### 3.2 Higher-Order Functions
-
-A **higher-order function** is any function that takes another function as an input, or hands one back. `map()`, `filter()`, and `sorted(key=...)` are the three you'll use constantly.
-
-- **`map()`** — runs one function across every item in a sequence, like applying the same brightness edit to every photo in an album:
+**`map(function, iterable)`** applies `function` to every item and hands back the transformed results, one per input:
 
 ```python
-marks = [78, 85, 92]
-percentages = list(map(lambda m: m / 100, marks))
-print(percentages)
+doubled = map(lambda n: n * 2, [1, 2, 3, 4])
+list(doubled)        # [2, 4, 6, 8]
 ```
 
-Output:
+`map()` itself does not hand you a list — it hands you a `map` object that produces values as you ask for them. Wrapping it in `list(...)` forces it to produce everything right now. This "produce on demand" behavior is the same idea generators use below.
 
-```
-[0.78, 0.85, 0.92]
-```
-
-- **`filter()`** — tests every item and keeps only the ones that pass, like a gallery view showing only the photos where a face was detected:
+**`filter(function, iterable)`** keeps only the items where `function` returns a truthy value, and drops the rest:
 
 ```python
-marks = [35, 78, 42, 88, 39]
-passing = list(filter(lambda m: m >= 40, marks))
-print(passing)
+evens = filter(lambda n: n % 2 == 0, [1, 2, 3, 4])
+list(evens)          # [2, 4]
 ```
 
-Output:
-
-```
-[78, 42, 88]
-```
-
-- **`sorted(key=...)`** — orders a sequence using whatever property you point it at, without changing the original list:
-
-```python
-students = [("Priya", 92), ("Rohan", 68), ("Arjun", 81)]
-ranked = sorted(students, key=lambda s: s[1], reverse=True)
-print(ranked)
-print(students)   # untouched — sorted() always returns a new list
-```
-
-Output:
-
-```
-[('Priya', 92), ('Arjun', 81), ('Rohan', 68)]
-[('Priya', 92), ('Rohan', 68), ('Arjun', 81)]
-```
-
-`map()` and `filter()` are honest tools, but they're not always the most readable ones. `list(map(lambda m: m / 100, marks))` and `[m / 100 for m in marks]` (a **list comprehension** — you'll meet this properly in the data structures unit) compute the exact same thing, and most Python developers find the second one easier to read at a glance. `sorted(key=...)`, on the other hand, has no such rival — it's the version you'll reach for constantly.
+`sorted(key=...)` is the one of these three you will reach for constantly — ordering results by score, by distance, by length, by any rule you can write as a one-line function. `map` and `filter` are worth recognizing when you read other people's code, but a list comprehension (a later unit) often reads more clearly for the same job. What matters now is the underlying concept: passing a small function into a built-in one to customize its behavior.
 
 ### 3.3 Decorators (Light Introduction)
 
-A **decorator** wraps a function with extra behavior *before* and/or *after* it runs, without changing a single line inside the function itself — like an app automatically stamping a watermark onto every photo the moment you hit export, without you ever touching the original photo file.
+A **decorator** is a function that takes another function and returns a new function that wraps extra behavior around it, without changing the original function's code. Writing `@my_decorator` directly above a `def` is shorthand for defining the function and then reassigning its name to `my_decorator(function)`.
+
+```python
+def shout(func):
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return result.upper()
+    return wrapper
+
+@shout
+def greet(name):
+    return f"hello, {name}"
+
+greet("sam")   # "HELLO, SAM"
+```
+
+Three pieces make this work, all of them things you already have from the functions unit. `shout` accepts a function (`func`) and returns a function (`wrapper`). `wrapper`, defined *inside* `shout`, is what actually replaces `greet` — calling `greet("sam")` really calls `wrapper("sam")`, which calls the original `greet` internally and does something extra with its result. And `wrapper(*args, **kwargs)` uses the exact `*args`/`**kwargs` collecting pattern you already know, because a decorator has to work on *any* function, regardless of how many arguments it takes.
+
+### 3.4 Generators: the `yield` Keyword and Lazy Evaluation
+
+A **generator function** looks like an ordinary function, except its body contains at least one `yield` statement instead of (or alongside) `return`. Calling a generator function does not run its body immediately — it returns a **generator object**, and the body only starts running when you start pulling values out of it, most commonly with a `for` loop.
+
+```python
+def count_up_to(n):
+    current = 1
+    while current <= n:
+        yield current
+        current += 1
+
+for value in count_up_to(5):
+    print(value)
+# 1 2 3 4 5
+```
+
+Each time execution reaches `yield`, the function hands out that value and *pauses* — everything about its state is frozen exactly where it stopped. When the `for` loop asks for the next value, the function wakes up right after the `yield` and keeps going until it hits `yield` again or the function ends. This is **lazy evaluation**: values are produced one at a time, only when requested, instead of an entire list being built and held in memory up front.
+
+The classic worked example is a Fibonacci generator:
+
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+```
+
+`fibonacci()` never finishes on its own — the `while True` loop runs forever — but that is fine, because nothing forces it to produce every value at once. You just take as many as you need with a `for` loop, stopping yourself once you have enough:
+
+```python
+count = 0
+for value in fibonacci():
+    print(value)
+    count += 1
+    if count == 5:
+        break
+# 0 1 1 2 3
+```
+
+The diagram below traces exactly this cycle. Calling `fibonacci()` creates a paused generator object holding `a = 0, b = 1`. Each pass hands back the current value of `a` through `yield`, the `for` loop's counter advances, and — unless the count has reached 5 — the generator resumes, updates `a, b = b, a + b`, and loops back around to the next `yield`.
+
+```mermaid
+---
+title: Generator Pause/Resume Cycle (fibonacci())
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#a5d8ff'
+    primaryBorderColor: '#4a9eed'
+    lineColor: '#555'
+  flowchart:
+    htmlLabels: true
+    curve: basis
+    rankSpacing: 60
+    nodeSpacing: 40
+---
+flowchart TB
+    callFib["<b>Call fibonacci()</b><br/><span style='font-size:11px;color:#6d28d9'>for value in fibonacci():</span>"]
+    genobj["<b>Generator Paused</b><br/><span style='font-size:11px;color:#6d28d9'>a = 0, b = 1</span>"]
+    yieldpoint["<b>Yield Value</b><br/><span style='font-size:11px;color:#6d28d9'>hands back a (0, 1, 1, 2, 3...), pauses</span>"]
+    loopcheck["<b>For Loop Counts</b><br/><span style='font-size:11px;color:#6d28d9'>count += 1</span>"]
+    resume["<b>Resume &amp; Update</b><br/><span style='font-size:11px;color:#6d28d9'>a, b = b, a + b -- state persists</span>"]
+    brk["<b>Break Loop</b><br/><span style='font-size:11px;color:#6d28d9'>count == 5, generator still paused</span>"]
+
+    callFib --> genobj
+    genobj --> yieldpoint
+    yieldpoint --> loopcheck
+    loopcheck -->|count < 5| resume
+    resume --> yieldpoint
+    loopcheck -->|count == 5| brk
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px,color:#1a1a1a
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px,color:#1a1a1a
+    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px,color:#1a1a1a
+```
+
+The `break` is what stops the loop, not the generator running out — an infinite generator never runs out on its own, so it is the caller's job to decide when enough values have been produced. Try writing this as a regular function that `return`s a list, and you hit a wall immediately: a function cannot `return` an infinite list, because it would have to finish building it first, and it never would. A generator sidesteps the problem entirely by never building the whole sequence — it only ever holds the next value to produce.
+
+---
+
+## 4. Real-World Application
+
+`sorted(..., key=lambda ...)` is the pattern you will meet constantly with real data: ranking search results by relevance score, ordering log entries by timestamp, sorting a leaderboard by highest score first. The lambda is disposable — it exists for one call to `sorted()` and is never reused, which is exactly why it does not need a name.
+
+Decorators show up anywhere the same wrapping behavior needs to apply to many different functions: timing slow operations to find performance bottlenecks, logging every call for debugging, or retrying a flaky operation automatically before giving up. `@timer` is the simplest member of that family — the same wrapper structure, with different logic inside `wrapper`, covers all of them.
+
+Generators earn their keep whenever the full sequence would be wasteful or impossible to hold in memory at once: reading a huge file, streaming rows from a large dataset, or producing values from a sequence — like Fibonacci — that has no natural end. Lazy evaluation means the program only pays for the values it actually asks for.
+
+---
+
+## 5. Worked Example
+
+**Goal:** Sort a list by a derived value, build and apply the canonical `@timer` decorator, then write a small generator of your own.
+
+**1. Sort words by length, shortest to longest and back again.**
+
+```python
+words = ["python", "ai", "engineering", "loop", "yield"]
+print(sorted(words, key=lambda w: len(w)))
+print(sorted(words, key=lambda w: len(w), reverse=True))
+```
+
+Output:
+
+```
+['ai', 'loop', 'yield', 'python', 'engineering']
+['engineering', 'python', 'yield', 'loop', 'ai']
+```
+
+**2. Build the `@timer` decorator, step by step.** Define an outer function (`timer`) that takes the function being decorated; inside it, define an inner `wrapper(*args, **kwargs)` so it can accept any call; have `wrapper` record a start time, call the original function, record an end time, report the elapsed time, and `return` the original result unchanged; have `timer` `return wrapper` itself, not call it.
 
 ```python
 import time
@@ -121,32 +209,34 @@ def timer(func):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        print("Took", round(end - start, 4), "seconds")
+        print(f"{func.__name__} took {end - start:.4f} seconds")
         return result
     return wrapper
+```
 
+**3. Apply it to a deliberately slow function and confirm both the timing and the correct result show up.**
+
+```python
 @timer
-def slow_greeting():
-    time.sleep(1)
-    print("Hello from AI Native Engineering!")
+def slow_add(a, b):
+    total = 0
+    for _ in range(10_000_000):
+        total += 1
+    return a + b
 
-slow_greeting()
+print(slow_add(2, 3))
 ```
 
 Output:
 
 ```
-Hello from AI Native Engineering!
-Took 1.0006 seconds
+slow_add took 0.3521 seconds
+5
 ```
 
-`@timer` directly above `def slow_greeting():` is not magic syntax — it's shorthand for one line: `slow_greeting = timer(slow_greeting)`. `timer()` receives the original function, builds a new `wrapper()` function that calls it in the middle, and hands that wrapper back. Every time you now call `slow_greeting()`, you're actually calling `wrapper()` — which is why the timing shows up on both sides of the original message.
+`slow_add` still returns `5` to its caller exactly as before — the decorator adds the timing message as a side effect without touching a single line inside `slow_add`.
 
-`wrapper`'s signature is `(*args, **kwargs)`, not empty parentheses, for a reason: `timer` has no idea in advance what the function it's wrapping actually needs. `slow_greeting` here takes zero arguments, but the next function you decorate with `@timer` might take three positional arguments and a keyword one — `*args, **kwargs` collects whatever was passed in and forwards it straight through to `func`, so one `timer` works on *any* function, not just this one.
-
-### 3.4 Generators
-
-A **generator** looks like a normal function but uses `yield` instead of `return`. The difference matters more than the swapped keyword suggests: a normal function runs start to finish and hands back one value, while a generator produces one value, *pauses exactly where it left off*, and waits to be asked for the next one.
+**4. Write a small generator of your own — `countdown(n)` — and drive it with a `for` loop.**
 
 ```python
 def countdown(n):
@@ -154,8 +244,8 @@ def countdown(n):
         yield n
         n -= 1
 
-for number in countdown(3):
-    print(number)
+for value in countdown(3):
+    print(value)
 ```
 
 Output:
@@ -166,103 +256,17 @@ Output:
 1
 ```
 
-This is called **lazy evaluation** — nothing is computed until it's actually asked for. Picture a photo app that loads thumbnails only as you scroll, instead of loading every full-resolution photo in a 10,000-image album into memory the instant you open it. A generator gives you exactly that behavior for any sequence of values: you get the next one on demand, and everything after it stays uncomputed until you ask.
-
----
-
-## 4. Real-World Application
-
-A coding platform's leaderboard, ranking every participant by score the instant a new submission comes in, is `sorted(key=...)` (§3.2) doing exactly what it did to the students in this unit — pointing at one field and ordering by it, with no hand-written comparison logic anywhere.
-
-A payment app that logs how long every single transaction takes, without a single line of timing code inside the actual payment logic, is the decorator pattern from §3.3 at work — `@timer`-style wrapping means the transaction function stays focused on payments, and the timing behavior lives entirely on the outside.
-
-Streaming a long video without downloading the whole file first is the same idea as §3.4's generator: the player asks for the next chunk only when it's actually needed, instead of pulling the entire file into memory upfront — exactly the difference between `yield`-ing one value at a time and returning a fully built list.
-
----
-
-## 5. Worked Example
-
-**Goal:** Rank students by marks, time how long it takes, and then hit a case where reaching for a lambda is the *wrong* call — to see the readability tradeoff from §3.1 in practice, not just in theory.
-
-**1. Define the timer decorator.**
-
-```python
-import time
-
-def timer(func):
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print("Ranking took", round(end - start, 5), "seconds")
-        return result
-    return wrapper
-```
-
-**2. Write the ranking function, decorated with `@timer`.**
-
-```python
-@timer
-def rank_students(students):
-    return sorted(students, key=lambda s: s[1], reverse=True)
-```
-
-**3. Call it.**
-
-```python
-students = [("Priya", 92), ("Rohan", 68), ("Arjun", 81)]
-print(rank_students(students))
-```
-
-Output:
-
-```
-Ranking took 0.00002 seconds
-[('Priya', 92), ('Arjun', 81), ('Rohan', 68)]
-```
-
-**4. Now try to also grade each student pass/fail inside the same sort key, using a lambda.**
-
-```python
-# Don't do this — cramming an if/else into a lambda to avoid writing a def:
-ranked = sorted(
-    students,
-    key=lambda s: (0 if s[1] >= 40 else 1, -s[1])
-)
-```
-
-This runs, but you had to stop and think about what `(0 if s[1] >= 40 else 1, -s[1])` even means. That's the readability guardrail from §3.1 showing up for real: the logic outgrew "a single simple expression" the moment it needed a pass/fail condition.
-
-**5. Fix it — pull the logic into a named function instead.**
-
-```python
-def sort_key(student):
-    name, mark = student
-    passed = mark >= 40
-    return (0 if passed else 1, -mark)
-
-ranked = sorted(students, key=sort_key)
-print(ranked)
-```
-
-Output:
-
-```
-[('Priya', 92), ('Arjun', 81), ('Rohan', 68)]
-```
-
-Same result — but anyone reading `sort_key` six months from now (including you) can tell what it's doing without decoding a one-liner first.
-
-*Common mistake: treating "I could write this as a lambda" as the same question as "should I write this as a lambda." If you need a comment to explain what your lambda is doing, that's the signal to give it a name and a `def` instead.*
+*Common mistake: writing a decorator's `wrapper` with just `(*args)`, or forgetting to `return result` at the end of `wrapper`. The first breaks the decorator the moment someone calls the decorated function with a keyword argument; the second silently discards whatever value the wrapped function was supposed to hand back, even though the timing or logging still appears to work.*
 
 ---
 
 ## 6. Summary
 
-- A **lambda** is a small, unnamed, single-expression function — ideal as a disposable argument to another function, and a readability problem the moment it needs more than one simple expression.
-- A **higher-order function** (`map()`, `filter()`, `sorted(key=...)`) takes a function as input to transform, filter, or order data — `sorted(key=...)` is the one you'll reach for constantly; `map()`/`filter()` often have a more readable comprehension-based alternative.
-- A **decorator** wraps a function with extra behavior using `@syntax`, without touching the original function's code — `@timer` above a function is shorthand for `func = timer(func)`.
-- A **generator** uses `yield` to produce values one at a time, on demand, instead of computing everything upfront — the same trick a photo app uses to load thumbnails only as you scroll.
+- A **lambda** is a single-expression, unnamed function — useful for a one-off argument to another function, not for logic that needs a name or more than one line.
+- A **higher-order function** accepts or returns another function; `sorted(key=...)`, `map()`, and `filter()` are the built-in examples, and `sorted(key=...)` is the one you will use most.
+- A **decorator** is a function that wraps another function and returns the wrapper; `@decorator` syntax is shorthand for `func = decorator(func)`, and a general-purpose wrapper needs `*args, **kwargs` to accept any function's signature.
+- A **generator** function uses `yield` instead of `return` to produce values one at a time, pausing between each `yield` and resuming exactly where it left off.
+- **Lazy evaluation** — producing values only when asked for them — is what lets a generator represent a sequence too large, or too infinite, to ever build as a complete list.
 
 Next up: organizing code across files — modules, packaging, and the professional tooling every Python project uses.
 

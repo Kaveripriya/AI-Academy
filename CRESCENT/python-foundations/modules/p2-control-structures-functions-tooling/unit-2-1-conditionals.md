@@ -6,161 +6,223 @@
 
 By the end of this unit, you will be able to:
 
-✓ Write single and multi-branch decisions using `if`, `elif`, and `else`.  
-✓ Nest conditionals when a decision genuinely depends on more than one layer, and know when nesting has gone too far.  
-✓ Combine comparisons with `and`, `or`, and `not` inside one condition — and catch the bug that happens when you mix them up.  
-✓ Write a compact ternary expression for a simple two-outcome decision.
+✓ Write a single `if` statement that runs a block of code only when a condition is `True`.  
+✓ Build multi-branch decisions with `if`/`elif`/`else`, choosing exactly one path out of several.  
+✓ Explain how indentation defines which statements belong to a branch in Python.  
+✓ Combine comparisons with `and`, `or`, and `not` to form richer conditions.  
+✓ Nest one conditional inside another, and judge when nesting helps or hurts readability.  
+✓ Rewrite a simple value-choosing `if`/`else` as a conditional (ternary) expression.
 
 ---
 
 ## 2. Overview
 
-Every unit up to now has been about producing one fixed result — build this string, compute this total. Real programs don't work that way. A checkout page decides whether to show "Free Delivery" based on your cart total; a login page decides whether to let you in based on your password. Python makes decisions like this with a **conditional** — code that runs one block or another, never both, based on whether something is true or false.
+Every program you've written so far runs top to bottom, one statement after another, no matter what. Real software has to *react*: a login screen behaves differently for the right password than the wrong one, and a task tracker sorts a job into "urgent," "soon," or "whenever." A **conditional** gives you that branching — it asks a yes/no question about your data and chooses which statements to run based on the answer. That question is always a boolean expression, one that evaluates to `True` or `False`, exactly the values you met with comparison operators in the last unit.
 
-Picture an airport gate agent scanning boarding passes. She checks one thing at a time, in a fixed order — priority tag first, then frequent-flyer status, then everyone else — and the moment a passenger matches a category, she waves them into that lane and moves on. She never re-checks a passenger who already got waved through, and she never sends anyone down two lanes at once. That's exactly how Python evaluates a conditional: check conditions in order, stop at the first match, run only that one block.
-
-This unit covers `if`/`elif`/`else`, nesting one decision inside another, combining conditions with `and`/`or`/`not`, and the compact one-line ternary form for simple either/or choices.
+This unit covers the `if` statement, multi-branch `if`/`elif`/`else` decisions, combining conditions with `and`/`or`/`not`, nesting one conditional inside another, and the compact ternary expression for simple two-value choices.
 
 ---
 
 ## 3. Description
 
-### 3.1 `if` / `elif` / `else`
+### 3.1 The `if` Statement
 
-**A single-branch decision.** An `if` runs its block only when the condition evaluates to `True` — nothing happens otherwise:
+The simplest conditional is a single `if`: a header line ending in a colon, followed by an indented block that runs only when the condition is `True`.
 
 ```python
-cart_total = 150
+temperature = 30
 
-if cart_total < 199:
-    print("Add ₹49 more for free delivery")
+if temperature > 25:
+    print("It is warm.")
+    print("Consider a lighter jacket.")
+
+print("Done checking.")
 ```
 
 Output:
 
 ```
-Add ₹49 more for free delivery
+It is warm.
+Consider a lighter jacket.
+Done checking.
 ```
 
-**A multi-branch decision.** `elif` ("else if") checks additional conditions in order, and `else` catches whatever matches none of them — like the gate agent's fallback lane for everyone who isn't priority or frequent-flyer:
+Read it literally: "if `temperature > 25` is `True`, run the indented block." Because `30 > 25`, both indented lines run. Had `temperature` been `20`, Python would skip the block and jump straight to `print("Done checking.")`, which isn't indented and therefore isn't part of the `if`.
+
+Any value that's `True` or `False` can serve as the condition, so you can test a boolean variable directly:
 
 ```python
-frequent_flyer_tier = "silver"
+is_raining = True
 
-if frequent_flyer_tier == "platinum":
-    print("Boarding Group 1")
-elif frequent_flyer_tier == "gold":
-    print("Boarding Group 2")
-elif frequent_flyer_tier == "silver":
-    print("Boarding Group 3")
+if is_raining:
+    print("Bring an umbrella.")
+```
+
+Output:
+
+```
+Bring an umbrella.
+```
+
+`if is_raining:` says the same thing as `if is_raining == True:`, more cleanly — the value is already a boolean, so comparing it to `True` just asks the same question twice.
+
+### 3.2 Indentation Is the Structure
+
+Where many languages use braces `{ }` to group statements, Python uses **indentation** — and that indentation isn't decoration, it's the grammar. The standard is four spaces per level, and every line in a block must be indented the same amount.
+
+```python
+score = 55
+
+if score >= 50:
+    print("You passed.")       # part of the if block
+    print("Well done.")        # still part of the if block
+print("Results recorded.")     # NOT in the block — always runs
+```
+
+Output:
+
+```
+You passed.
+Well done.
+Results recorded.
+```
+
+Mixing indentation, or forgetting it, produces an `IndentationError`. The shape of the code on the page matches the logic, so treat indentation with the same care you give the condition itself.
+
+### 3.3 `if` / `else` — Two Paths
+
+When you want one thing to happen on `True` and a different thing on `False`, add an `else`. Exactly one of the two blocks runs — never both, never neither. `else` has no condition of its own; it's the catch-all for everything the `if` didn't cover.
+
+```python
+age = 16
+
+if age >= 18:
+    print("You may vote.")
 else:
-    print("Boarding Group 4")
+    print("You are too young to vote.")
 ```
 
 Output:
 
 ```
-Boarding Group 3
+You are too young to vote.
 ```
 
-Python checks each condition top to bottom and **stops at the first one that's `True`.** Even if a passenger somehow matched two categories, only the first matching branch runs — the rest are never even checked.
+### 3.4 `if` / `elif` / `else` — Multi-Branch Decisions
 
-**Indentation is the block.** Python has no `{ }` to mark where a block starts and ends — the indentation itself does that job. Line up two lines under an `if` at the same indent level (four spaces is the standard) and they're both part of that block; mix tabs and spaces, or indent one line differently from its neighbor, and Python raises an `IndentationError` before your code even runs.
-
-One more habit worth building early: if a variable already holds `True` or `False`, test it directly — `if is_raining:` — instead of writing `if is_raining == True:`. Both work, but the second is redundant; the value is already a boolean, so comparing it to `True` just asks the same question twice.
-
-### 3.2 Nested Conditionals
-
-A **nested conditional** is a conditional placed inside another conditional's block — for when a decision only makes sense after an earlier decision has already been settled. It's like a gate agent who, after waving someone into the priority lane, still checks whether they're carrying an oversized bag before letting them board:
+For more than two possibilities, chain conditions with `elif` ("else if"). Python checks each condition **in order, top to bottom**, and runs the block for the *first* one that's `True`; once a branch matches, the rest are skipped entirely. An optional final `else` handles the case where none matched.
 
 ```python
-has_priority_ticket = True
-checked_bag_count = 3
+grade = 78
 
-if has_priority_ticket:
-    if checked_bag_count <= 2:
-        print("Board now, Group 1")
+if grade >= 90:
+    print("A")
+elif grade >= 80:
+    print("B")
+elif grade >= 70:
+    print("C")
+else:
+    print("Below C")
+```
+
+Output:
+
+```
+C
+```
+
+A `grade` of `78` fails `>= 90` and `>= 80`, matches `>= 70`, and prints `C`. Notice the code never had to write `grade >= 70 and grade < 80` — because the `>= 80` branch above already handled everything from 80 up, by the time execution reaches the `>= 70` test it's already known the grade is under 80. Three rules follow from this top-to-bottom evaluation:
+
+- **Order matters.** Put the most specific or most common conditions first; if two conditions could both be true, the earlier one wins and the later one never runs.
+- **Only one branch executes**, even if a later `elif` would also have been `True`.
+- **`else` is optional.** Leave it off for "do nothing when nothing matches," but including it guarantees a path always runs — often safer, since it catches values you didn't anticipate.
+
+### 3.5 Compound Conditions — `and`, `or`, `not`
+
+A condition doesn't have to be a single comparison. Combine comparisons with the logical operators to express richer tests: `and` is `True` only when *both* sides are true, `or` is `True` when *at least one* side is, and `not` flips a boolean.
+
+```python
+age = 25
+has_ticket = True
+logged_in = False
+
+if age >= 18 and has_ticket:
+    print("Admitted to the show.")
+
+if not logged_in:
+    print("Please log in first.")
+```
+
+Output:
+
+```
+Admitted to the show.
+Please log in first.
+```
+
+"You may enter if you are an adult *and* you hold a ticket" reads almost like the English sentence, capturing in one branch what would otherwise need clumsy nesting. Two practical habits: group with parentheses when precedence is unclear — `if (a > 0 and b > 0) or c == 0:` — and remember a range check reads naturally as a chained comparison, `if 0 <= score <= 100:`, which is Python's shorthand for `score >= 0 and score <= 100`.
+
+### 3.6 Nested Conditionals
+
+The block inside an `if` can contain anything — including another `if`. Putting one conditional inside another is called **nesting**, and each level adds a step of indentation.
+
+```python
+logged_in = True
+is_admin = False
+
+if logged_in:
+    if is_admin:
+        print("Welcome, administrator.")
     else:
-        print("Priority lane, but excess baggage — see counter first")
+        print("Welcome, user.")
 else:
-    print("Wait for your assigned group")
+    print("Access denied. Please log in.")
 ```
 
 Output:
 
 ```
-Priority lane, but excess baggage — see counter first
+Welcome, user.
 ```
 
-**Readability has a limit.** One layer of nesting is fine. Two is still readable. Beyond that, most people lose track of which `else` belongs to which `if`. When you notice yourself nesting three or four levels deep, that's usually a sign the conditions should be combined with `and` instead — which is exactly what the next section does with this same example.
-
-### 3.3 Combining Conditions — `and`, `or`, `not`
-
-`and`, `or`, and `not` let one `if` evaluate more than one condition at a time, often replacing a nested conditional entirely:
+Nesting fits when the second decision only makes sense *after* the first is answered — there's no point asking "are you an admin?" about someone who isn't logged in at all. But every level shifts the code right and adds a fact you have to hold in your head. Often a nested test flattens into one combined condition:
 
 ```python
-has_priority_ticket = True
-checked_bag_count = 3
+# Nested
+if logged_in:
+    if is_admin:
+        print("Welcome, administrator.")
 
-if has_priority_ticket and checked_bag_count <= 2:
-    print("Board now, Group 1")
-else:
-    print("Not yet — check ticket tier or baggage limit")
+# Flattened — same result, easier to read
+if logged_in and is_admin:
+    print("Welcome, administrator.")
 ```
 
-Output:
+Prefer the flatter version when both conditions are simply required. Reserve genuine nesting for when the inner decision has its own `else` that the outer level doesn't share.
+
+### 3.7 The Conditional (Ternary) Expression
+
+Sometimes an `if`/`else` exists only to pick between two *values*. Python offers a compact one-line form for that case, called the **conditional expression** (informally, the "ternary operator"). Its shape reads almost like English:
 
 ```
-Not yet — check ticket tier or baggage limit
+value_if_true if condition else value_if_false
 ```
 
-This one line does the same job as the nested version in §3.2, more compactly — `and` only lets the first branch run when **both** conditions are `True`.
-
-- **`and`** — every condition must be `True`.
-- **`or`** — at least one condition must be `True`.
-- **`not`** — flips `True` to `False` and back.
-
-Mixing up `and` and `or` is one of the most common real bugs in conditional logic, because both read like ordinary English and the wrong one still "sounds right":
+"Give me `value_if_true` if `condition` is true, else `value_if_false`."
 
 ```python
-frequent_flyer_tier = "none"
-has_priority_ticket = True
-
-# Bug: this grants Group 1 to ANYONE with a priority ticket,
-# even a passenger with no frequent-flyer status at all.
-if frequent_flyer_tier == "platinum" or has_priority_ticket:
-    print("Boarding Group 1")
-```
-
-Output:
-
-```
-Boarding Group 1
-```
-
-That's the wrong result for a passenger with no elite status — the rule almost certainly meant `and` a specific ticket type is present, not "either one is enough." Whenever a rule requires two things to hold *at the same time*, reach for `and`; the moment you see an `or` granting access more easily than you intended, that's the line to re-read first.
-
-**Two habits worth adopting now.** First, when a condition combines `and`/`or` in a non-obvious way, wrap the parts in parentheses — `if (age >= 18 and has_ticket) or is_staff:` — even though Python doesn't require it. It costs nothing and removes any doubt about which operator applies to which part. Second, a range check reads more naturally as a chained comparison than as two conditions joined by `and`: `if 0 <= score <= 100:` means exactly `score >= 0 and score <= 100`, just shorter and closer to how you'd say it out loud.
-
-### 3.4 The Ternary (Conditional) Expression
-
-For a simple choice between exactly two values, Python offers a one-line form instead of a full `if`/`else` block:
-
-```python
-seats_available = 0
-status = "Sold Out" if seats_available == 0 else "Available"
+age = 20
+status = "adult" if age >= 18 else "minor"
 print(status)
 ```
 
 Output:
 
 ```
-Sold Out
+adult
 ```
 
-The pattern reads left to right as *value-if-true*, `if`, *condition*, `else`, *value-if-false*. It's a great fit for exactly two outcomes and nothing else — the instant a decision needs a third outcome or extra logic, a full `if`/`elif`/`else` stays far more readable than trying to force it into one line.
-
-The distinction underneath this is worth naming: a plain `if`/`else` is a **statement** — it directs what the program does next, and doesn't produce a value you can use elsewhere. A ternary is an **expression** — it evaluates to a value, so you can drop it directly wherever a value is expected, including straight inside a `print()` call:
+The key distinction: a plain `if`/`else` is a **statement** — it directs what happens, and produces no value of its own. A conditional expression *evaluates to a value*, so you can use it anywhere a value is expected, including straight inside a `print()` call:
 
 ```python
 number = 7
@@ -173,116 +235,90 @@ Output:
 odd
 ```
 
-That line never creates a `status` variable at all — the ternary's result flows straight into `print()`.
+That line never creates a `status` variable at all — the ternary's result flows straight into `print()`. Use it only for simple two-way value choices that fit comfortably on one line; chaining several ternaries together is possible but quickly becomes unreadable — when you feel that urge, a full `if`/`elif`/`else` chain is the clearer choice.
 
 ---
 
 ## 4. Real-World Application
 
-An airport's own departure board runs on exactly §3.1's chain — boarding groups are checked and called in a fixed order, and a passenger gets placed into the first group they qualify for, never two at once.
+A login screen is exactly §3.3's two-path branch in action — one message for the right password, a different one for the wrong one, never both. A thermostat runs on §3.4's multi-branch pattern: turn the heat on below a target temperature, off above it, holding steady in between.
 
-Spam filters lean on §3.3 instead of a single check: real filters combine dozens of signals — sender reputation, flagged words, attachment type — with `and`/`or`, because "spam" is almost never decided by one signal alone. Get the `and`/`or` choice wrong there and you either flood inboxes with junk or bury real mail in the spam folder — the exact class of bug this unit's worked example walks through.
-
-A product page's "In Stock" / "Out of Stock" tag is a good fit for §3.4's ternary — one condition, exactly two possible labels, no reason to write a full `if`/`else` block for it.
-
-A result portal turning a numeric score into a letter grade leans on §3.1's "order matters" rule directly: a chain like `if score >= 90: "A"`, `elif score >= 80: "B"`, `elif score >= 70: "C"` never needs to write `score >= 70 and score < 80` for the `"C"` branch — by the time execution reaches it, the two branches above have already claimed everything 80 and up, so whatever's left is correctly under 80.
+A task tracker sorting a job into "urgent," "soon," or "whenever" based on its due date — the running example this whole unit builds toward — is nothing more than the same `if`/`elif`/`else` chain from §3.4, applied to a priority number instead of a temperature.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a boarding-group assigner, introduce the classic `and`/`or` bug on purpose, then fix it — the same mistake airlines' own booking systems have to guard against.
+**Goal:** Build a task classifier that reads a task's priority and prints how urgent it is, then extend it to also check whether the task is blocked.
 
-**1. Define a passenger's details.**
-
-```python
-frequent_flyer_tier = "gold"
-has_priority_ticket = False
-checked_bag_count = 1
-```
-
-**2. Write the eligibility rule for Group 1 boarding.**
+**1. Read the priority and classify it.**
 
 ```python
-if frequent_flyer_tier == "platinum" and has_priority_ticket:
-    print("Boarding Group 1")
+priority = int(input("Enter task priority (1-3): "))
+
+if priority == 1:
+    print("Urgent — do it now.")
+elif priority == 2:
+    print("Soon — do it today.")
+elif priority == 3:
+    print("Whenever — no rush.")
 else:
-    print("Not Group 1 — check next tier")
+    print("Unknown priority. Please enter 1, 2, or 3.")
 ```
 
-Output:
+Output (entering `2`):
 
 ```
-Not Group 1 — check next tier
+Enter task priority (1-3): 2
+Soon — do it today.
 ```
 
-That's correct: this passenger is gold tier, not platinum, and doesn't hold a priority ticket, so they rightly miss Group 1.
+**2. Step through what happened.** `input()` returns text, so `int(...)` converts it to a number before the comparisons run. Python tested `priority == 1` (false, skip), then `priority == 2` (true) — it printed `"Soon — do it today."` and skipped every branch below, including the `else`.
 
-**3. Introduce the bug — swap `and` for `or`.**
+**3. Try an out-of-range value.** Enter `9` instead, and all three `==` tests fail, so the final `else` catches it — the program always responds sensibly rather than doing nothing silently. That's exactly why the `else` earns its place here.
+
+**4. Extend it: add a blocked check that overrides everything else.**
 
 ```python
-if frequent_flyer_tier == "platinum" or has_priority_ticket:
-    print("Boarding Group 1")
+priority = int(input("Enter task priority (1-3): "))
+is_blocked = input("Is this task blocked? (yes/no): ") == "yes"
+
+if is_blocked:
+    print("Blocked — resolve dependency first.")
+elif priority == 1:
+    print("Urgent — do it now.")
+elif priority == 2:
+    print("Soon — do it today.")
+elif priority == 3:
+    print("Whenever — no rush.")
 else:
-    print("Not Group 1 — check next tier")
+    print("Unknown priority. Please enter 1, 2, or 3.")
 ```
 
-Output:
+Output (priority `1`, blocked `yes`):
 
 ```
-Not Group 1 — check next tier
+Enter task priority (1-3): 1
+Is this task blocked? (yes/no): yes
+Blocked — resolve dependency first.
 ```
 
-No visible difference yet — this passenger still fails both conditions either way, which is exactly why this bug is dangerous: it hides until the right input exposes it.
+Because Python checks conditions top to bottom and stops at the first match, putting `is_blocked` first guarantees the blocked message wins regardless of priority — exactly the "order matters" rule from §3.4.
 
-**4. Expose the bug with a different passenger.**
-
-```python
-frequent_flyer_tier = "none"
-has_priority_ticket = True
-
-if frequent_flyer_tier == "platinum" or has_priority_ticket:
-    print("Boarding Group 1")
-else:
-    print("Not Group 1 — check next tier")
-```
-
-Output:
-
-```
-Boarding Group 1
-```
-
-A passenger with *no* frequent-flyer status just got Group 1 boarding, because `or` only needed one condition to hold — and a priority ticket alone was enough. If the real rule was "platinum tier **and** a priority ticket," this is a genuine incorrect result, not a matter of style.
-
-**5. Fix it — restore `and`.**
-
-```python
-if frequent_flyer_tier == "platinum" and has_priority_ticket:
-    print("Boarding Group 1")
-else:
-    print("Not Group 1 — check next tier")
-```
-
-Output:
-
-```
-Not Group 1 — check next tier
-```
-
-*Common mistake: reaching for `or` because a rule sounds like "either of these matters," when it actually means "both of these are required." Read the rule again as "must ALL be true" vs. "any ONE is enough" before choosing between `and` and `or` — don't rely on how the English sentence happens to sound.*
+*Common mistake: putting the blocked check last instead of first. Since only the first matching branch runs, an urgent-but-blocked task would incorrectly print "Urgent — do it now." if the priority check came before the blocked check.*
 
 ---
 
 ## 6. Summary
 
-- **`if`/`elif`/`else`** checks conditions top to bottom and runs only the first block whose condition is `True` — later branches are never even checked once a match is found.
-- **Indentation is Python's block structure** — there's no `{ }`; inconsistent indentation is a `SyntaxError`, not a style nitpick.
-- **Nested conditionals** put one decision inside another for genuinely layered logic, but nesting past two or three levels is usually a sign to switch to `and`/`or`.
-- **`and` requires every condition to hold; `or` needs just one.** Swapping one for the other is a common, easy-to-miss bug because both still read like plausible English.
-- **The ternary expression** (`value_if_true if condition else value_if_false`) compresses a simple two-outcome decision into one line — and should stay limited to exactly that.
+- A conditional runs a block of code based on a boolean condition: `if` runs its block only when the condition is `True`, and `else` covers the `False` case.
+- Indentation is not just style in Python — it defines which statements belong to which branch, and inconsistent indentation raises an `IndentationError`.
+- `if`/`elif`/`else` checks conditions top to bottom and runs only the first branch that's `True` — order matters, and later branches are skipped once one matches.
+- Conditions can be compound: `and` requires both sides true, `or` requires at least one, and `not` flips a boolean.
+- Nesting puts a decision inside a decision — keep it shallow, and flatten "both must be true" cases with `and`.
+- The conditional expression `value_if_true if condition else value_if_false` produces a value in one line, best used for simple two-way value choices.
 
-Up next: loops — how Python repeats a block of code instead of writing it out again and again.
+Up next: loops — how Python repeats a block of code instead of running the same decision once.
 
 ---
 

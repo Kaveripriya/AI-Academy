@@ -6,18 +6,19 @@
 
 By the end of this unit, you will be able to:
 
-✓ Explain why Python became the go-to language for AI work.
-✓ Explain what "interpreted language" means, and what the REPL is.
-✓ Use Google Colab confidently — cells, run order, and restarting a runtime.
-✓ Write and run your first `print()` statements, and read their output correctly.
+✓ Explain why Python is the common language for AI and machine learning work.
+✓ Describe what an interpreter does and what "interactive mode" (the REPL) means.
+✓ Open Google Colab, create a cell, run it, and read its output.
+✓ Restart the Colab runtime and save a notebook to Google Drive.
+✓ Write and run your first program using the `print()` function.
 
 ---
 
 ## 2. Overview
 
-Before you can build anything with AI, you need a place to write instructions for the computer and a way to run them. In this program that place is **Python** — a programming language, meaning a set of words and rules for writing instructions a computer can follow — and the tool you run it in is **Google Colab**. Think of Python as the language you speak to the computer, and Colab as the room where that conversation happens.
+This is the very first topic in the program, and it assumes you have never written a line of code — that's exactly the right place to start. Before you can build anything with AI, you need a place to write instructions for the computer and a way to run them. In this program that place is **Python** (a programming language) and the tool you run it in is **Google Colab**. Think of Python as the language you speak to the computer, and Colab as the room where the conversation happens.
 
-We're keeping the scope small on purpose: what Python is, how it runs your code, where you'll write it, and how to run your first line. By the end, you'll have run a real program and watched it print a message back to you.
+We keep the scope small on purpose: what Python is, how it runs your code, where you'll write it, and how to run your first line. By the end you will have run a real program and seen it print a message back to you.
 
 ---
 
@@ -25,120 +26,95 @@ We're keeping the scope small on purpose: what Python is, how it runs your code,
 
 ### 3.1 Why Python for AI Work
 
-If you look at any major AI tool — ChatGPT, PyTorch, TensorFlow — Python is almost always the language wrapped around it. Two reasons stand out:
+A **programming language** is a set of words and rules for writing instructions a computer can follow. There are many such languages. For artificial intelligence (AI) and machine learning (ML) work, Python is the one almost everyone uses.
 
-- **It reads like plain English.** No semicolons, no curly braces, no declaring types before you use them. Python has less **syntax overhead** — fewer confusing symbols standing between your idea and the code that expresses it.
-- **The richest ecosystem for AI.** An *ecosystem*, here, just means the large collection of ready-made code packages — for math, data, and training models — that other people have already built and you can reuse: NumPy, pandas, PyTorch, Hugging Face. Because almost every AI tool is written for Python first, choosing Python means that whole world works *with* you.
+Two reasons stand out. First, Python is **readable**: its code looks close to plain English and has low "syntax overhead," meaning you write fewer confusing symbols to get something done. That lets you focus on the idea instead of fighting the language. Second, Python has the richest **ecosystem** for AI. An ecosystem here means the large collection of ready-made, shareable code packages — for math, data, and training models — that other people have already built and that you can reuse. Because almost every AI tool is written for Python first, choosing Python means the whole AI world works with you rather than against you.
 
-In an AI-native workflow — one where you build and use AI systems every day — Python is the layer where you connect the pieces: loading data, calling a model, reading back results. It's the glue, not necessarily the fastest part underneath. When PyTorch does heavy math, the actual number-crunching runs in pre-built C++ code; your Python line just says *what* should happen and *in what order*. That's why "Python is slow" and "Python runs today's AI models" aren't a contradiction — you're rarely looking at the part that's slow.
+In an AI-native workflow — one where you build and use AI systems every day — Python is the layer where you connect the pieces: loading data, calling models, and reading results. It is the glue and the workbench at the same time.
 
 ### 3.2 The Interpreter and Interactive Mode
 
-Some languages (like C or Java) are **compiled**: translated all at once, ahead of time, into a separate file the machine runs later. If there's a typo near the end, you find out only after the whole translation finishes.
+When you write Python, something has to turn your instructions into actions. That something is the **Python interpreter**: a program that reads your code and carries it out.
 
-Python is **interpreted** — it reads and runs your code one line at a time, immediately, the way a live interpreter at a conference translates each sentence as the speaker says it.
+Languages generally run in one of two ways. A **compiled** language is translated all at once, ahead of time, into a separate file the machine runs later. An **interpreted** language like Python is read and executed directly, line by line, as it runs. You do not compile Python first; the interpreter just does what each line says, in order. The practical benefit for a beginner is speed of feedback — you write a line, run it, and see the result immediately.
 
-| | Compiled (C, Java) | Interpreted (Python) |
-|---|---|---|
-| Runs after... | The entire program is translated first | Each line, as soon as it's reached |
-| Feels like... | Write → wait → run | Write → run → see result immediately |
-
-That immediate back-and-forth has a name: **interactive mode**, or the **REPL** — Read, Evaluate, Print, Loop. Type `3 + 4` and it prints `7` without you calling `print()` at all — the REPL just shows you the result of the last thing you typed:
-
-```python
-x = 5     # an assignment — shows nothing
-x         # just the variable name on its own line — this DOES show
-```
-
-Output: `5`. Don't panic if a line shows nothing — assigning a value is a silent action, not a broken one. Colab gives you this same read-run-see rhythm, one cell at a time.
+That immediate back-and-forth has a name: **interactive mode**, also called the **REPL**. REPL stands for Read-Eval-Print Loop: the interpreter **R**eads what you type, **E**valuates (runs) it, **P**rints the result, and **L**oops back to wait for more. You type an instruction, you get an answer, you type the next one. Colab, which you'll meet next, gives you this same read-run-see rhythm one cell at a time.
 
 ### 3.3 Google Colab as the Standard Environment
 
-Google Colab is a free notebook that runs in your browser — but the computer running your code isn't your laptop, it's a machine in Google's data center you're borrowing for the session. It's a **rented** computer, and rentals can be taken back.
+**Google Colab** (short for Colaboratory) is a free tool from Google for writing and running Python in your web browser. It is a **hosted Jupyter notebook** environment, which means the code runs on Google's computers, not yours, and there is nothing to install or set up on your machine. You open a web page and you are ready to write Python.
 
-- **Cells.** A notebook is a stack of cells. You choose which cell to run and when — Colab does not auto-run anything.
-- **Run order matters.** If Cell 2 uses a variable from Cell 1, you must run Cell 1 *first*. Skipping around is the #1 cause of confusing early errors.
-- **The runtime can disconnect.** Step away for ~90 minutes and Colab reclaims the machine. Your notebook's *text* is safe; every variable in memory is gone.
-- **Restarting the runtime.** Runtime → Restart runtime wipes memory and gives you a fresh start — your code stays, but every cell must run again from the top.
-- **Save to Drive.** File → Save a copy in Drive. Colab autosaves your text periodically, but never your memory.
+A Colab document is called a **notebook**, and a notebook is made of **cells**. A cell is a box you type code into. You run one cell at a time, and each cell shows its output right underneath it. This gives you the same read-run-see loop as the REPL, but saved and organized on a page you can return to.
 
-When something feels "stuck" for no obvious reason, restart the runtime and rerun from the top rather than debugging around it — a restart is cheap.
+**Run order matters.** Cells do not run by themselves and they do not have to run top to bottom — they run when you tell them to, in the order you run them. Because of this, code in an earlier cell affects later cells only after you have actually run it. Running cells out of order is a common source of confusion, so a good habit is to run cells from top to bottom.
 
-### 3.4 Running Your First Program — `print()`
+Behind your notebook is the **runtime**: the live Python session on Google's computer that remembers everything you have run so far in this session. Sometimes you want a clean slate — for example, if something gets into a confused state. You can **restart the runtime**, which wipes that memory and starts the Python session fresh; after a restart you must run your setup cells again. (Colab runtimes can also be given extra hardware such as a GPU for heavier AI work, but you do not need that yet.)
 
-`print()` is a **function** — a named, reusable instruction you use by writing its name followed by parentheses — and it's the first one every Python programmer reaches for. Whatever you put inside the parentheses gets displayed as output. Text you want printed exactly as written goes inside quotation marks, and is called a **string**.
+Your work is not lost when you close the tab: Colab **saves notebooks to Google Drive**, your Google storage, so you can reopen them later from any browser.
+
+### 3.4 Running Your First Program
+
+The `print()` function is how a program shows text to you. A **function** is a named, reusable instruction; you use it by writing its name followed by parentheses. Whatever you put inside the parentheses of `print()` gets displayed as output. Text you want printed literally goes inside quotation marks and is called a **string** — a piece of text data.
+
+Here is your first program:
 
 ```python
-print("Hello, World!")
-print("I am learning Python for AI.")
+print("Hello, world!")
 ```
 
 Output:
 
 ```
-Hello, World!
-I am learning Python for AI.
+Hello, world!
 ```
 
-`#` starts a comment — Python ignores everything after it on that line. When you run several cells in sequence, each one's output appears below its own cell, in the order *you* ran them — reading that output, and checking it matches what you expected, is a core habit from day one.
+That is a complete program. You type it into a cell, run the cell, and the message appears underneath. When you run several cells in sequence, each one's output appears below its own cell, in the order you ran them. Reading that output — checking that what appeared matches what you expected — is a core part of programming from day one.
 
 ---
 
 ## 4. Real-World Application
 
-**A ChatGPT-style reply streaming back word by word.** Python orchestrates the request and response, but the actual matrix math generating each word runs in compiled code underneath — the "glue, not engine" split from §3.1, happening live.
-
-**A Colab notebook suddenly saying "session expired" after you step away for lunch.** Nothing is broken — the rented machine behind your notebook was reclaimed after sitting idle, exactly as §3.3 described. Reconnecting hands you a fresh runtime with cleared memory.
+Every AI workflow you build later in this program follows the same shape described above: Python is the layer that connects the pieces — loading data, calling a model, and reading back results. Even once you're calling a large, pre-built AI model instead of writing one from scratch, the code doing that connecting is still ordinary Python, run the same way you're running `print()` here.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Run cells in order, then see what happens when that order breaks.
+**Goal:** Write and run your first program in Colab, then see what a runtime restart actually does.
 
-**1. Create the notebook.** Go to colab.research.google.com, sign in, click **New Notebook**.
+**1. Open Colab and create a notebook.** Go to `colab.research.google.com` in your browser and sign in with a Google account. Create a new notebook (File → New notebook) — it saves to your Google Drive automatically.
 
-**2. Cell 1 — create a variable, and run it.**
-
-```python
-name = "Priya Nair"
-```
-
-No output appears — that's expected, assignment is silent.
-
-**3. Cell 2 — use it, and run it.**
+**2. Type your first program into the empty code cell.**
 
 ```python
-print("Hello,", name)
+print("Hello, world!")
 ```
 
-Output: `Hello, Priya Nair`
-
-**4. Restart the runtime** (Runtime → Restart runtime → confirm), then **re-run only Cell 2**, skipping Cell 1.
+**3. Run the cell** — click the run button on its left, or press Shift+Enter. Read the output that appears directly below the cell.
 
 Output:
 
 ```
-NameError: name 'name' is not defined
+Hello, world!
 ```
 
-This isn't a bug in your code — the restart wiped the runtime's memory, so `name` no longer exists anywhere. Run Cell 1 again, then Cell 2, and it works.
+**4. In a second cell, print your name and a short sentence about why you're learning Python.** Run it, and confirm the message appears under its own cell, below the first one's output.
 
-**5. Save your notebook.** File → Save a copy in Drive.
+**5. Restart and rerun.** If you ever want a fresh start, use Runtime → Restart runtime, then run your cells again from the top.
 
-*Common mistake: seeing a `NameError` and assuming your code is wrong. First check — did I actually run every cell it depends on, in order, since the last restart?*
+*Common mistake: when something feels "stuck" or behaves strangely for no obvious reason, restart the runtime and rerun from the top rather than debugging around it — a restart is cheap, and it rebuilds a clean, predictable state.*
 
 ---
 
 ## 6. Summary
 
-- Python is popular for AI because it's easy to read, has a huge library ecosystem, and acts as the glue directing fast, compiled code that does the actual heavy computation.
-- Python is **interpreted** — it runs your code one line at a time and gives you feedback immediately.
-- The **REPL** (Read, Evaluate, Print, Loop) is why a bare variable name shows its value automatically, while an assignment shows nothing.
-- **Google Colab** runs your code on a borrowed cloud machine — cells run in the order *you* run them, and a restart wipes memory but keeps your code.
-- `print()` displays output to the screen; `#` marks a comment Python never runs.
+- Python is the standard language for AI work because it is readable and has the largest ecosystem of AI tools.
+- Python is **interpreted**: the interpreter runs your code line by line, giving you fast feedback — the same read-run-see idea as the REPL.
+- **Google Colab** runs Python in your browser with no setup; you write code in cells, and the runtime remembers what you have run in this session.
+- Run order matters, restarting the runtime clears its memory, and notebooks save to Google Drive.
+- `print()` displays output, and reading that output is how you confirm your program did what you meant.
 
-Next up: variables, identifiers, and how Python handles different types of data.
+Coming next: the building blocks of the language itself — storing values and doing math.
 
 ---
 

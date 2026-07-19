@@ -16,11 +16,9 @@ By the end of this unit, you will be able to:
 
 ## 2. Overview
 
-The file-handling unit right before this one opened a door to a real risk: a file that doesn't exist, a number a user typed as text, a list index that's out of range. Every one of those crashes your program on the spot — unless you've told Python what to do when it happens. **Exception handling** is exactly that: code that watches for a specific kind of failure and runs a planned response instead of letting the whole program crash.
+The file-handling unit right before this one deliberately left a question open: what happens the day someone deletes `sales.csv`, or a user types text where a number belongs? Try it, and Python stops the program cold with a red message ending in an exception name. **Exception handling** is how you plan for exactly that: code that watches for a specific kind of failure and runs a planned response instead of letting the whole program crash.
 
-Here's a real-world parallel: picture a call center's escalation policy. A generic "sorry, something went wrong, goodbye" script for every single call is useless — a billing dispute, a forgotten password, and a cancellation request each need their own specific next step. A good support agent listens for *which* kind of problem it is, then follows that problem's specific playbook. Python's exception handling works the same way: you don't write one catch-all "something broke" response, you write a specific plan for each specific kind of failure you actually expect.
-
-This unit covers the full toolkit: recognizing errors versus exceptions, the anatomy of `try`/`except`/`else`/`finally`, why catching *everything* indiscriminately is a real danger rather than just bad style, handling multiple failure types from one block, and raising exceptions — including your own — when your code detects a problem no built-in exception describes.
+You don't write one catch-all "something broke" response for every possible failure — a missing file, a bad number, and a division by zero each deserve their own specific next step, the same way a program's logic branches on `if`/`elif` rather than one generic `else`. This unit covers the full toolkit: recognizing errors versus exceptions, the anatomy of `try`/`except`/`else`/`finally`, why catching *everything* indiscriminately is a real danger rather than just bad style, handling multiple failure types from one block, and raising exceptions — including your own — when your code detects a problem no built-in exception describes.
 
 ---
 
@@ -32,15 +30,41 @@ This unit covers the full toolkit: recognizing errors versus exceptions, the ana
 - **Exceptions** happen *while* the program is running. The code was valid Python — it started executing — but something went wrong partway through: a file wasn't there, a value couldn't be converted, a number got divided by zero.
 - Every exception Python raises is an *object*, built from a class — and if that sounds familiar, it's the same class/inheritance system from Part 4. `ValueError`, `FileNotFoundError`, and every other built-in exception all ultimately inherit from a base class called `Exception`, arranged in a tree:
 
+```mermaid
+graph TD
+    BaseException["<b>BaseException</b>"]
+    Exception["<b>Exception</b>"]
+    ArithmeticError["<b>ArithmeticError</b>"]
+    ZeroDivisionError["<b>ZeroDivisionError</b>"]
+    LookupError["<b>LookupError</b>"]
+    IndexError["<b>IndexError</b>"]
+    KeyError["<b>KeyError</b>"]
+    OSError["<b>OSError</b>"]
+    FileNotFoundError["<b>FileNotFoundError</b>"]
+    ValueError["<b>ValueError</b>"]
+    TypeError["<b>TypeError</b>"]
+    AttributeError["<b>AttributeError</b>"]
+
+    BaseException --> Exception
+    Exception --> ArithmeticError
+    Exception --> LookupError
+    Exception --> OSError
+    Exception --> ValueError
+    Exception --> TypeError
+    Exception --> AttributeError
+    ArithmeticError -->|catch parent, catch child| ZeroDivisionError
+    LookupError -->|catch parent, catch child| IndexError
+    LookupError -->|catch parent, catch child| KeyError
+    OSError -->|catch parent, catch child| FileNotFoundError
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px;
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px;
+    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px;
+    class BaseException,Exception start;
+    class ArithmeticError,LookupError,OSError auto;
+    class ZeroDivisionError,IndexError,KeyError,FileNotFoundError,ValueError,TypeError,AttributeError done;
 ```
-Exception
- ├── ArithmeticError → ZeroDivisionError
- ├── LookupError → IndexError, KeyError
- ├── OSError → FileNotFoundError
- ├── ValueError
- ├── TypeError
- └── AttributeError
-```
+*A simplified slice of Python's exception tree — catching a parent class also catches every child beneath it.*
 
 This matters in practice: catching a **parent** class also catches all its children. `except LookupError:` catches both `IndexError` and `KeyError`, since both descend from it. That's also why `except` order matters once types are related — put the specific one first, or a broader parent listed above it will catch the error before the specific block ever gets a chance.
 
@@ -90,7 +114,7 @@ finally:
 - **`else`** — runs only if `try` finished with zero exceptions. Skipped entirely if any `except` fired.
 - **`finally`** — runs unconditionally: whether `try` succeeded, whether an `except` fired, even if the code inside `except` itself raises a *new* exception. It's the one block you can always count on executing.
 
-Back to the call center from the Overview: `try` is the agent actually attempting to resolve your request, `except` is a specific escalation path for a specific kind of problem, `else` is the "anything else I can help with?" that only happens if the call went smoothly, and `finally` is the call log entry — written no matter how the call ends, resolved or not.
+Read it as a sentence: *try* this; if it fails this way, do the matching *except*; if it succeeded with no exception at all, also do the *else*; and in every case, *finally* do this last.
 
 ### 3.3 Why a Bare `except:` Is a Real Danger, Not Just Bad Style
 

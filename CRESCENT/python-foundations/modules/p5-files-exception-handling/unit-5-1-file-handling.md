@@ -16,9 +16,9 @@ By the end of this unit, you will be able to:
 
 ## 2. Overview
 
-Everything you've built so far has lived inside one Colab runtime — the moment that runtime restarts, every variable you created is gone, as unit 1.1 showed you the hard way. Real programs can't work like that. A marks portal needs last semester's marks to still exist when a student logs back in next month. Python's file-handling tools are how a program stores data somewhere that survives after the program itself has stopped running: a file on disk. Working with one always follows the same shape — you `open()` it, you read from or write to it, and you `close()` it when you're done, which is what actually saves your changes and frees the file for anything else to use.
+Every program you've written so far forgets everything the moment it stops — variables live in memory, and memory is wiped when the program exits, as unit 1.1 showed you directly with a runtime restart. That's fine for a calculator, but useless for a program that has to remember yesterday's sales, a saved game, or a student's marks from last semester. To remember things between runs, a program reads and writes **files** — data stored on disk that survives after the program ends.
 
-Here's a real-world parallel: picture a bank locker. You go to the counter, and the clerk unlocks a specific numbered locker for you — that's `open()`. While it's unlocked, you can take documents out or put new ones in — that's reading and writing. When you're done, you hand it back and the clerk locks it — that's `close()`. Until it's locked again, that locker is *yours*: no one else can safely use it, and anything you just put inside isn't guaranteed safe yet. This unit is about doing that open → use → close sequence correctly, and about two of the most common shapes data comes in once it's stored: CSV and JSON.
+Working with a file always follows the same shape: you `open()` it, you read from or write to it, and you `close()` it when you're done — which is what actually guarantees your changes are saved and frees the file for anything else to use. This unit covers that open → use → close sequence correctly, and two of the most common shapes data comes in once it's stored: CSV and JSON.
 
 ---
 
@@ -26,21 +26,27 @@ Here's a real-world parallel: picture a bank locker. You go to the counter, and 
 
 ### 3.1 Text Files, Binary Files, and Paths
 
-- **Text files** store human-readable characters — `.txt`, `.csv`, `.json`. Open one in Notepad and you can read it directly.
-- **Binary files** store raw bytes that aren't meant to be read as text — `.jpg` images, `.mp3` audio. Open one in Notepad and you get scrambled-looking symbols, because Notepad is trying to interpret non-text data *as* text.
-- **Absolute path** — the full location from the drive's root, e.g. `C:\Users\Priya\data\marks.csv`.
-- **Relative path** — a location relative to wherever your program is currently running, e.g. `data/marks.csv`. Relative paths are shorter and, importantly, they still work if you move the whole project folder to a different computer — an absolute path breaks the moment the folder moves.
+A **text file** stores human-readable characters — letters, digits, punctuation — encoded as bytes using a scheme like UTF-8: `.txt` notes, `.csv`, and `.json` are all text files. A **binary file** stores raw bytes that aren't meant to be read as characters — images (`.jpg`), audio (`.mp3`), compiled programs. Open a binary file in a text editor and you get scrambled-looking symbols, because the editor is trying to interpret non-text data *as* text. This unit works entirely in text mode, which is what CSV and JSON need.
+
+A **path** is a file's address, and comes in two forms:
+
+- **Absolute path** — the full location from the drive's root, e.g. `C:\Users\Priya\data\marks.csv`. It works no matter where your program runs from.
+- **Relative path** — a location relative to wherever your program is currently running, e.g. `data/marks.csv`. Shorter, and portable if you move the whole project folder to a different computer — an absolute path breaks the moment the folder moves.
+
+An absolute path is a full postal address — country, city, street, number. A relative path is "two doors down from where you're standing" — only meaningful once you know where you're standing. For most projects, relative paths are preferred for exactly that portability.
 
 ### 3.2 Opening, Using, and Closing a File
 
-`open()` is Python's function for accessing a file: give it a path and a **mode** — what you intend to do once it's open — and it hands back a file object you can read from or write to. In the locker parallel from the Overview, this is the clerk handing you the locker:
+`open()` is Python's function for accessing a file: give it a path and a **mode** — what you intend to do once it's open — and it hands back a file object you read from or write to.
 
 | **Mode** | **Meaning** |
 |---|---|
-| `r` | Read an existing file. Fails with an error if the file doesn't exist — there's no locker to open. |
-| `w` | Write a new file. Creates it if missing; **erases everything already inside** if it exists — like emptying the locker before you put anything new in. |
+| `r` | Read an existing file. Fails with an error if the file doesn't exist. This is the default if you give no mode. |
+| `w` | Write. Creates the file if missing; **erases everything already inside** if it exists. |
 | `a` | Append. Adds new content after what's already there, without erasing it. |
 | `r+` | Read and write the same file without erasing its existing content. |
+
+A quick way to remember the destructive ones: `"w"` wipes, `"a"` adds.
 
 ```python
 file = open("notes.txt", "w")
@@ -53,10 +59,10 @@ Once open, the operations you'll use most:
 - **`read()`** — the entire file, as one string.
 - **`readline()`** — just the next line.
 - **`readlines()`** — every line, as a list of strings.
-- **`write()`** — writes a string into the file.
-- **`close()`** — hands the locker back.
+- **`write()`** — writes a string into the file. It does **not** add a newline for you; include `\n` yourself if you want one.
+- **`close()`** — flushes buffered data to disk and releases the file.
 
-There's a fifth option worth knowing as the default for most real reading: looping directly over the file itself. A file is iterable, so `for line in file:` hands you one line at a time without ever loading the whole thing into memory — the same lazy, one-at-a-time behavior you saw with generators:
+There's a fifth option worth knowing as the memory-friendly default for most real reading: looping directly over the file itself. A file is iterable, so `for line in file:` hands you one line at a time without ever loading the whole thing into memory — the same lazy, one-at-a-time behavior you saw with generators:
 
 ```python
 with open("notes.txt", "r") as file:
@@ -81,7 +87,7 @@ Output:
 ''
 ```
 
-The write genuinely happened — in memory — but without `close()`, there's no guarantee it ever reached the disk. A second program (or a second `open()`, like the check above) reading that same file may see nothing at all, or only part of what you wrote. The locker was never locked, so as far as anyone else is concerned, it might as well be empty.
+The write genuinely happened — in memory — but without `close()`, there's no guarantee it ever reached disk. A second program (or a second `open()`, like the check above) reading that same file may see nothing at all, or only part of what you wrote.
 
 ### 3.3 The `with` Statement — Closing Automatically
 
@@ -94,7 +100,7 @@ result = 10 / 0          # crashes here
 file.close()              # never reached
 ```
 
-The locker stays open forever — nobody handed it back. Python's **context manager**, written with `with`, fixes this at the language level: it closes the file the moment the indented block ends, whether that block finished normally *or* crashed with an error.
+Python's **context manager**, written with `with`, fixes this at the language level — think of it as a self-closing door: you walk through it, and no matter how you leave the room, calmly or in a panic, the door swings shut behind you. It closes the file the moment the indented block ends, whether that block finished normally *or* crashed with an error.
 
 ```python
 with open("log.txt", "w") as file:
@@ -119,7 +125,7 @@ Notice there's no `file.close()` anywhere — `with` handles it, guaranteed. Use
 
 ### 3.4 Reading CSV Files
 
-A **CSV** (Comma-Separated Values) file stores rows and columns as plain text, comma-separated — the shape most spreadsheet exports come in. Python's built-in `csv` module reads each row back as a list of strings.
+A **CSV** (Comma-Separated Values) file stores rows and columns as plain text, comma-separated — the shape most spreadsheet exports come in. You *could* split each line on commas yourself, but that breaks the moment a value contains a comma of its own (like `"Smith, Jr."`). Python's built-in `csv` module handles that quoting for you and reads each row back as a list of strings.
 
 ```python
 import csv
@@ -140,14 +146,16 @@ Output:
 
 Every value comes back as a **string**, even `'78'` — CSV has no concept of numbers, only text. If you need `78` the number, you convert it yourself with `int()`, which the worked example below does.
 
-Always pass `newline=""` to `open()` when reading or writing CSV — without it, the `csv` module can't fully control line endings itself, and rows occasionally split incorrectly on some systems.
+Always pass `newline=""` to `open()` when reading or writing CSV — the `csv` module's own documentation calls for it, so the module can manage line endings itself instead of rows occasionally splitting incorrectly on some platforms.
+
+Two siblings worth knowing exist: `csv.writer` (with a `.writerow()` method) writes rows back out, and `csv.DictReader` gives you each row as a dictionary keyed by the header names instead of a plain list — handy when you'd rather write `row["Marks"]` than remember that marks is `row[1]`.
 
 ### 3.5 Working with JSON
 
-**JSON** (JavaScript Object Notation) stores data as key-value pairs — structurally close to a Python dictionary — and it's the format almost every web API, including AI model APIs, sends and receives data in.
+**JSON** (JavaScript Object Notation) stores data as key-value pairs — structurally close to a Python dictionary — and it's the format almost every web API, including AI model APIs, sends and receives data in. It maps neatly onto Python types: a JSON object becomes a `dict`, a JSON array becomes a `list`, and strings, numbers, `true`/`false`, and `null` become `str`, `int`/`float`, `bool`, and `None`.
 
-- **`json.dump(data, file)`** — writes a Python dictionary out to a file as JSON.
-- **`json.load(file)`** — reads JSON from a file back into a Python dictionary.
+- **`json.dump(data, file)`** — writes a Python object out to a file as JSON. This is *serializing*.
+- **`json.load(file)`** — reads JSON from a file back into a Python object. This is *deserializing*.
 
 ```python
 import json
@@ -155,7 +163,7 @@ import json
 student = {"name": "Priya", "marks": 78}
 
 with open("student.json", "w") as file:
-    json.dump(student, file)
+    json.dump(student, file, indent=2)
 
 with open("student.json", "r") as file:
     data = json.load(file)
@@ -170,13 +178,13 @@ Output:
 
 Unlike CSV, JSON *does* preserve types — `data["marks"]` comes back as the integer `78`, not the string `"78"`, because JSON has its own idea of numbers, strings, and booleans, and Python's `json` module maps them faithfully in both directions.
 
+Two siblings work on **strings** in memory instead of files: `json.dumps(data)` returns a JSON string instead of writing one to a file, and `json.loads(text)` parses a JSON string instead of reading one. The rule of thumb: `load`/`dump` for files, `loads`/`dumps` (note the trailing `s`) for strings already sitting in a variable.
+
 ---
 
 ## 4. Real-World Application
 
-Your semester result portal's "download as CSV" button, and a UPI app's "export transaction history" option, are both doing exactly §3.2/§3.4's pattern on the server: writing rows with `csv.writer` inside a `with` block, so a slow download from a browser can't leave a file handle stuck open — one row per record, plain text, no surprises.
-
-JSON covers the other common case. A mobile app saving your profile settings so they're still there next time you open it is a dictionary written out with `json.dump()` and loaded back with `json.load()` (§3.5). That exact exchange — a Python dictionary going out as JSON and coming back as one — is also what's happening on the wire every time your code calls an AI model's API, which is why those two functions are among the most-used once you start working with real APIs later in this program.
+Your semester result portal's "download as CSV" button, and a UPI app's "export transaction history" option, are both writing rows with `csv.writer` inside a `with` block on the server, so a slow download from a browser can't leave a file handle stuck open. Applications storing settings — API keys, feature flags, defaults — in a `config.json` loaded once at startup with `json.load()` is the same pattern from the opposite direction: a Python dictionary going out as JSON and coming back as one, which is also exactly what's happening on the wire every time your code calls an AI model's API.
 
 ---
 
