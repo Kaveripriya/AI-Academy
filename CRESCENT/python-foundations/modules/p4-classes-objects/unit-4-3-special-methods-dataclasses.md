@@ -6,33 +6,47 @@
 
 By the end of this unit, you will be able to:
 
-✓ Implement `__str__` and `__repr__` to control how an object is displayed.  
-✓ Implement `__eq__` to compare two objects for equality.  
-✓ Refactor a class into a dataclass using `@dataclass`.  
-✓ Explain how dataclasses reduce boilerplate code.  
-✓ Organise related classes into separate modules for a larger project.
+✓ Explain why printing a plain object gives you an ugly, unhelpful default — and fix it with `__str__` and `__repr__`.  
+✓ Implement `__eq__` so two objects with matching data are correctly treated as equal.  
+✓ Refactor a hand-written class into a `@dataclass`, and explain exactly what work that decorator is doing for you.  
+✓ Organise related classes into separate modules as a project grows.
 
 ---
 
 ## 2. Overview
 
-Every lab sample bottle in a science lab carries a label describing exactly what is inside it, so anyone picking it up instantly understands what they are holding. Python objects can carry the same kind of label — special methods that control how an object describes itself when printed, and how it is compared against another object.
+By default, a Python object doesn't know how to describe itself, and it doesn't know what "equal" should mean for its own data — printing one gives you an ugly memory address instead of anything useful. **Special methods** — Python's name for a small set of methods with double-underscore names like `__str__` and `__eq__`, often called **dunder methods** ("dunder" = "double underscore") — are how you fix that: they teach an object to describe itself and compare itself sensibly.
 
-These special methods are recognisable by their double-underscore names, such as `__str__` and `__eq__`, often called **dunder methods** ("double underscore"). Two exam answer booklets are only considered "equal" if their roll numbers match — not because they are the same physical booklet — and `__eq__` lets you define exactly that kind of custom equality rule for your own classes.
-
-This unit also introduces **dataclasses** — a shortcut that writes several of these common methods for you automatically, cutting down the repetitive boilerplate code you would otherwise write by hand for every simple data-holding class.
-
-By the end of this unit, you will be able to write classes that behave predictably when printed, compared, and organised across multiple files — exactly the habits expected in any real, multi-file AI or software project.
+Here's a real-world parallel: every museum faces the same problem with a new artifact sitting in a storage crate — it doesn't explain itself either. Someone has to write the placard that says what it is, and decide what makes two artifacts "the same piece" versus two separate copies. Writing special methods is writing that placard for your own objects. Once you've written one by hand, you'll meet `@dataclass` — a machine that writes several of these placards for you automatically, once you tell it what fields the object has.
 
 ---
 
 ## 3. Description
 
-### 3.1 Operator Overloading — Dunder Methods
+### 3.1 The Default Is Ugly — `__str__` and `__repr__`
 
-- **`__str__`** — defines the readable text Python shows when you `print()` an object.
-- **`__repr__`** — defines the more precise, developer-facing text Python shows in a console or log, ideally detailed enough to recreate the object.
-- **`__eq__`** — defines what it means for two objects of this class to be considered equal with `==`.
+Create a plain object and print it, with no special methods defined at all:
+
+```python
+class Student:
+    def __init__(self, name, roll_number):
+        self.name = name
+        self.roll_number = roll_number
+
+priya = Student("Priya", 101)
+print(priya)
+```
+
+Output:
+
+```
+<__main__.Student object at 0x7f2a4c1b3d90>
+```
+
+That's Python being honest, not broken: without instructions, all it can tell you is the object's class and its memory address — genuinely useless for reading, logging, or debugging. This is exactly the "artifact with no placard" problem. You fix it with two methods:
+
+- **`__str__`** — the friendly placard. Defines what `print()` and `str()` show: a readable description for a *human* reading it.
+- **`__repr__`** — the curator's catalog card. Defines what shows up in a console, a log file, or inside a list of objects: precise enough that another programmer (or you, at 2 a.m. debugging) can tell exactly what the object contains.
 
 ```python
 class Student:
@@ -46,30 +60,87 @@ class Student:
     def __repr__(self):
         return f"Student(name={self.name!r}, roll_number={self.roll_number})"
 
+priya = Student("Priya", 101)
+print(priya)          # uses __str__
+print(repr(priya))    # uses __repr__
+```
+
+Output:
+
+```
+Priya (Roll No. 101)
+Student(name='Priya', roll_number=101)
+```
+
+Same object, two different jobs: `__str__` reads like a sentence for a person; `__repr__` reads like something you could paste back into Python to recreate the object.
+
+### 3.2 Equal by Data, Not by Identity — `__eq__`
+
+Create two *separate* `Student` objects holding identical data and compare them:
+
+```python
+priya_1 = Student("Priya", 101)
+priya_2 = Student("Priya", 101)
+
+print(priya_1 == priya_2)
+```
+
+Output:
+
+```
+False
+```
+
+That surprises almost everyone the first time. `==` without a custom rule checks **identity** — "are these literally the same object sitting in memory?" — not "do they hold the same data?" `priya_1` and `priya_2` are two separate crates that happen to contain identical labels; Python isn't opening the crates to compare labels, it's just checking whether you're pointing at the same crate twice.
+
+**`__eq__`** lets you redefine what "equal" means for your own class — compare the data inside instead of the object's identity:
+
+```python
+class Student:
+    def __init__(self, name, roll_number):
+        self.name = name
+        self.roll_number = roll_number
+
     def __eq__(self, other):
         return self.roll_number == other.roll_number
 
 priya_1 = Student("Priya", 101)
 priya_2 = Student("Priya", 101)
 
-print(priya_1)
-print(repr(priya_1))
 print(priya_1 == priya_2)
 ```
 
-**Output:**
+Output:
+
 ```
-Priya (Roll No. 101)
-Student(name='Priya', roll_number=101)
 True
 ```
 
-Without `__eq__`, `priya_1 == priya_2` would return `False` by default, since Python would compare whether they are the exact same object in memory, not whether their data matches.
+Now two students count as "equal" the moment their roll numbers match — a deliberate rule you chose, matching how two exam booklets are only considered the same submission because the roll number matches, not because they're physically the same sheet of paper.
 
-### 3.2 Dataclasses
+### 3.3 Dataclasses — a Machine That Writes the Placard for You
 
-- **`@dataclass`** — a decorator from the `dataclasses` module that automatically generates `__init__`, `__repr__`, and `__eq__` for a class, based only on the attributes you declare.
-- Dataclasses remove the need to hand-write these methods for simple, data-holding classes.
+Look back at 3.1 and 3.2: three methods (`__init__`, `__str__`/`__repr__`, `__eq__`) just to make one simple, data-holding class behave sensibly. For a class that's really just "a few named fields," writing all of that by hand every time is pure repetition — and repetition is exactly where copy-paste mistakes creep in.
+
+`@dataclass`, from Python's built-in `dataclasses` module, is a **decorator** — a one-line instruction placed above a class that modifies what the class does — and this particular one automatically writes `__init__`, `__repr__`, and `__eq__` for you, based only on the fields you list.
+
+**Before — hand-written, doing every job yourself:**
+
+```python
+class Student:
+    def __init__(self, name, roll_number, marks):
+        self.name = name
+        self.roll_number = roll_number
+        self.marks = marks
+
+    def __repr__(self):
+        return f"Student(name={self.name!r}, roll_number={self.roll_number}, marks={self.marks})"
+
+    def __eq__(self, other):
+        return (self.name, self.roll_number, self.marks) == (other.name, other.roll_number, other.marks)
+```
+
+**After — the same behaviour, written by the machine:**
 
 ```python
 from dataclasses import dataclass
@@ -81,24 +152,36 @@ class Student:
     marks: float
 
 priya = Student("Priya", 101, 78.5)
-rohan = Student("Priya", 101, 78.5)
+priya_copy = Student("Priya", 101, 78.5)
 
 print(priya)
-print(priya == rohan)
+print(priya == priya_copy)
 ```
 
-**Output:**
+Output:
+
 ```
 Student(name='Priya', roll_number=101, marks=78.5)
 True
 ```
 
-Compare this to the hand-written `Student` class in 3.1 — `@dataclass` produced a working `__init__`, `__repr__`, and `__eq__` from three lines of type-hinted attributes, with no manual method bodies at all.
+Three type-hinted lines replaced eleven hand-written ones, and the behaviour — a readable `__repr__`, and `__eq__` comparing every field — is identical. The type hints (`str`, `int`, `float`) aren't optional decoration here; `@dataclass` reads them to know which fields exist and what belongs in `__init__`. Leave a field without a type hint and the decorator won't recognise it as a field at all.
 
-### 3.3 Organising Classes into Modules
+Two things catch people off guard here. First, `@dataclass` generates `__repr__` and `__eq__`, but never `__str__` — printing a plain dataclass instance shows the same output `repr()` would, purely because of the fallback rule from §3.1, not because the decorator wrote a matching `__str__` for you. Second, if a field has a default value (`marks: float = 0.0`), every field declared *after* it must also have one — Python won't let a required field follow an optional one, because the generated `__init__` places fields as parameters in that same order:
 
-- A **module** is simply a `.py` file; related classes are usually grouped into the same module, and unrelated groups of classes go into separate modules.
-- Classes from one module are brought into another using `import`.
+```python
+@dataclass
+class Student:
+    name: str
+    marks: float = 0.0
+    roll_number: int        # error: non-default field follows default field
+```
+
+Two optional arguments to the decorator itself are worth knowing: `@dataclass(frozen=True)` makes every field read-only after construction — real immutability, not the naming-convention-only kind from unit 4.2 — and `@dataclass(order=True)` additionally generates `<`, `<=`, `>`, `>=`, so a list of instances can be sorted directly.
+
+### 3.4 Organising Classes into Modules
+
+A **module** is just a `.py` file. As a project grows past one or two classes, cramming everything into a single file becomes its own problem — so related classes get grouped into their own module, and you `import` them where needed.
 
 ```python
 # student.py
@@ -116,47 +199,59 @@ priya = Student("Priya", 101)
 print(priya.name)
 ```
 
-**Output:**
+Output:
+
 ```
 Priya
 ```
 
-As a project grows, organising classes into their own modules — one file for `student.py`, another for `faculty.py` — keeps the codebase navigable instead of one enormous file.
+`student.py` and `main.py` are two files in the same folder; `main.py` reaches into `student.py` by name. A larger project might have `student.py`, `faculty.py`, and `course.py` sitting side by side, each owning one idea.
 
 ---
 
 ## 4. Real-World Application
 
-| **Where you see it** | **How Python is working behind the scenes** |
-|---|---|
-| **A LinkedIn profile card** | The clean summary you see (name, headline, photo) is produced by a `__str__`-style method formatting the underlying profile object for display. |
-| **Comparing two UPI transaction receipts** | An `__eq__` method checks whether two transaction objects share the same transaction ID, not whether they are the same object in memory. |
-| **Error logs in a production AI system** | Engineers rely on a clear `__repr__` so that when an object appears in a log file, its exact state is immediately readable for debugging. |
-| **Configuration objects in ML pipelines** | Simple settings objects (batch size, learning rate) are frequently written as dataclasses, since they are mostly just data with little custom behaviour. |
-| **A Django or Flask web project** | Real projects organise models like `User`, `Post`, and `Comment` into separate modules/files, exactly as shown in 3.3, so the codebase stays maintainable as it grows. |
+A crash log that shows `User(id=48213, email='a@x.com')` instead of a bare memory address is `__repr__` (§3.1) doing its job — giving an engineer enough detail to understand the object without re-running the program. The same mechanism, aimed at a human instead of a debugger, is what turns raw database fields into the clean profile card LinkedIn shows you: a `__str__`-style method formatting the object for reading, not debugging.
+
+Two UPI payment receipts get flagged as "the same transaction" through a custom `__eq__` (§3.2) that compares transaction IDs — not whether they're literally the same object in memory. Two separately-fetched receipts for the same payment still need to count as equal, which is exactly the identity-vs-data distinction this unit opened with.
+
+And a machine-learning config object holding `batch_size`, `learning_rate`, and `epochs` is almost always a dataclass (§3.3) — configuration is pure data with no custom behaviour, precisely the case `@dataclass` exists for.
 
 ---
 
 ## 5. Worked Example
 
-**Scenario:** Your professor asks you to refactor your `Student` class from earlier units into a dataclass for a mini project, and confirm it still prints cleanly and compares correctly.
+**Goal:** You're building a small course-roster tool. Two `Student` records get created from two different data sources for the same real student — confirm the bug that causes them to compare as unequal, then fix it.
 
-**1. Original hand-written class (for comparison).**
+**1. Start with a class that has no `__eq__` at all.**
+
 ```python
 class Student:
     def __init__(self, name, roll_number, marks):
         self.name = name
         self.roll_number = roll_number
         self.marks = marks
-
-    def __repr__(self):
-        return f"Student(name={self.name!r}, roll_number={self.roll_number}, marks={self.marks})"
-
-    def __eq__(self, other):
-        return (self.name, self.roll_number, self.marks) == (other.name, other.roll_number, other.marks)
 ```
 
-**2. Refactor using `@dataclass`.**
+**2. Build "the same student" from two different sources and compare them.**
+
+```python
+from_registrar = Student("Priya", 101, 78.5)
+from_exam_office = Student("Priya", 101, 78.5)
+
+print(from_registrar == from_exam_office)
+```
+
+Output:
+
+```
+False
+```
+
+**3. Diagnose it.** Same name, same roll number, same marks — and still `False`, because without `__eq__`, Python is comparing whether these are the same object in memory. They aren't; they're two separate `Student` instances that happen to agree on every field. A roster-merging function using `==` to detect duplicates would silently keep both and double-count this student.
+
+**4. Fix it — refactor to `@dataclass`, which writes a field-by-field `__eq__` for you.**
+
 ```python
 from dataclasses import dataclass
 
@@ -165,35 +260,34 @@ class Student:
     name: str
     roll_number: int
     marks: float
+
+from_registrar = Student("Priya", 101, 78.5)
+from_exam_office = Student("Priya", 101, 78.5)
+
+print(from_registrar == from_exam_office)
+print(from_registrar)
 ```
 
-**3. Confirm the behaviour is identical.**
-```python
-priya = Student("Priya", 101, 78.5)
-priya_copy = Student("Priya", 101, 78.5)
+Output:
 
-print(priya)
-print(priya == priya_copy)
 ```
-
-**Output:**
-```
-Student(name='Priya', roll_number=101, marks=78.5)
 True
+Student(name='Priya', roll_number=101, marks=78.5)
 ```
 
-*Common mistake: adding a type hint without a value, like `marks` instead of `marks: float`, inside a `@dataclass` — every attribute must be annotated with a type (`str`, `int`, `float`, and so on), or Python will not recognise it as a dataclass field.*
+*Common mistake: assuming two objects with "the same data" will compare equal by default. Without `__eq__` (written by hand or generated by `@dataclass`), Python only ever checks identity — always confirm which one you're getting before you rely on `==` to catch duplicates.*
 
 ---
 
 ## 6. Summary
 
-- **`__str__`** controls the readable text shown when an object is printed; **`__repr__`** controls the more precise, developer-facing text.
-- **`__eq__`** defines what makes two objects of a class equal, instead of relying on Python's default identity check.
-- **`@dataclass`** automatically generates `__init__`, `__repr__`, and `__eq__` from a class's type-hinted attributes, removing repetitive boilerplate.
-- **Modules** — separate `.py` files — keep related classes organised as a project grows, imported wherever they are needed.
+- Printing a plain object gives you an unhelpful default (`<__main__.Student object at 0x...>`) — Python has no way to describe your data until you tell it how.
+- **`__str__`** gives a human-readable description; **`__repr__`** gives a precise, debugging-friendly one — different audiences, different jobs.
+- **`__eq__`** redefines `==` to compare data instead of identity; without it, two objects with identical fields still compare as `False`.
+- **`@dataclass`** is a decorator that generates `__init__`, `__repr__`, and `__eq__` from type-hinted fields — the same behaviour as writing all three by hand, in a fraction of the code, provided every field carries a type hint.
+- **Modules** (separate `.py` files) keep related classes organised as a project grows past a handful of classes.
 
-This closes Part A's coverage of core Python. The next module moves into files and exception handling — reading real data and managing the errors it inevitably produces.
+This closes Part 4's coverage of classes and objects. The next module moves into files and exception handling — reading real data and managing the errors it inevitably produces.
 
 ---
 

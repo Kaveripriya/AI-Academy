@@ -6,44 +6,40 @@
 
 By the end of this unit, you will be able to:
 
-✓ Distinguish between text and binary files, and between absolute and relative file paths.  
-✓ Open a file in the correct mode (read, write, append) and safely close it.  
-✓ Use a `with` block so files are closed automatically, even if an error occurs.  
-✓ Read data from a CSV file using Python's `csv` module.  
-✓ Load and save simple JSON data using `json.load()` and `json.dump()`.
+✓ Explain the difference between a text file and a binary file, and between an absolute and a relative path.  
+✓ Open a file in the right mode, and explain concretely what goes wrong if you forget to close it.  
+✓ Use a `with` block so a file closes automatically — even when an error happens partway through.  
+✓ Read a CSV file into rows using the `csv` module.  
+✓ Load and save data as JSON using `json.load()` and `json.dump()`.
 
 ---
 
 ## 2. Overview
 
-Every program you have written so far in this course has lived and died inside a single Colab session — the moment the runtime restarts, every value you created disappears. Real programs cannot work this way. A college attendance system, a marks portal, or an AI model's training log all need to store data permanently, in a file, so it survives long after the program that created it has stopped running.
+Everything you've built so far has lived inside one Colab runtime — the moment that runtime restarts, every variable you created is gone, as unit 1.1 showed you the hard way. Real programs can't work like that. A marks portal needs last semester's marks to still exist when a student logs back in next month. Python's file-handling tools are how a program stores data somewhere that survives after the program itself has stopped running: a file on disk. Working with one always follows the same shape — you `open()` it, you read from or write to it, and you `close()` it when you're done, which is what actually saves your changes and frees the file for anything else to use.
 
-Think of a file the way you think of a physical lab register kept in your engineering department. The register exists whether or not anyone is currently writing in it. You can open it to read old entries, open it to add a new entry at the end, or occasionally start a fresh register altogether. Python's file-handling tools give you exactly this same set of operations — open, read, write, close — applied to a file stored on disk instead of a paper register.
-
-This unit covers how Python opens, reads, and writes files safely, including two of the most common file formats in real data work: CSV (spreadsheet-style rows and columns) and JSON (the format almost every web API uses to send data).
-
-Every AI system that trains on data starts by reading that data from a file exactly the way you will practise in this unit — which is why file handling is one of the first practical skills every data-facing Python programmer needs.
+Here's a real-world parallel: picture a bank locker. You go to the counter, and the clerk unlocks a specific numbered locker for you — that's `open()`. While it's unlocked, you can take documents out or put new ones in — that's reading and writing. When you're done, you hand it back and the clerk locks it — that's `close()`. Until it's locked again, that locker is *yours*: no one else can safely use it, and anything you just put inside isn't guaranteed safe yet. This unit is about doing that open → use → close sequence correctly, and about two of the most common shapes data comes in once it's stored: CSV and JSON.
 
 ---
 
 ## 3. Description
 
-### 3.1 Introduction to Files
+### 3.1 Text Files, Binary Files, and Paths
 
-- **Text files** store human-readable characters — such as `.txt`, `.csv`, and `.json` files. You can open one in Notepad and read it directly.
-- **Binary files** store data as raw bytes not meant to be read directly — such as `.jpg` images or `.mp3` audio files. Opening one in a text editor shows unreadable characters.
-- **Absolute path** — the complete location of a file starting from the root of the drive, such as `C:\Users\Priya\data\marks.csv`.
-- **Relative path** — a location given relative to wherever your program is currently running, such as `data/marks.csv`. Relative paths are shorter and more portable between machines, which is why most course exercises use them.
+- **Text files** store human-readable characters — `.txt`, `.csv`, `.json`. Open one in Notepad and you can read it directly.
+- **Binary files** store raw bytes that aren't meant to be read as text — `.jpg` images, `.mp3` audio. Open one in Notepad and you get scrambled-looking symbols, because Notepad is trying to interpret non-text data *as* text.
+- **Absolute path** — the full location from the drive's root, e.g. `C:\Users\Priya\data\marks.csv`.
+- **Relative path** — a location relative to wherever your program is currently running, e.g. `data/marks.csv`. Relative paths are shorter and, importantly, they still work if you move the whole project folder to a different computer — an absolute path breaks the moment the folder moves.
 
-### 3.2 File Operations
+### 3.2 Opening, Using, and Closing a File
 
-Python opens a file using the built-in `open()` function, which takes a file path and a **mode** describing what you intend to do with it.
+`open()` is Python's function for accessing a file: give it a path and a **mode** — what you intend to do once it's open — and it hands back a file object you can read from or write to. In the locker parallel from the Overview, this is the clerk handing you the locker:
 
 | **Mode** | **Meaning** |
 |---|---|
-| `r` | Read an existing file. Fails if the file does not exist. |
-| `w` | Write a new file. Creates the file if it doesn't exist; erases existing content if it does. |
-| `a` | Append to an existing file, adding new content at the end without erasing what's already there. |
+| `r` | Read an existing file. Fails with an error if the file doesn't exist — there's no locker to open. |
+| `w` | Write a new file. Creates it if missing; **erases everything already inside** if it exists — like emptying the locker before you put anything new in. |
+| `a` | Append. Adds new content after what's already there, without erasing it. |
 | `r+` | Read and write the same file without erasing its existing content. |
 
 ```python
@@ -52,17 +48,60 @@ file.write("Python file handling notes\n")
 file.close()
 ```
 
-Once a file is open, these are the core operations you will use:
+Once open, the operations you'll use most:
 
-- **`read()`** — reads the entire file as one string.
-- **`readline()`** — reads just one line at a time.
-- **`readlines()`** — reads every line into a list of strings.
+- **`read()`** — the entire file, as one string.
+- **`readline()`** — just the next line.
+- **`readlines()`** — every line, as a list of strings.
 - **`write()`** — writes a string into the file.
-- **`close()`** — releases the file so other programs (and the rest of your own code) can use it safely.
+- **`close()`** — hands the locker back.
 
-### 3.3 Context Managers — the `with` Statement
+There's a fifth option worth knowing as the default for most real reading: looping directly over the file itself. A file is iterable, so `for line in file:` hands you one line at a time without ever loading the whole thing into memory — the same lazy, one-at-a-time behavior you saw with generators:
 
-Calling `close()` manually is easy to forget — especially if an error happens between `open()` and `close()`, in which case `close()` never runs at all. Python's **context manager**, written with the `with` keyword, solves this by closing the file automatically the moment the block finishes, whether it finished normally or because of an error.
+```python
+with open("notes.txt", "r") as file:
+    for line in file:
+        print(line.strip())    # strip() drops the trailing newline
+```
+
+**Here's what forgetting `close()` actually costs you** — it's not just tidiness. When you `write()`, Python often holds what you wrote in a temporary memory buffer rather than sending it to disk immediately, for speed. `close()` is also the signal that flushes that buffer to disk for good. Skip it, and:
+
+```python
+file = open("draft.txt", "w")
+file.write("Meeting notes for Monday")
+# no file.close() here
+
+with open("draft.txt", "r") as check:
+    print(repr(check.read()))
+```
+
+Output:
+
+```
+''
+```
+
+The write genuinely happened — in memory — but without `close()`, there's no guarantee it ever reached the disk. A second program (or a second `open()`, like the check above) reading that same file may see nothing at all, or only part of what you wrote. The locker was never locked, so as far as anyone else is concerned, it might as well be empty.
+
+### 3.3 The `with` Statement — Closing Automatically
+
+Calling `close()` yourself has a sharper failure mode than just forgetting it: if an *error* happens between `open()` and `close()`, the `close()` line never runs at all, because Python stops executing that function the instant the error is raised.
+
+```python
+file = open("log.txt", "w")
+file.write("step 1 complete\n")
+result = 10 / 0          # crashes here
+file.close()              # never reached
+```
+
+The locker stays open forever — nobody handed it back. Python's **context manager**, written with `with`, fixes this at the language level: it closes the file the moment the indented block ends, whether that block finished normally *or* crashed with an error.
+
+```python
+with open("log.txt", "w") as file:
+    file.write("step 1 complete\n")
+    result = 10 / 0       # still crashes...
+# ...but the file is already closed by the time the crash propagates
+```
 
 ```python
 with open("notes.txt", "r") as file:
@@ -70,46 +109,45 @@ with open("notes.txt", "r") as file:
     print(content)
 ```
 
-```mermaid
-flowchart TD
-    A[with open file] --> B[Run the indented block]
-    B --> C[Block finishes normally OR an error occurs]
-    C --> D[Python closes the file automatically either way]
-```
+Output:
 
-**Output:**
 ```
 Python file handling notes
 ```
 
-Notice there is no `file.close()` line at all — the `with` block handles it for you. This is the pattern you should use for every file you open from now on.
+Notice there's no `file.close()` anywhere — `with` handles it, guaranteed. Use `with` for every file you open from this point on; treat manual `open()`/`close()` as something you now know exists but shouldn't reach for.
 
-### 3.4 Reading CSVs
+### 3.4 Reading CSV Files
 
-A **CSV** (Comma-Separated Values) file stores data as rows and columns, like a simplified spreadsheet — exactly the shape most college marksheets and attendance exports are shared in. Python's built-in `csv` module reads each row as a list.
+A **CSV** (Comma-Separated Values) file stores rows and columns as plain text, comma-separated — the shape most spreadsheet exports come in. Python's built-in `csv` module reads each row back as a list of strings.
 
 ```python
 import csv
 
-with open("marks.csv", "r") as file:
+with open("marks.csv", "r", newline="") as file:
     reader = csv.reader(file)
     for row in reader:
         print(row)
 ```
 
-**Output:**
+Output:
+
 ```
 ['Name', 'Marks']
 ['Priya', '78']
 ['Rohan', '85']
 ```
 
+Every value comes back as a **string**, even `'78'` — CSV has no concept of numbers, only text. If you need `78` the number, you convert it yourself with `int()`, which the worked example below does.
+
+Always pass `newline=""` to `open()` when reading or writing CSV — without it, the `csv` module can't fully control line endings itself, and rows occasionally split incorrectly on some systems.
+
 ### 3.5 Working with JSON
 
-**JSON** (JavaScript Object Notation) stores data as key-value pairs, similar to a Python dictionary — and it is the format almost every web API, including AI model APIs, uses to send and receive data.
+**JSON** (JavaScript Object Notation) stores data as key-value pairs — structurally close to a Python dictionary — and it's the format almost every web API, including AI model APIs, sends and receives data in.
 
-- **`json.load()`** — reads JSON data from a file into a Python dictionary.
-- **`json.dump()`** — writes a Python dictionary out to a file as JSON.
+- **`json.dump(data, file)`** — writes a Python dictionary out to a file as JSON.
+- **`json.load(file)`** — reads JSON from a file back into a Python dictionary.
 
 ```python
 import json
@@ -124,30 +162,30 @@ with open("student.json", "r") as file:
     print(data)
 ```
 
-**Output:**
+Output:
+
 ```
 {'name': 'Priya', 'marks': 78}
 ```
+
+Unlike CSV, JSON *does* preserve types — `data["marks"]` comes back as the integer `78`, not the string `"78"`, because JSON has its own idea of numbers, strings, and booleans, and Python's `json` module maps them faithfully in both directions.
 
 ---
 
 ## 4. Real-World Application
 
-| **Where you see it** | **How Python is working behind the scenes** |
-|---|---|
-| **Downloading your semester result as a PDF or CSV** | The portal's backend reads your marks from a database and writes them out to a file in exactly the read/write pattern covered in this unit. |
-| **A cricket score app updating live** | The app repeatedly reads a small JSON file (or API response) containing the current score and re-displays it the moment it changes. |
-| **UPI transaction history export** | Banking apps let you export your transaction history as a CSV file, read using the exact `csv.reader()` pattern shown above. |
-| **NPTEL or Internshala saving your profile** | Your profile details are stored and reloaded as JSON, the same `json.load()` / `json.dump()` pair used in this unit. |
-| **ChatGPT and other AI APIs** | Every request and response between your code and an AI model is exchanged as JSON — the format this unit introduces. |
+Your semester result portal's "download as CSV" button, and a UPI app's "export transaction history" option, are both doing exactly §3.2/§3.4's pattern on the server: writing rows with `csv.writer` inside a `with` block, so a slow download from a browser can't leave a file handle stuck open — one row per record, plain text, no surprises.
+
+JSON covers the other common case. A mobile app saving your profile settings so they're still there next time you open it is a dictionary written out with `json.dump()` and loaded back with `json.load()` (§3.5). That exact exchange — a Python dictionary going out as JSON and coming back as one — is also what's happening on the wire every time your code calls an AI model's API, which is why those two functions are among the most-used once you start working with real APIs later in this program.
 
 ---
 
 ## 5. Worked Example
 
-**Scenario:** Your professor has shared a CSV file, `marks.csv`, containing student names and their marks. You must write a Python program that reads the file and prints each student's name along with a Pass/Fail result.
+**Goal:** You've been given `marks.csv` and need a program that prints each student's name with a Pass/Fail result — and you'll deliberately hit the header-row bug almost everyone hits the first time.
 
-**1. Prepare the input file.** Assume `marks.csv` contains:
+**1. The input file, `marks.csv`:**
+
 ```
 Name,Marks
 Priya,78
@@ -155,43 +193,62 @@ Rohan,32
 Arjun,55
 ```
 
-**2. Open the file safely.** Use a `with` block so the file always closes correctly:
+**2. First attempt — read every row, including the header, and try to grade it.**
+
 ```python
 import csv
 
-with open("marks.csv", "r") as file:
+with open("marks.csv", "r", newline="") as file:
     reader = csv.reader(file)
-    header = next(reader)
     for row in reader:
         name, marks = row[0], int(row[1])
         result = "Pass" if marks >= 40 else "Fail"
         print(f"{name}: {result}")
 ```
 
-**3. Run the cell.** Press `Shift + Enter` in Colab.
+Output:
 
-**4. Check the output.**
+```
+ValueError: invalid literal for int() with base 10: 'Marks'
+```
+
+**3. Diagnose it.** The very first row read is `['Name', 'Marks']` — the header, not a student. `int("Marks")` has no way to become a number, because it isn't one. The `csv` module doesn't know some rows are headers and others aren't; it just hands you every row, in order, and trusts you to know your own file's shape.
+
+**4. Fix it by consuming the header row once, before the loop starts:**
+
+```python
+with open("marks.csv", "r", newline="") as file:
+    reader = csv.reader(file)
+    header = next(reader)     # reads and discards row 1 — the header
+    for row in reader:
+        name, marks = row[0], int(row[1])
+        result = "Pass" if marks >= 40 else "Fail"
+        print(f"{name}: {result}")
+```
+
+Output:
+
 ```
 Priya: Pass
 Rohan: Fail
 Arjun: Pass
 ```
 
-**5. Save your work.** Save the notebook to Google Drive so both your code and the result are stored together.
+`next(reader)` pulls exactly one row off the front and hands it to `header`, so the `for` loop that follows only ever sees the real data rows.
 
-*Common mistake: forgetting to skip the header row (`Name,Marks`) before processing the data — this causes an error when Python tries to convert the word "Marks" into a number with `int()`. Always call `next(reader)` once before the loop to skip it.*
+*Common mistake: forgetting the header exists at all until `int()` crashes on it. Whenever a CSV read blows up on the very first row, check whether that row is a header before you check anything else.*
 
 ---
 
 ## 6. Summary
 
-- **Files** let a program's data survive after the program itself has stopped running, unlike a Colab runtime's temporary memory.
-- **File modes** (`r`, `w`, `a`, `r+`) control whether you are reading, writing, appending, or doing both.
-- **The `with` statement** closes a file automatically, even if an error occurs inside the block — always prefer it over calling `close()` manually.
-- **The `csv` module** reads spreadsheet-style data row by row, exactly the shape most marksheets and exports use.
-- **JSON**, read and written with `json.load()` and `json.dump()`, is the data format almost every web and AI API uses.
+- **Files** let data outlive the program that created it — unlike a Colab runtime's memory, which is wiped by every restart.
+- **Modes** (`r`, `w`, `a`, `r+`) tell `open()` whether you intend to read, write (erasing existing content), append, or both.
+- **Forgetting to close a file isn't just untidy** — writes can sit in a memory buffer and never actually reach disk until `close()` runs, so an unclosed file can look empty to anyone else reading it.
+- **`with` closes a file automatically**, even if an error occurs inside the block — manual `open()`/`close()` has no such guarantee, since an error skips the `close()` line entirely.
+- **`csv.reader()`** hands back every row — including the header — as a list of strings; **JSON**, via `json.load()`/`json.dump()`, preserves real types and is the format most APIs speak.
 
-With files now readable and writable, the next unit covers what happens when that data isn't clean — errors and exceptions, and how to handle them without crashing your program.
+Now that data can survive on disk, the next unit covers what happens when that data — or anything else in your program — goes wrong: errors and exceptions, and how to handle them without crashing.
 
 ---
 

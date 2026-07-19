@@ -6,39 +6,22 @@
 
 By the end of this unit, you will be able to:
 
-✓ Import a module using `import`, `from ... import`, and `as`.  
+✓ Import code with `import`, `from ... import`, and `as`, and explain what each one actually does.  
 ✓ Use at least three modules from Python's standard library.  
-✓ Explain what `pip` does and install a package with it.  
-✓ Explain why a virtual environment (`venv`) is used on a real project.  
-✓ Describe, at a concept level, what Poetry and Pytest are used for.
+✓ Explain what `pip` does, install a package with it, and say what problem a virtual environment solves.  
+✓ Describe, at a concept level, what Poetry and Pytest are for and why professional projects use them.
 
 ---
 
 ## 2. Overview
 
-Every function you have written so far has lived in a single notebook.
-Real projects are organised across many files, use code other people
-have already written, and are tested before anyone trusts them. This
-unit covers the professional habits that make that possible — modules,
-package management, isolated environments, and testing.
+Every piece of code you've written so far has lived in a single notebook, written entirely by you. Real projects don't work that way: code is split across many files, most of it wasn't written by you at all, and none of it gets trusted until something has actually checked that it works.
 
-Think of a virtual environment the way a hospital uses a separate,
-sealed operating theatre for each procedure. Instruments are sterilised
-and set up fresh each time so that nothing from a previous procedure
-contaminates the next one. A Python virtual environment does the same
-for your code — it keeps one project's packages completely separate
-from another's, so installing something for one project can never
-silently break a different one.
+This unit covers five tools built for exactly that reality. A **module** is a file of code someone else already wrote that you can pull into your own program. **pip** installs a module you don't have yet. A **virtual environment** keeps one project's installed modules separate from another's, so they can't conflict. **Poetry** writes down exactly which modules and versions a project needs, so anyone can rebuild the same setup. **Pytest** runs small checks that confirm your code still works before you rely on it.
 
-This unit covers modules and imports, the Python standard library,
-installing packages with `pip`, working inside a virtual environment,
-and a concept-level introduction to Poetry and Pytest — tools you will
-use throughout the rest of this programme.
+Picture all five together as a workshop. So far, you've been building things using only tools you made yourself, on one workbench. Modules are shelves of tools other people already built; pip is the delivery service that brings in tools you don't have; a virtual environment keeps one project's tools from getting mixed up with another's; Poetry is the labeled inventory list so anyone can rebuild your exact workshop; and Pytest is the inspector who checks your tools still work before you trust them.
 
-Every professional Python project — including the ones you will build
-later in this course — depends on this exact tooling: organised modules,
-managed dependencies, and a test suite that confirms the code still
-works after every change.
+Every professional Python project you'll touch later in this course — and after it — is built on exactly this setup.
 
 ---
 
@@ -46,60 +29,55 @@ works after every change.
 
 ### 3.1 Modules and Imports
 
-- **`import`** — brings an entire module into your code, accessed with a
-  dot:
+A **module** is just a `.py` file full of code someone already wrote — functions, values, whatever — sitting ready for you to pull into your own program instead of rewriting it from scratch. Bringing one in is called **importing** it.
+
+- **`import`** — brings the whole module in under its own name; you reach into it with a dot. (Like taking the whole toolbox off the shelf.)
 
 ```python
 import math
 print(math.sqrt(81))
 ```
 
-**Output:**
+Output:
 ```
 9.0
 ```
 
-- **`from ... import`** — brings a specific name out of a module, so you
-  can use it directly:
+- **`from ... import`** — pulls one specific item out of the module, so you can use it directly, without the dot. (Like taking a single tool out of the toolbox.)
 
 ```python
 from math import sqrt
 print(sqrt(81))
 ```
 
-**Output:**
+Output:
 ```
 9.0
 ```
 
-- **`as`** — gives an imported module or name a different (usually
-  shorter) alias:
+- **`as`** — gives the thing you just imported a shorter name to use from then on. (Like relabeling a toolbox on the way in.)
 
 ```python
 import math as m
 print(m.sqrt(81))
 ```
 
-**Output:**
+Output:
 ```
 9.0
 ```
 
-- **Namespacing.** Using `import math` and calling `math.sqrt()` keeps
-  the function clearly tied to where it came from — this avoids
-  confusion when two different modules happen to define something with
-  the same name.
+Writing `math.sqrt()` instead of just `sqrt()` isn't just habit — it's a label that says *which* toolbox this tool came from. That matters the moment two different modules happen to have a function with the same name; the dot is what keeps them from colliding.
 
 ### 3.2 The Python Standard Library
 
-Python ships with a large collection of ready-to-use modules — no
-installation required.
+Python's **standard library** is the set of modules that ship with Python itself — nothing to install, nothing to wait for. Picture them as toolboxes that come pre-installed in your workshop the moment you move in.
 
-| **Module** | **What it is used for** |
+| **Module** | **What it's for** |
 |---|---|
-| `random` | Generating random numbers, shuffling lists, picking a random item. |
-| `math` | Mathematical functions — square roots, powers, trigonometry, constants like `pi`. |
-| `datetime` | Working with dates and times — today's date, calculating a difference between two dates. |
+| `random` | Random numbers, shuffling a list, picking a random item. |
+| `math` | Square roots, powers, trigonometry, constants like `pi`. |
+| `datetime` | Today's date, the current time, the gap between two dates. |
 
 ```python
 import random
@@ -109,61 +87,37 @@ print(random.choice(["Rohan", "Priya", "Arjun"]))
 print(datetime.date.today())
 ```
 
-**Output:**
+Output:
 ```
 Priya
 2026-07-17
 ```
 
-### 3.3 Package Management with pip
+### 3.3 Installing Packages with `pip`
 
-- **Installing and using packages.** Beyond the standard library,
-  thousands of community-built packages can be installed with `pip`,
-  Python's package installer:
+Beyond what ships pre-installed, there's a much bigger catalog: **PyPI** (the Python Package Index) — a public, shared listing where any developer, anywhere, can publish a toolbox for others to use. `pip` is the delivery service that goes and fetches one for you by name.
 
 ```python
 !pip install requests
 ```
 
-Once installed, a package is imported and used exactly like a standard
-library module. Google Colab comes with many popular packages
-(including `requests`) already installed, so this command is often
-instant.
+Once it arrives, you `import` and use it exactly like anything from the standard library — Python doesn't distinguish between "built-in" and "installed" once the import succeeds. Google Colab happens to keep several popular packages (`requests` included) already stocked, so this particular install is often instant.
 
-### 3.4 Virtual Environments (venv)
+### 3.4 Why Virtual Environments Exist
 
-- **Why isolation matters (concept).** A virtual environment is an
-  isolated copy of Python and its packages, created for one project at a
-  time. Without it, installing a newer version of a package for one
-  project could quietly break a different project that needed the older
-  version.
+Here's the problem a **virtual environment** solves. Say Project A was built against `requests` version 2.20, and Project B — on the very same laptop — needs `requests` version 2.31 because it uses a feature that didn't exist in 2.20. Without isolation, there's only *one* copy of `requests` installed system-wide: upgrading it for Project B silently breaks Project A, and neither project's code has to change for that to happen.
 
-```mermaid
-flowchart LR
-    A[Project A venv] -->|isolated packages| A1[Its own installed packages]
-    B[Project B venv] -->|isolated packages| B1[Its own installed packages]
-```
+A virtual environment gives each project its own private room, with its own copy of Python's packages, sealed off from every other project's room — Project A keeps its `requests` v2.20 in its room, Project B keeps v2.31 in its own, and neither room can touch the other's shelves.
 
-- **Offline practice (concept).** On your own laptop, a virtual
-  environment is created once per project and activated before you work
-  in it. Google Colab does not need this step, since every notebook
-  already runs in its own isolated cloud session — but you will use
-  `venv` directly once you move to writing code outside Colab.
+On your own laptop, you create one of these rooms per project and step into it (`activate`) before working. Google Colab skips this step for you — every notebook already runs in its own sealed cloud session — but you'll create `venv`s directly the moment you write code outside a notebook.
 
-### 3.5 Poetry
+### 3.5 Poetry — the Project's Inventory List
 
-- **`poetry new` to initialise a project (concept).** Poetry is a tool
-  that manages a Python project's dependencies and packaging together,
-  replacing several older, separate tools. Running `poetry new
-  my_project` sets up a ready-to-use project structure, including a file
-  that records exactly which packages (and versions) the project
-  depends on.
+**Poetry** is a tool that keeps a written, exact record of which packages — and which versions — a project depends on, in one file. Instead of you (or anyone else) trying to remember or guess what to install, running `poetry new my_project` sets up a project with that inventory list already in place. Anyone who clones the project can hand that same list to Poetry and get the *identical* set of tools, with no guesswork.
 
-### 3.6 Pytest
+### 3.6 Pytest — an Inspector for Your Code
 
-- **Writing and running a first test (concept).** Pytest is the standard
-  tool for writing automated tests — small scripts that check your code
-  behaves correctly, without you having to check it by hand every time:
+**Pytest** is the standard tool for writing automated tests: small pieces of code whose only job is to check that a *different* piece of code still behaves the way it's supposed to, so you're not manually re-checking it by hand after every change.
 
 ```python
 def add(a, b):
@@ -173,99 +127,97 @@ def test_add():
     assert add(2, 3) == 5
 ```
 
-Running `pytest` on a file like this automatically finds any function
-starting with `test_` and checks whether its `assert` statements hold
-true — if `add(2, 3)` ever stopped returning `5`, this test would fail
-immediately and tell you exactly where.
+An `assert` statement is a claim — "this had better be true." Running `pytest` on a file like this automatically finds every function starting with `test_` and checks whether its `assert` lines hold. The moment `add(2, 3)` stops returning `5` — because someone, somewhere, broke it — this test fails immediately and points straight at the problem, instead of a user finding out first.
 
 ---
 
 ## 4. Real-World Application
 
-| **Where you see it** | **How Python is working behind the scenes** |
-|---|---|
-| **A weather app** showing today's forecast | Uses `datetime` to know the current date and time before fetching the right day's forecast. |
-| **A shuffle feature** on Spotify | Uses `random` to reorder your playlist so it does not play in the same order every time. |
-| **Any professional Python project on GitHub** | Uses `pip`-installed packages and a virtual environment, so contributors can set up the exact same environment on their own laptop. |
-| **A company's automated testing pipeline** | Runs Pytest automatically every time new code is pushed, blocking the change if any test fails. |
-| **An AI chatbot's backend** | Imports multiple modules — one for handling requests, one for logging, one for talking to the AI model — each with a clear, separate responsibility. |
+A weather app showing today's forecast, and Spotify's shuffle button never repeating the same order twice, both lean on §3.2's standard library doing exactly what you just did by hand — `datetime` picks the right day before a forecast is fetched, `random` reorders the queue — just wired into a much bigger app instead of a two-line script.
+
+Two data science projects on the same laptop needing different, conflicting versions of the same library is precisely the §3.4 problem: solved by giving each project its own virtual environment instead of one shared, global set of packages that both are forced to fight over.
+
+And the two guarantees behind most professional codebases are §3.5 and §3.6 working together: a new developer joining a company project runs one command that reads the project's Poetry inventory and installs exactly what's listed, nothing more or missing — and code doesn't merge into the main project until Pytest's automated checks confirm it didn't break anything that used to work.
 
 ---
 
 ## 5. Worked Example
 
-**Scenario:** Your professor asks you to write a small script that
-picks a random student from your class for a surprise viva, logs the
-date it was run, and includes a test confirming the picking logic
-works correctly.
+**Goal:** Split code across two files instead of one notebook cell, import your own module the same way you'd import `math`, then add a test that checks it.
 
-**1. Open a Colab notebook** and create a new code cell.
-
-**2. Import the modules you need.**
-```python
-import random
-import datetime
-```
-
-**3. Write the selection logic.**
-```python
-students = ["Priya", "Rohan", "Arjun", "Meera"]
-chosen = random.choice(students)
-today = datetime.date.today()
-
-print(f"Viva selected for {today}: {chosen}")
-```
-
-**4. Run the cell and check the output.**
-```
-Viva selected for 2026-07-17: Rohan
-```
-
-**5. Add a simple Pytest-style check** confirming the function only ever
-picks a name that is actually in the list:
+**1. Write your own module.** In a Colab cell, use `%%writefile` to save code straight to a file instead of running it:
 
 ```python
-def pick_student(names):
-    return random.choice(names)
-
-def test_pick_student():
-    students = ["Priya", "Rohan", "Arjun", "Meera"]
-    assert pick_student(students) in students
-
-test_pick_student()
-print("Test passed — no error means the assertion held.")
+%%writefile grader.py
+def letter_grade(score):
+    if score >= 90:
+        return "A"
+    elif score >= 75:
+        return "B"
+    else:
+        return "C"
 ```
 
-**Output:**
+Output:
 ```
-Test passed — no error means the assertion held.
+Writing grader.py
 ```
 
-*Common mistake: installing a package with `pip install` directly on a
-shared laptop or server without a virtual environment. This can silently
-upgrade or downgrade a package that a different project on the same
-machine depends on, breaking code that has nothing to do with your
-current work.*
+**2. Import it from a different cell, exactly like a standard library module.**
+
+```python
+import grader
+
+print(grader.letter_grade(92))
+print(grader.letter_grade(80))
+```
+
+Output:
+```
+A
+B
+```
+
+Nothing about this `import` is different from `import math` — `grader.py` is a module now, the same category of thing, just one you happened to write yourself two cells ago instead of one the Python team shipped years ago.
+
+**3. Add a test that checks it, the Pytest way.**
+
+```python
+def test_letter_grade():
+    assert grader.letter_grade(95) == "A"
+    assert grader.letter_grade(60) == "C"
+
+test_letter_grade()
+print("Test passed — no error means every assertion held.")
+```
+
+Output:
+```
+Test passed — no error means every assertion held.
+```
+
+**4. Break it on purpose, and watch the test do its job.** Rewrite `grader.py` so `letter_grade(95)` returns `"B"` by mistake, re-run the import, then re-run `test_letter_grade()`.
+
+Output:
+```
+AssertionError
+```
+
+The test didn't need you to notice the bug by reading the code — it noticed for you, the instant the behavior changed.
+
+*Common mistake: installing a package straight into a shared machine with `pip install` and no virtual environment. On your own laptop, that can quietly upgrade or downgrade a package a completely unrelated project depends on — the exact failure mode §3.4 describes.*
 
 ---
 
 ## 6. Summary
 
-- **`import`, `from ... import`, and `as`** bring code from a module
-  into your program, with `as` giving it a shorter alias.
-- **The standard library** (`random`, `math`, `datetime`, and many more)
-  ships with Python, ready to use without installing anything.
-- **`pip`** installs community-built packages beyond the standard
-  library.
-- **Virtual environments** isolate one project's packages from another's,
-  preventing one project's dependencies from silently breaking a
-  different one.
-- **Poetry** manages a project's dependencies and structure; **Pytest**
-  automatically checks that your code still behaves correctly.
+- **`import`, `from ... import`, and `as`** bring code from a module into your program — a module being nothing more exotic than a `.py` file someone already wrote.
+- **The standard library** ships pre-installed with Python; **`pip`** reaches into PyPI's public catalog to fetch anything beyond that, by name.
+- **Virtual environments** give each project its own private set of installed packages, so one project's version needs can never silently break another's.
+- **Poetry** keeps a written, exact inventory of a project's dependencies so its setup can be reproduced identically by anyone; **Pytest** runs small `assert`-based checks that catch broken behavior the instant it happens, not after.
+- Your own files are modules too — `import grader` works exactly like `import math`, because Python draws no real distinction between "code you wrote" and "code you imported."
 
-This closes Part A's core Python teaching. The next module moves from
-individual values into the data structures — lists, tuples, sets, and
-dictionaries — every later AI lab in this programme relies on.
+This closes Part 2's core language teaching. Part 3 moves from individual values into data structures — starting with lists — that every later AI lab in this program depends on.
 
 ---
 
