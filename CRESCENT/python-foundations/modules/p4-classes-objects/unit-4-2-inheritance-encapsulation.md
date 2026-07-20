@@ -33,10 +33,7 @@ This unit takes that idea further than a single parent-child pair. You will chai
 
 ### 3.1 Definition
 
-**Inheritance** is a mechanism where a new class is defined in terms of an existing class, automatically acquiring all of that existing class's attributes and methods. The existing class being extended is called the **superclass** (also called the **parent class** or **base class**); the new class built on top of it is called the **subclass** (also called the **child class** or **derived class**).
-
-**Encapsulation** is the practice of bundling an object's data together with the methods that operate on it, while restricting which parts of that data may be accessed directly by code outside the class. In Python, encapsulation is expressed through naming convention — a leading underscore signals "internal, please don't touch" — rather than through a hard language rule.
-
+**Inheritance** helps us reuse existing code. Instead of creating a new class from scratch, we can create it from an existing class. The existing class is called the **superclass** (or **parent class**), while the new class is called the **subclass** (or **child class**). The subclass inherits all the attributes and methods of the superclass and can also include its own additional features.
 ```python
 class BankAccount:               # superclass / parent / base class
     def __init__(self, balance):
@@ -46,18 +43,41 @@ class BankAccount:               # superclass / parent / base class
 class SavingsAccount(BankAccount):   # subclass / child / derived class
     pass
 ```
-
 Even though `SavingsAccount` has an empty body, it already has everything `BankAccount` has. That single line, `class SavingsAccount(BankAccount):`, is the entire mechanism of inheritance.
+
+**Encapsulation** is the process of keeping an object's data and the methods that work on that data together inside a class. It also helps protect the object's data by encouraging controlled access. In Python, attributes that begin with an underscore (`_`) are treated as **internal** by convention and should not be accessed directly from outside the class.
+```python
+class BankAccount:
+    def __init__(self, balance):
+        self.__balance = balance
+    def show_balance(self):
+        print("Balance:", self.__balance)
+account = BankAccount(5000)
+account.show_balance()      # Correct
+print(account.__balance)    # Error
+```
+The `__balance` attribute cannot be accessed directly from outside the class. Instead, it should be accessed through the `show_balance()` method.
 
 ### 3.2 Why This Concept Exists
 
-Without inheritance, every related class would need to be written from scratch, and every future change to shared behavior would have to be copy-pasted into every class that used it. Inheritance exists to solve three real problems that show up constantly in Indian IT projects:
+#### Inheritance
 
-- **Avoiding duplication** — a `CurrentAccount` and a `SavingsAccount` both need `deposit()` and `withdraw()`; writing that logic once on a shared `BankAccount` and inheriting it means one bug fix in one place fixes it everywhere.
-- **Modeling real-world relationships** — a `Manager` genuinely **is an** `Employee`, with extra responsibilities. Inheritance lets your code mirror that real relationship directly.
-- **Extending safely** — `super()` lets a subclass build on top of a superclass's method without needing to know or retype its internals, so the superclass can change later without breaking every subclass.
+Without inheritance, every related class would need to be written from scratch, and any common change would have to be repeated in every class. Inheritance helps solve this problem by:
 
-Encapsulation exists for a related but distinct reason: to protect an object's internal state from being changed carelessly by code outside the class. A bank account's balance should only ever change through `deposit()` and `withdraw()` — never by some unrelated piece of code directly overwriting it. Naming a field `_balance` or `__balance` signals that intention clearly to every other developer reading the code, even though, as you'll see in §3.7, Python does not physically stop anyone from ignoring that signal.
+- **Reducing code duplication** – Common methods such as `deposit()` and `withdraw()` can be written once in a `BankAccount` class and reused by `SavingsAccount` and `CurrentAccount`.
+- **Representing real-world relationships** – A `SavingsAccount` **is a** `BankAccount`, so it can inherit its common features.
+- **Making programs easier to maintain** – A change made to a common method in the parent class is automatically available to all child classes.
+
+#### Encapsulation
+
+Encapsulation keeps an object's data and the methods that work on that data together inside a class. It also encourages controlled access to important data, helping prevent accidental changes from outside the class.
+
+Encapsulation is useful because it:
+
+- **Keeps related data and methods together** inside a class.
+- **Protects important data** by encouraging access through methods instead of direct modification.
+- **Improves code readability** by marking internal attributes (such as `_balance`) that are intended for use only within the class.
+- **Makes programs easier to maintain** by ensuring that changes to internal data handling are managed within the class itself.
 
 ### 3.3 Key Terminology
 
