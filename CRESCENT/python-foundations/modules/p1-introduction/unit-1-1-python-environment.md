@@ -6,10 +6,10 @@
 
 By the end of this unit, you will be able to:
 
-✓ Explain why Python is the common language for AI and machine learning work.
-✓ Describe what an interpreter does and what "interactive mode" (the REPL) means.
-✓ Open Google Colab, create a cell, run it, and read its output.
-✓ Restart the Colab runtime and save a notebook to Google Drive.
+✓ Explain why Python is the common language for AI and machine learning work.  
+✓ Describe what an interpreter does and what "interactive mode" (the REPL) means.  
+✓ Open Google Colab, create a cell, run it, and read its output.  
+✓ Restart the Colab runtime and save a notebook to Google Drive.  
 ✓ Write and run your first program using the `print()` function.
 
 ---
