@@ -99,7 +99,7 @@ Every line in that skeleton is syntax you already know — file and CSV handling
 | Risk if used in the wrong place | Loses all remaining good work over one bad record | Could hide a systemic problem if failures are only logged and never actually reviewed |
 | What this unit builds | The naive first version in §3.8 | The robust version in §3.8, and the worked example in §5 |
 
-**Diagram: The Skip-and-Log Flow**
+**The Skip-and-Log Flow**
 
 ```mermaid
 flowchart TD

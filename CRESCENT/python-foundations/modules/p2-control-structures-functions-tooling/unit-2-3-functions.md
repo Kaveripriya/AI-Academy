@@ -1,4 +1,4 @@
-# Functions
+﻿# Functions
 
 ---
 
@@ -116,7 +116,7 @@ Calling the function reuses the same familiar shape you've used since Unit 1.1:
 function_name(argument1, argument2)
 ```
 
-**Diagram: Function Call Flow**
+**Function Call Flow**
 
 ```mermaid
 flowchart LR
@@ -223,7 +223,7 @@ factorial(4)   # 4 * 3 * 2 * 1 = 24
 
 Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. The diagram below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
 
-**Diagram: Recursion Call Stack — `factorial(4)`**
+**Recursion Call Stack — `factorial(4)`**
 
 ```mermaid
 flowchart TB

@@ -137,7 +137,7 @@ obj = ClassName(value1, value2)      # instantiation
 | Example | `Student` (the idea of "a student") | `Student("Priya Nair", 91)` (one real student) |
 | Independence | N/A — there is only one blueprint | Every object's attributes are independent of every other object's |
 
-**Diagram: One Class, Many Independent Objects**
+**One Class, Many Independent Objects**
 
 ```mermaid
 ---

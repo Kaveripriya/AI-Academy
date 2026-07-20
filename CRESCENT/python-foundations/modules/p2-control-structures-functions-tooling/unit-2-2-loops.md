@@ -83,7 +83,7 @@ while condition:
 | `condition` | Any expression that evaluates to `True` or `False`. | Re-checked before every single iteration, including the first. |
 | Indented block | The loop body. | Runs once per iteration, as long as `condition` is `True`. |
 
-**Diagram: `while` Loop**
+**`while` Loop**
 
 ```mermaid
 flowchart TD
@@ -107,7 +107,7 @@ for item in sequence:
 | `item` | The **loop variable** — your chosen name. | Holds the current item's value during each iteration. |
 | `sequence` | Anything Python can iterate over — a string, `range(...)`, `enumerate(...)`, or `zip(...)`. | Defines what values `item` will take, and how many iterations run. |
 
-**Diagram: `for` Loop**
+**`for` Loop**
 
 ```mermaid
 flowchart TD

@@ -100,7 +100,7 @@ a, b, c = (10, 20, 30)
 | `=` | The assignment operator. | Same operator you already know — it works on multiple names at once when the right side is a tuple (or any iterable) of matching length. |
 | `(10, 20, 30)` | The tuple being unpacked. | The number of names on the left must match the number of values on the right, or Python raises a `ValueError`. |
 
-**Diagram: Tuple Unpacking Flow**
+**Tuple Unpacking Flow**
 
 ```mermaid
 flowchart LR

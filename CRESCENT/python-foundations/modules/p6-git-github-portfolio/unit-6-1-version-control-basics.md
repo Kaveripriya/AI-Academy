@@ -78,7 +78,7 @@ Because this course works entirely through the GitHub website, "syntax" here mea
 
 The key takeaway from this table: on the GitHub web interface, steps 3 through 5 collapse into one click. You do not need to separately "stage," "commit," and "push" the way someone working from a local computer with the git command line would — that distinction becomes relevant later in your career if you move to command-line Git, but is not required for this course.
 
-**Diagram: The Edit → Commit → Push Loop (Web Interface)**
+**The Edit → Commit → Push Loop (Web Interface)**
 
 ```mermaid
 flowchart LR
@@ -89,7 +89,7 @@ flowchart LR
     E --> F["Visible immediately in the<br/>repository's Commits tab"]
 ```
 
-**Diagram: Local Work vs GitHub (Conceptual)**
+**Local Work vs GitHub (Conceptual)**
 
 ```mermaid
 flowchart TD

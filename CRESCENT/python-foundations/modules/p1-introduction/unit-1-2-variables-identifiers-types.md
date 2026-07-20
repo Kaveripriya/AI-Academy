@@ -151,7 +151,7 @@ print(type(age))
 | Can a variable change type? | No — a variable keeps its declared type forever | Yes — the same name can refer to an `int` now and a `str` later |
 | Beginner impact | More upfront typing, catches some mistakes earlier | Faster to write, but you must track types yourself using `type()` |
 
-**Diagram: Dynamic Typing Over Time**
+**Dynamic Typing Over Time**
 
 ```mermaid
 flowchart TD

@@ -74,7 +74,7 @@ In short: Python exists in your syllabus because it lowers the barrier to entry 
 | Typical use in this course | Not used | Used throughout, via the Python interpreter in Colab |
 | Beginner-friendliness | Extra setup and translation step | Faster feedback loop, better for learning |
 
-**Diagram: The REPL / Interactive Mode Loop**
+**The REPL / Interactive Mode Loop**
 
 ```mermaid
 flowchart TD
@@ -135,7 +135,7 @@ There are two ways to run a cell — pick whichever feels easier:
 **Step 9: Read the output.**
 Within a second or two, you should see `Hello, world!` appear directly underneath the cell. This confirms three things at once: Colab is active, your Python interpreter is running, and your very first program worked correctly.
 
-**Diagram: How Your Code Becomes Output**
+**How Your Code Becomes Output**
 
 ```mermaid
 flowchart LR

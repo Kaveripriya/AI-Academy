@@ -87,7 +87,7 @@ The `collections` module exists because three patterns are so common that Python
 | `defaultdict(factory)` | Create a dict that auto-fills missing keys using `factory()`. | `defaultdict(list)` |
 | `namedtuple(typename, [fields])` | Create a tuple subclass with named, readable fields. | `namedtuple("Point", ["x", "y"])` |
 
-**Diagram: The Iterator Protocol**
+**The Iterator Protocol**
 
 ```mermaid
 flowchart LR
@@ -98,7 +98,7 @@ flowchart LR
     D -->|No| E["StopIteration raised<br/>for loop stops silently"]
 ```
 
-**Diagram: Generator Pause and Resume**
+**Generator Pause and Resume**
 
 ```mermaid
 flowchart TD

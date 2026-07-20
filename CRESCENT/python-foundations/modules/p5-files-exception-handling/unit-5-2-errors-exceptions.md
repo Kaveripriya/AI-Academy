@@ -118,7 +118,7 @@ finally:
 | `finally:` | Runs no matter what happened above. | The one place to put cleanup code you can always count on running. |
 | `raise SomeError("message")` | Deliberately triggers an exception with a custom message. | Lets your own code signal a problem — built-in or custom. |
 
-**Diagram: `try` / `except` / `else` / `finally` Control Flow**
+**`try` / `except` / `else` / `finally` Control Flow**
 
 ```mermaid
 flowchart TD

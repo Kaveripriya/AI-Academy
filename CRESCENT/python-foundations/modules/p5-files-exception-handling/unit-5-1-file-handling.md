@@ -99,7 +99,7 @@ with open(filename, mode) as file:   # preferred — closes automatically
 | Risk of a forgotten `close()` | High — easy to forget, especially in longer functions | None — closing is handled by the language itself |
 | Recommended for new code | No | Yes — the standard, expected approach |
 
-**Diagram: The File Lifecycle**
+**The File Lifecycle**
 
 ```mermaid
 flowchart LR
@@ -108,7 +108,7 @@ flowchart LR
     C --> D["File safely saved<br/>and available to others"]
 ```
 
-**Diagram: How `with` Guarantees Cleanup Even on Error**
+**How `with` Guarantees Cleanup Even on Error**
 
 ```mermaid
 flowchart TD

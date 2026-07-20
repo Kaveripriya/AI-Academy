@@ -112,7 +112,7 @@ class ClassName:
 | If missing | Falls back to `__repr__` (via `object`'s default `__str__`) | No further fallback — defaults to `<ClassName object at 0x...>` |
 | Typical content | `"Priya (Roll No. 101)"` | `"Student(name='Priya', roll_number=101)"` |
 
-**Diagram: How `print(obj)` Resolves to a Dunder Method**
+**How `print(obj)` Resolves to a Dunder Method**
 
 ```mermaid
 flowchart TD
@@ -152,7 +152,7 @@ class ClassName:
 | Boilerplate | More typing, more places to introduce bugs | Minimal — a short, type-hinted field list |
 | Extra features | None built in | `frozen=True` for immutability, `order=True` for `<`, `<=`, `>`, `>=` |
 
-**Diagram: What `@dataclass` Generates**
+**What `@dataclass` Generates**
 
 ```mermaid
 flowchart LR

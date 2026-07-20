@@ -82,7 +82,7 @@ Every professional Python project you touch — in this course and in your caree
 | `import module as alias` | `import math as m` | Loads the whole module but gives it a shorter or clearer name to use afterward: `m.sqrt(9)`. |
 | `from module import name as alias` | `from math import sqrt as square_root` | Combines both — pulls out one item and renames it. |
 
-**Diagram: How Python Resolves an `import`**
+**How Python Resolves an `import`**
 
 ```mermaid
 flowchart TD
@@ -122,7 +122,7 @@ flowchart TD
 | Beginner learning curve | Lower — two small, well-known tools | Slightly higher — one tool, more moving parts to learn at once |
 | Common in industry | Still very common, especially in older or smaller projects | Increasingly standard in newer, professionally managed Python projects |
 
-**Diagram: A Professional Project's Dependency & Testing Workflow**
+**A Professional Project's Dependency & Testing Workflow**
 
 ```mermaid
 flowchart LR

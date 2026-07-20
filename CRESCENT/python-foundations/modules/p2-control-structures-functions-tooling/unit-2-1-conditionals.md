@@ -94,7 +94,7 @@ else:
 | `elif` | Optional keyword, short for "else if." | Adds another condition to check, only reached if all prior conditions were `False`. You may write zero, one, or many `elif` branches. |
 | `else` | Optional, final keyword with no condition. | Catches every case not matched by any `if` or `elif` above it. |
 
-**Diagram: Decision Flow Through `if`/`elif`/`else`**
+**Decision Flow Through `if`/`elif`/`else`**
 
 ```mermaid
 flowchart TD

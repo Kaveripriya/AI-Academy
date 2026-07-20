@@ -37,7 +37,7 @@ A **portfolio repository** is a single, permanent GitHub repository that you cre
 
 A **diagnostic** (also called a **checkpoint assessment**) is a small, focused task used to confirm that a learner has reached a required level of skill before being allowed to move to the next stage. It is not meant to teach anything new or to be difficult — every skill it requires has already been practised earlier. Its only purpose is to verify readiness. The **Part A diagnostic** in this unit is exactly that: one short task combining a Python skill (reading and summarizing data from a file) and a Git skill (committing and pushing that result), reviewed and signed off by your instructor before you begin Part B.
 
-**Diagram: Part A to Part B Flow**
+**Part A to Part B Flow**
 
 ```mermaid
 flowchart LR
@@ -92,7 +92,7 @@ Keep the layout flat rather than deeply nested. A handful of clearly named top-l
 | Visibility | Private, or forgotten after creation | Public and actively maintained |
 | Reader's experience | Has to open every file to understand anything | Can predict where something lives from folder/README alone |
 
-**Diagram: Portfolio Repository Structure**
+**Portfolio Repository Structure**
 
 ```mermaid
 flowchart TD

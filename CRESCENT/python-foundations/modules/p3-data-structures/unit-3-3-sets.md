@@ -106,7 +106,7 @@ unique_numbers = set([1, 2, 2, 3, 3, 3])
 | `a - b` | **Difference** — elements in `a` that are not in `b`. | `{1,2} - {2,3}` → `{1}` |
 | `a ^ b` | **Symmetric difference** — elements in exactly one of `a`, `b`. | `{1,2} ^ {2,3}` → `{1,3}` |
 
-**Diagram: Set Operations**
+**Set Operations**
 
 ```mermaid
 flowchart TD

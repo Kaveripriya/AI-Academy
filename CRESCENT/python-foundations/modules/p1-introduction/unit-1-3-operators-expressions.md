@@ -125,7 +125,7 @@ flowchart TD
     O2 -->|No| O4["Must check right side<br/>result = value of B"]
 ```
 
-**Diagram: Operator Precedence Ladder**
+**Operator Precedence Ladder**
 
 When an expression has more than one operator, Python does not read left to right — it follows a fixed ranking called **operator precedence**. Here is the ladder, highest (evaluated first) at the top:
 

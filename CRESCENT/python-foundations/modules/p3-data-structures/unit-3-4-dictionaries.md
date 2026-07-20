@@ -106,7 +106,7 @@ del d[key]                         # delete a key-value pair
 | Written with | `[ ]` | `{ }` / `set()` | `{key: value}` |
 | Typical use case | an ordered sequence of items | unique items, fast membership tests | labelled records, lookup tables, counting |
 
-**Diagram: Key-Value Mapping**
+**Key-Value Mapping**
 
 ```mermaid
 flowchart LR
@@ -117,7 +117,7 @@ flowchart LR
 
 Each key on the left points to exactly one value on the right — that arrow *is* the dictionary. Look up `"marks"` and you are handed `87` directly; there is no scanning involved.
 
-**Diagram: A Nested Dictionary**
+**A Nested Dictionary**
 
 ```mermaid
 flowchart TD
