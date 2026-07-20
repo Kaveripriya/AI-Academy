@@ -135,7 +135,7 @@ The Part A diagnostic itself is intentionally narrow in what it demands — but 
 ```markdown
 # Priya Nair's AI-Native Engineering Portfolio
 
-Python projects and exercises from the Python Foundations programme (Parts 1-6).
+Python projects and exercises from the Python Foundations modules (P1-P6).
 
 ## What's Inside
 - `csv_summary_tool/` — reads and summarizes transaction CSVs

@@ -33,12 +33,12 @@ def calculate_average(marks):
 
 print(calculate_average(student["marks"]))
 ```
-This works well for one student.But what if a college has 5,000 students?
+This works well for one student. But what if a college has 5,000 students?
 Each student has a name, roll number, marks, and department.
 Each student needs functions like calculate_average(), display_details(), and check_result().
-Keeping all the student data in dictionaries and all the functions separately becomes difficult to organize
+Keeping all the student data in dictionaries and all the functions separately becomes difficult to organize.
 
-**Object-oriented programming (OOP)** Object-Oriented Programming (OOP) solves this problem by keeping related data and the functions that work on that data together in one place. Think of a Student object. It can store the student's name and marks, and it can also have functions to calculate the average or display the student's details. Everything related to the student stays together.
+**Object-Oriented Programming (OOP)** solves this problem by keeping related data and the functions that work on that data together in one place. Think of a Student object. It can store the student's name and marks, and it can also have functions to calculate the average or display the student's details. Everything related to the student stays together.
 This unit introduces the four building blocks every later OOP concept in this course depends on: the **abstract data type** as a way of thinking, the **class** as a blueprint, the **object** as a concrete instance of that blueprint, and the **constructor** and **methods** that give an object its data and behaviour.
 
 ---
@@ -192,7 +192,7 @@ The single `Student` blueprint never holds any real data itself. Every time it i
 
 - **Forgetting `self` as a method's first parameter.** Python still passes the object in automatically, so the call ends up with one argument too many, producing a `TypeError` about argument counts rather than an obvious complaint about a missing `self`.
 - **Confusing a class with an instance.** `Student` is the blueprint; `Student()` produces an object. Trying to read `Student.name` before any object has set `name` as an instance attribute raises an `AttributeError`, because the class itself never held that value — only an instance does.
-- **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself, and calling `account.deposit(100)` later fails because the class has no such bound method to call.
+- **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself. Calling `account.deposit(100)` later still finds the `deposit` method (it exists on the class), but it fails with a `TypeError`, because `100` is bound to `self` and no value is left for `amount`.
 - **Forgetting the `self.` prefix inside a method.** Writing `balance = balance + amount` instead of `self.balance = self.balance + amount` creates a plain local variable that vanishes when the method ends, leaving the object's real attribute completely unchanged.
 
 ### 3.8 Code Examples

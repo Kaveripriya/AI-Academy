@@ -23,7 +23,7 @@ Every program you have written so far in this course runs top to bottom, one lin
 
 That decision-making ability comes from a **conditional** — a piece of code that asks a yes/no question and runs different statements depending on the answer. The question is always a **boolean expression**, one that evaluates to `True` or `False`, built using the comparison and logical operators you already learned in Unit 1.3.
 
-In this unit, you will learn the `if` statement, how to add `elif` and `else` for multi-branch decisions, how to combine conditions using `and`/`or`/`not`, how to nest one conditional inside another, and how to write a compact conditional (ternary) expression for simple two-value choices. Mastering this one skill — asking a question and branching on the answer — is the foundation every later topic in this course, from loops to functions to real applications, is built on top of.
+In this unit, you will learn the `if` statement, how to add `elif` and `else` for multi-branch decisions, how to combine conditions using `and`/`or`/`not`, how to nest one conditional inside another, and how to write a compact conditional (ternary) expression for simple two-value choices. Mastering this one skill — asking a question and branching on the answer — is the foundation that every later topic in this course, from loops to functions to real applications, is built on.
 
 ---
 
@@ -65,7 +65,7 @@ A conditional solves all three by letting the program's path change based on a b
 | **Block** | A group of statements indented at the same level, treated by Python as belonging together. |
 | **Indentation** | The whitespace at the start of a line that Python uses, instead of braces, to define blocks. |
 | **`IndentationError`** | The error Python raises when indentation is inconsistent or missing where a block is expected. |
-| **Compound condition** | A condition built by joining two or more boolean expressions using `and`, `or`, or `not`. |
+| **Compound condition** | A condition built by combining two or more boolean expressions with `and`/`or`, or negating one with `not`. |
 | **Chained comparison** | Python's shorthand for a range check, e.g. `0 <= score <= 100`, equivalent to `score >= 0 and score <= 100`. |
 | **Nesting** | Placing one conditional entirely inside the block of another conditional. |
 | **Conditional (ternary) expression** | A one-line expression of the form `value_if_true if condition else value_if_false` that *produces a value*, rather than just directing which statements run. |
@@ -117,6 +117,22 @@ value_if_true if condition else value_if_false
 | `value_if_true` | The value produced when `condition` is `True`. | This is what the whole expression evaluates to on a `True` result. |
 | `if condition else` | The test, written between the two possible values. | Reads almost like English: "this value if the condition holds, else that value." |
 | `value_if_false` | The value produced when `condition` is `False`. | This is what the whole expression evaluates to on a `False` result. |
+
+```python
+age = 20
+status = "adult" if age >= 18 else "minor"
+print(status)
+```
+
+*Line-by-line explanation:*
+- `age = 20` stores a whole number to test.
+- `status = "adult" if age >= 18 else "minor"` is the ternary expression itself: Python first evaluates the condition `age >= 18`, which is `20 >= 18` → `True`. Because the condition is `True`, the whole expression evaluates to `value_if_true`, the string `"adult"` — `value_if_false` (`"minor"`) is never even looked at. The result is then stored in `status`, exactly like any ordinary assignment.
+- `print(status)` displays whatever `status` ended up holding.
+- Output:
+  ```
+  adult
+  ```
+  If `age` had been `15` instead, `age >= 18` would be `False`, so the expression would evaluate to `"minor"` instead, and that is what `status` would hold and `print()` would display.
 
 ### 3.5 Rules
 
@@ -258,7 +274,7 @@ print(order_label)
 - **Banking & FinTech:** A withdrawal request checks `if amount <= balance:` before allowing money to leave an account — one wrong branch order here could allow an overdraft.
 - **UPI / Payment Systems:** A payment confirmation screen uses `if`/`else` to show "Payment Successful" or "Payment Failed," and a nested check can further classify a failure as "Insufficient Balance" or "Bank Server Error."
 - **E-commerce:** A checkout page decides shipping cost using conditions on cart value and membership status — exactly the pattern in the food delivery example above.
-- **Healthcare:** A patient monitoring screen classifies a temperature reading into "Normal," "Fever," or "High Fever" using an `if`/`elif`/`else` chain, the same shape as a grading system.
+- **Healthcare:** A patient monitoring screen classifies a temperature reading into "Normal," "Fever," or "High Fever" using an `if`/`elif`/`else` chain — the same multi-branch pattern you just used to classify task priority in the worked example below.
 - **Railway Booking (IRCTC-style systems):** A booking system checks `if seats_available > 0:` before confirming a ticket, and nests a further check for whether the passenger holds a valid concession category.
 - **AI/ML:** A model's output confidence score is often turned into a decision using a conditional — `if confidence >= 0.8:` accept the prediction, otherwise flag it for human review.
 

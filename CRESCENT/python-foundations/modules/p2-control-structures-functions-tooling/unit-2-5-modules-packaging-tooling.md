@@ -23,7 +23,7 @@ Every program you have written so far has lived in one file, written entirely by
 
 This unit covers the tooling that makes that possible. A **module** lets you split code into files and reuse it instead of retyping it. Python's **standard library** ships a large set of modules for free, the moment you install Python. **pip** reaches beyond that, fetching any of the hundreds of thousands of packages published publicly by other developers. A **virtual environment** keeps one project's installed packages from silently colliding with another project's. **Poetry** writes down, in one file, exactly which packages and versions a project needs, so anyone can rebuild the identical setup. **Pytest** runs small automated checks that catch broken code the moment it breaks, instead of a user finding out first in production.
 
-In an Indian IT services or product company, every single one of these five tools shows up on your very first day on a real codebase — usually before you are asked to write a single line of business logic. This unit is your introduction to how professional Python teams actually organize and protect their work.
+In an Indian IT services or product company, every single one of these tools and ideas shows up on your very first day on a real codebase — usually before you are asked to write a single line of business logic. This unit is your introduction to how professional Python teams actually organize and protect their work.
 
 ---
 
@@ -248,7 +248,7 @@ pytest pricing.py
 ```
 
 *Line-by-line explanation:*
-- `pip install babel==2.14.0` shows a real dependency pinned to an exact version — `babel` is a widely used package for formatting currency and dates for different locales; pinning it means this project always gets that exact behaviour, never a surprise from a newer release.
+- `pip install babel==2.14.0` shows a real dependency pinned to an exact version — `babel` is a widely used package for formatting currency and dates for different locales; pinning it means this project always gets that exact behaviour, never a surprise from a newer release. This install command stands on its own here to demonstrate the pinning step; `pricing.py` below does not import `babel`, since the goal of this example is the module-plus-test workflow, not `babel`'s formatting features.
 - `calculate_total()` is ordinary business logic an e-commerce checkout page would run: multiply price by quantity for the subtotal, then add GST (Goods and Services Tax) on top.
 - `test_calculate_total()` is a Pytest test function — its name starts with `test_`, so Pytest finds it automatically. Each `assert` line is a claim: for a given input, the function must return an exact expected output.
 - Running `pytest pricing.py` from a terminal executes `test_calculate_total()` and reports `1 passed` if every `assert` holds, or exactly which `assert` failed if the logic is ever broken later — the same check a real checkout service would run before every deployment.

@@ -33,7 +33,7 @@ This unit takes that idea further than a single parent-child pair. You will chai
 
 **Inheritance** is a mechanism where a new class is defined in terms of an existing class, automatically acquiring all of that existing class's attributes and methods. The existing class being extended is called the **superclass** (also called the **parent class** or **base class**); the new class built on top of it is called the **subclass** (also called the **child class** or **derived class**).
 
-**Encapsulation** is the practice of bundling an object's data together with the methods that operate on it, while restricting which parts of that data outside code is meant to access directly. In Python, encapsulation is expressed through naming convention — a leading underscore signals "internal, please don't touch" — rather than through a hard language rule.
+**Encapsulation** is the practice of bundling an object's data together with the methods that operate on it, while restricting which parts of that data may be accessed directly by code outside the class. In Python, encapsulation is expressed through naming convention — a leading underscore signals "internal, please don't touch" — rather than through a hard language rule.
 
 ```python
 class BankAccount:               # superclass / parent / base class
@@ -70,6 +70,7 @@ Encapsulation exists for a related but distinct reason: to protect an object's i
 | **Multiple inheritance** | A single subclass extending more than one direct superclass at once, written `class C(A, B):`. |
 | **MRO (Method Resolution Order)** | The fixed order Python searches through a class's ancestors when looking up a method or attribute; inspectable via `ClassName.__mro__`. |
 | **Diamond problem** | The situation where two superclasses share a common ancestor, and a subclass inherits from both — raising the question of which ancestor's method runs first. |
+| **Mixin** | A small superclass written only to add one specific piece of reusable behavior through multiple inheritance — it isn't meant to be used on its own as a genuine "is-a" relationship. |
 | **Encapsulation** | Bundling data and the methods that act on it together, while signaling which parts are meant to stay internal to the class. |
 | **Public attribute** | A normal attribute (`balance`) — no naming signal; any code may read or change it freely. |
 | **Protected attribute (`_name`)** | A single leading underscore — a convention meaning "internal use, don't rely on this from outside," but not enforced by Python. |
@@ -145,7 +146,7 @@ This diagram shows a realistic banking hierarchy: `SavingsAccount` extends `Bank
 - A subclass is declared with `class Child(Parent):`; the parenthesized name(s) are the direct superclass(es).
 - If a subclass does not define its own `__init__`, Python uses the superclass's `__init__` automatically.
 - If a subclass **does** define its own `__init__`, the superclass's `__init__` does **not** run automatically — it must be called explicitly with `super().__init__(...)`.
-- Method lookup always follows the MRO: Python checks the object's own class first, then walks the MRO in order until it finds the method.
+- Method lookup always follows the MRO: Python walks the MRO in order — starting with the object's own class — until it finds the method.
 - `super()` always means "the next class in the computed MRO," not literally "my parent class" — this distinction only becomes visible with multiple inheritance (see the diagram in §3.4).
 - A double leading underscore (`__name`) is rewritten by Python, at compile time, to `_ClassName__name`, using the exact name of the class where that line of code is written.
 - `isinstance(obj, Cls)` returns `True` if `Cls` appears anywhere in the object's class's MRO, not only if it is the immediate class.
@@ -164,7 +165,7 @@ This diagram shows a realistic banking hierarchy: `SavingsAccount` extends `Bank
 - **Forgetting to call `super().__init__()`** — the superclass's attributes are never set, and any method relying on them later fails with an `AttributeError`.
 - **Assuming a subclass "automatically" has the parent's data** — inheriting a *method* only makes it available; the object's actual *data* exists only if `__init__` genuinely ran and assigned it.
 - **Diamond-problem confusion in multiple inheritance** — assuming `super()` inside a class always jumps to "its" direct parent; it actually jumps to the next class in the MRO, which in a diamond shape is often a sibling class, not the shared ancestor.
-- **Assuming Python enforces true private variables** — `self.__pin` is still reachable from outside as `self._ClassName__pin`; double underscore prevents accidental name collisions, it does not provide real security.
+- **Assuming Python enforces true private variables** — `self.__pin` is still reachable from outside as `self._ClassName__pin`; double underscore prevents accidental name collisions, but it does not provide real security.
 - **Building unnecessarily deep inheritance chains** just to reuse a couple of methods, when a simpler, flatter design (or composition) would be easier to read and maintain.
 - **Overriding a method without knowing you're overriding it** — accidentally reusing a superclass's method name and silently losing access to its original behavior.
 

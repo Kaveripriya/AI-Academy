@@ -48,7 +48,7 @@ person = ("Ada", 36, True)
 | Mutability | Mutable — can be changed after creation | Immutable — cannot be changed after creation |
 | Syntax | Square brackets `[1, 2, 3]` | Parentheses (or just commas) `(1, 2, 3)` |
 | Methods available | Many — `append()`, `insert()`, `remove()`, `pop()`, `sort()`, and more | Only two — `count()` and `index()` |
-| Hashable | No — cannot be used as a dictionary key or set element | Yes — can be used as a dictionary key or set element |
+| Hashable | No — cannot be used as a dictionary key or set element | Yes — can be used as a dictionary key or set element, provided every element inside it is itself hashable |
 | Typical use case | A collection that grows, shrinks, or reorders over time | A fixed group of related values, or a function's multiple return values |
 | Performance | Slightly slower to iterate; more memory overhead for the same data | Slightly faster to iterate; lower memory overhead, since Python can optimise fixed-size storage |
 
@@ -72,7 +72,7 @@ The tuple exists to solve exactly this problem. By refusing to support any opera
 | **Index** | The position of an element in a sequence, starting at `0`. |
 | **Slice** | A sub-sequence extracted using `start:stop:step` notation, e.g. `nums[1:3]`. |
 | **Hashable** | An object whose value never changes and can therefore be used as a dictionary key or placed inside a set. |
-| **Lexicographic comparison** | Comparing two sequences element by element, left to right, the same way words are compared in a dictionary. |
+| **Lexicographic comparison** | Comparing two sequences element by element, left to right, the same way words are compared in a dictionary — for example, `(1, 2) < (1, 3)` is `True`, because the first elements are equal and the second pair decides the result. |
 
 ### 3.4 Syntax
 
@@ -164,6 +164,9 @@ print(name, age, branch)
 a, b = 5, 10
 a, b = b, a
 print(a, b)
+
+first, *rest = (1, 2, 3, 4)
+print(first, rest)
 ```
 
 *Line-by-line explanation:*
@@ -171,10 +174,12 @@ print(a, b)
 - `print(name, age, branch)` displays all three values.
 - `a, b = 5, 10` packs and assigns in one step — no parentheses needed.
 - `a, b = b, a` builds the tuple `(b, a)` completely first, *then* unpacks it back into `a` and `b` — this is how Python swaps two variables without a temporary third variable.
+- `first, *rest = (1, 2, 3, 4)` demonstrates **star-unpacking**: `first` takes the first value, and the `*rest` collects every remaining value into a new list, however many there are.
 - Output:
   ```
   Priya 21 Computer Science
   10 5
+  1 [2, 3, 4]
   ```
 
 **Practical example** — nested tuples, immutability, and basic operations:
@@ -194,6 +199,8 @@ marks = (7, 3, 7, 7, 1)
 print(marks.count(7))
 print(marks.index(7))
 print((1, 2) + (3, 4))
+print(marks * 2)
+print(7 in marks)
 ```
 
 *Line-by-line explanation:*
@@ -204,6 +211,8 @@ print((1, 2) + (3, 4))
 - `marks.count(7)` counts how many times `7` appears in the tuple.
 - `marks.index(7)` returns the position of the *first* occurrence of `7`.
 - `(1, 2) + (3, 4)` concatenates two tuples into a brand-new tuple — the originals are untouched.
+- `marks * 2` **repeats** the tuple's elements twice over, producing a longer tuple — `marks` itself is left unchanged.
+- `7 in marks` checks **membership** and returns `True`, since `7` does appear inside `marks`.
 - Output:
   ```
   Central Library
@@ -212,6 +221,8 @@ print((1, 2) + (3, 4))
   3
   0
   (1, 2, 3, 4)
+  (7, 3, 7, 7, 1, 7, 3, 7, 7, 1)
+  True
   ```
 
 **Industry-oriented example** — a food delivery order record built from tuples:
@@ -326,7 +337,7 @@ The first four lines come directly from unpacking the original tuple and its nes
 ### Important Notes (Interview Insights)
 
 - A very common fresher interview question is: *"What is the difference between a list and a tuple?"* Be ready to answer crisply: lists are mutable and use `[]`, tuples are immutable and use `()`; tuples are generally used for fixed, related data, while lists are used for collections that change.
-- An equally common follow-up: *"Why are tuples hashable but lists are not?"* Answer: a value is **hashable** only if it never changes over its lifetime, because Python computes a hash value once and relies on it staying accurate — since a tuple's contents can never change, Python can safely compute a hash for it, allowing a tuple to be used as a dictionary key or stored inside a set. A list can change at any time, so its hash could go stale, which is why Python does not allow lists to be hashed.
+- An equally common follow-up: *"Why are tuples hashable but lists are not?"* Answer: a value is **hashable** only if it never changes over its lifetime, because Python computes a hash value once and relies on it staying accurate — since a tuple's contents can never change, Python can safely compute a hash for it, allowing a tuple to be used as a dictionary key or stored inside a set. A list can change at any time, so its hash could go stale, which is why Python does not allow lists to be hashed. One sharp follow-up worth knowing: a tuple is hashable only if *everything inside it* is also hashable — a tuple like `("Ada", [90, 85])` is **not** hashable, because the list nested inside it can still change.
 - Interviewers sometimes ask you to prove immutability live: show that `tuple_var[0] = x` raises a `TypeError`, and explain that this happens because a tuple has no `__setitem__` behaviour defined for it — a clean, confident way to demonstrate real understanding rather than a memorised answer.
 
 ---

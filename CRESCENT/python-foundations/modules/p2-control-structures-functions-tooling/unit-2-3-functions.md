@@ -150,6 +150,8 @@ def factorial(n):
 factorial(4)   # 4 * 3 * 2 * 1 = 24
 ```
 
+(The triple-quoted line right under `def` is a **docstring** — you will meet it properly in section 3.5. For now, just notice that it briefly documents what the function returns, and keep your attention on the base case and recursive case below it.)
+
 Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. The diagram below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
 
 **Diagram: Recursion Call Stack — `factorial(4)`**
@@ -320,7 +322,7 @@ flowchart LR
 - **Forgetting `return`** — the function runs correctly but silently hands back `None`, and anything that tries to use the "result" fails or behaves oddly.
 - **Confusing `print()` with `return`** — printing shows a value once on screen; only `return` makes that value available to the rest of the program or to a test.
 - **Giving a parameter a mutable default value** — because a default is evaluated once, at definition time, every call relying on that default can end up silently sharing the same object across calls.
-- **Scope confusion** — assigning to a name inside a function without `global` creates a brand-new local variable instead of updating the global one you expected, often producing a `NameError` or an unexpected value elsewhere.
+- **Scope confusion** — assigning to a name inside a function without `global` creates a brand-new local variable instead of updating the global one you expected. If the function also tries to *read* that name before its local assignment runs, Python raises `UnboundLocalError`; otherwise, the function runs fine but the global variable outside is left silently unchanged.
 - **Missing or unreachable base case in recursion** — the function keeps calling itself until Python raises a `RecursionError: maximum recursion depth exceeded`.
 - **Mixing up parameter and argument** — using the two terms interchangeably in an interview is a common giveaway of shaky fundamentals.
 - **Calling a function before it is defined** — Python reads top to bottom, so a call above the matching `def` raises a `NameError`.

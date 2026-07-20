@@ -66,6 +66,7 @@ A variable solves all three problems with one mechanism: give the value a name o
 | **`str`** | Text data, written inside quotation marks, e.g. `"hello"`. |
 | **`bool`** | A truth value: exactly `True` or `False`. |
 | **`type()`** | A built-in function that tells you the type of any value. |
+| **`input()`** | A built-in function that pauses the program, displays an optional prompt, and returns whatever the user types — always as a `str`. |
 | **Dynamic typing** | Python's behaviour of determining a value's type automatically at assignment time, rather than requiring you to declare it in advance. |
 | **`NameError`** | The error Python raises when you try to use a variable that was never assigned. |
 | **`SyntaxError`** | The error Python raises when code breaks the language's grammar rules, such as an illegal variable name. |
@@ -88,6 +89,33 @@ Reassignment uses the exact same syntax, just written again later in the program
 score = 100      # first assignment — score is created
 score = 150      # reassignment — score's old value (100) is replaced
 ```
+
+**Getting a value from the user: `input()`**
+
+Every example so far has assigned a value you typed directly into the code. Real programs usually need to ask the *person running the program* for a value instead — a name, an age, an amount to pay. The built-in **`input()`** function does exactly this: it pauses the program, displays an optional prompt message, waits for the user to type something and press Enter, and then hands back whatever they typed.
+
+```python
+name = input("Enter your name: ")
+print("Hello,", name)
+```
+
+*Line-by-line explanation:*
+- `input("Enter your name: ")` displays the text `Enter your name: ` on the screen and then pauses — the program does nothing further until the user types a response and presses Enter.
+- Whatever the user typed is returned by `input()` as a value, and `name = ...` immediately assigns that returned value to the variable `name`, exactly like any other assignment.
+- `print("Hello,", name)` then displays a greeting using whatever the user entered.
+- Sample run (user types `Ada` and presses Enter):
+  ```
+  Enter your name: Ada
+  Hello, Ada
+  ```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `input(...)` | The built-in function that reads one line of text typed by the user. | This is how a program collects information from a real person instead of having every value hard-coded. |
+| `"Enter your name: "` | An optional **prompt** string, shown before the program waits. | Tells the user what kind of value is expected; without it, the program would still wait, but with no visible message. |
+| Return value | **Always a `str`**, no matter what the user types — even `input("Enter your age: ")` with `20` typed in returns the *string* `"20"`, not the number `20`. | This is the single most important fact about `input()`: you must explicitly convert it (using `int()` or `float()`, covered in Unit 1.4) before using it as a number. |
+
+**Use case:** `input()` is what turns a fixed script into an interactive program — a login prompt asking for a username, a calculator asking for two numbers, a quiz asking for an answer, or a food delivery app asking for a delivery address all start with `input()` collecting something directly from the person using the program.
 
 **Comparison Table: Statically Typed vs Dynamically Typed Languages**
 

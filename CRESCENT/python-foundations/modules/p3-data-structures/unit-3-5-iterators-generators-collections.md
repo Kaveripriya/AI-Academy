@@ -174,6 +174,7 @@ print(next(it))
 **Beginner example** — what a `for` loop actually does underneath, and why an iterator is one-shot:
 
 ```python
+nums = [10, 20, 30]
 it = iter(nums)
 while True:
     try:
@@ -233,9 +234,9 @@ print(sys.getsizeof(squares_gen), "bytes")
   2
   1
   8448728 bytes
-  104 bytes
+  200 bytes
   ```
-- The list costs roughly 8 megabytes before you have used a single value from it; the generator costs about the same tiny amount whether the range were a thousand or a billion, because it stores a plan, not the values. For large or unpredictable amounts of data, this is often the difference between a program that runs and one that runs out of memory.
+- The list costs roughly 8 megabytes before you have used a single value from it; the generator costs only a couple hundred bytes — and that stays true whether the range were a thousand or a billion, because it stores a plan, not the values. (The exact byte count for the generator can shift slightly between Python versions; the point that matters is that it stays tiny and constant, not the precise number.) For large or unpredictable amounts of data, this is often the difference between a program that runs and one that runs out of memory.
 
 **Industry-oriented example** — `Counter`, `defaultdict`, and `namedtuple` in one realistic scenario:
 

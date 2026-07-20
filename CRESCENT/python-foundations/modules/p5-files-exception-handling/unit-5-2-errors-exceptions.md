@@ -39,16 +39,18 @@ An **error** is a general term for anything that stops your program from doing w
 **Exception handling** is the set of Python tools — `try`, `except`, `else`, `finally`, and `raise` — that let you detect a runtime exception, respond to it in a planned way, and keep your program running instead of letting it crash.
 
 ```python
-# This next line has a typo Python catches before running anything:
-prin("hello")
+# This next line is missing the colon Python's grammar requires:
+if 5 > 3
+    print("hello")
 ```
 
 Output:
 
 ```
-  File "<cell>", line 2
-    prin("hello")
-SyntaxError: invalid syntax
+  File "<cell>", line 1
+    if 5 > 3
+           ^
+SyntaxError: expected ':'
 ```
 
 That's a syntax error — nothing ran. Compare it to this, which is perfectly valid Python that fails *during* execution:
@@ -128,7 +130,7 @@ flowchart TD
     C --> G["finally block runs"]
     E --> G
     F --> G
-    G --> H["Program continues normally,<br/>or the exception re-raises if it was never caught"]
+    G --> H["Program continues normally,<br/>or the exception propagates further if it was never caught"]
 ```
 *No matter which path is taken above, `finally` always executes before the block is truly done.*
 
@@ -260,7 +262,7 @@ finally:
 - `finally:` — runs after every single attempt, regardless of which path above was taken.
 - Sample run with `10` and `2`:
   ```
-  Result: 20.0
+  Result: 5.0
   Calculation attempt finished.
   ```
 - Sample run with `10` and `0`:

@@ -163,7 +163,7 @@ print(a[:3])       # [0, 1, 2]        — start defaults to 0
 print(a[7:])       # [7, 8, 9]        — stop defaults to len(a)
 print(a[::2])      # [0, 2, 4, 6, 8]  — every 2nd element
 print(a[1:5:2])    # [1, 3]           — from index 1 to 5, stepping by 2
-print(a[::-1])     # [9, 8, 7, ..., 0] — a reversed copy
+print(a[::-1])     # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] — a reversed copy
 ```
 
 Two slicing idioms come up so often that they are worth memorizing: `a[::2]` takes every second element, and `a[::-1]` produces the list reversed, because a negative step walks backward through the list. Since a slice always builds a *new* list, slicing itself never changes the original — this is different from the in-place methods you will meet in §3.8.
@@ -490,7 +490,7 @@ Prices with GST: [208.95, 366.45, 628.95, 261.45, 156.45]
 - A very common fresher interview question: *"Is a Python list mutable or immutable?"* Answer confidently: a list is **mutable** — its contents can change after creation, unlike the tuple you will study in Unit 3.2, which is **immutable** once built.
 - Interviewers frequently probe the **aliasing vs copying** distinction: `b = a` makes `b` a second name for the *same* list object; only `a.copy()` or `a[:]` (a **shallow copy**) creates an independent outer list. Be ready to explain that a shallow copy of a *nested* list still shares its inner lists with the original — a subtlety that trips up many candidates.
 - Be ready to explain why `list.sort()` returns `None` while `sorted()` returns a new list — this single question is asked constantly, and getting it wrong (`x = some_list.sort()`) is one of the most common real bugs in beginner code.
-- Know that list indexing and slicing are O(1) and O(k) respectively in terms of how Python implements them (constant-time element access, and time proportional to the slice length) — interviewers sometimes ask why lists are efficient for this kind of access.
+- Know that list indexing runs in O(1) time (constant-time element access), while slicing runs in O(k) time (proportional to the length of the slice) — interviewers sometimes ask why lists are efficient for this kind of access.
 
 ---
 

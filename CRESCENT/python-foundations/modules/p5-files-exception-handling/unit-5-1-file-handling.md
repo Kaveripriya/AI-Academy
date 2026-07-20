@@ -62,6 +62,7 @@ Files solve all three by moving data out of volatile memory and onto disk, in a 
 | **`r` mode** | Read mode — opens an existing file for reading; raises an error if the file does not exist. This is the default if no mode is given. |
 | **`w` mode** | Write mode — creates the file if it is missing, and **erases all existing content** if it already exists. |
 | **`a` mode** | Append mode — adds new content after whatever is already in the file, without erasing it. |
+| **`r+` mode** | Read-and-write mode — opens an existing file for both reading and writing, without erasing anything already there; raises an error if the file does not exist, just like `r` mode. |
 | **Context manager** | An object that defines setup and cleanup actions to run automatically around a block of code — used with the `with` statement. |
 | **`with` statement** | Python's syntax for using a context manager; it guarantees the file is closed when the indented block ends, whether it finishes normally or crashes. |
 | **CSV (Comma-Separated Values)** | A plain-text file format storing rows and columns as text, with values in each row separated by commas — the typical shape of a spreadsheet export. |
@@ -163,7 +164,7 @@ with open("student.json", "r") as file:
 - A file object's `write()` method does **not** add a newline automatically — you must include `\n` yourself.
 - Every value read from a CSV row comes back as a **string**, even if it looks like a number — CSV has no concept of numeric types, only text.
 - JSON, unlike CSV, preserves real types — a JSON number becomes a Python `int` or `float`, `true`/`false` becomes `bool`, and `null` becomes `None`.
-- `csv.reader()` and `csv.DictReader()` do not skip the header row automatically for `reader()` — you must consume it yourself with `next()` if you don't want it treated as data; `DictReader` uses it to build dictionary keys, so it is handled for you there instead.
+- `csv.reader()` does not skip the header row automatically — you must consume it yourself with `next()` if you don't want it treated as data; `csv.DictReader()` uses that same header row to build its dictionary keys instead, so it is handled for you there.
 
 ### 3.6 Best Practices
 
@@ -201,7 +202,7 @@ with open("notes.txt", "r") as file:
 - `file.write(...)` writes the given string into the file; the `\n` is added explicitly, since `write()` never adds one automatically.
 - The block ends, and `with` closes the file automatically, flushing the write to disk.
 - The second `with` block reopens the same file in read mode; `file.read()` returns the entire contents as one string.
-- Output: `Python file handling notes`
+- Output: `Python file handling notes`, followed by one blank line — `content` still carries the `\n` written earlier, and `print()` adds its own newline on top of it.
 
 **Beginner example** — reading a file line by line with `for`:
 

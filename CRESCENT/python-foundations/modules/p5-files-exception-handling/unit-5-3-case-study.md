@@ -87,7 +87,7 @@ with open("data.csv", "r", newline="") as file:
             invalid_records.append(row)
 ```
 
-Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *robust* reader is placing the `try`/`except` **inside** the `for` loop, wrapping only one row at a time — not around the whole loop, which would still stop everything at the first failure.
+Every line in that skeleton is syntax you already know — file and CSV handling from Unit 5.1, `try`/`except` from Unit 5.2, and the list operations (`[]`, `.append(...)`) from even earlier. What makes it a *robust* reader is placing the `try`/`except` **inside** the `for` loop, wrapping only one row at a time — not around the whole loop, which would still stop everything at the first failure.
 
 **Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)**
 

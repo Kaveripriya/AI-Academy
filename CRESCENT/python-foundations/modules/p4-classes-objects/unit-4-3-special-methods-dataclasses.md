@@ -23,7 +23,7 @@ Think about something you do every single day while writing Python: `print(some_
 
 In real Indian IT projects — a banking platform, a UPI payment gateway, an e-commerce backend, a railway reservation system — engineers deal with hundreds of custom classes: `Account`, `Transaction`, `CartItem`, `Ticket`. Every one of them eventually needs to be printed in a log, compared for equality in a test, or combined using an operator like `+`. Special methods (also called **dunder methods**, short for "double underscore") are exactly how Python lets you plug your own class into these built-in behaviours, instead of writing separate helper functions like `print_account()` or `add_wallets()` everywhere.
 
-The second half of this unit solves a related, very practical problem: many classes in real projects are little more than a bundle of attributes with almost no custom behaviour — a config object, a DTO (data transfer object), a record fetched from a database. Writing `__init__`, `__repr__`, and `__eq__ ` by hand for every one of these is repetitive, and repetition is exactly where bugs creep in. The `@dataclass` decorator generates all of this for you. By the end of this unit, you will also know how to keep growing collections of classes organized into modules and packages, exactly as production codebases do.
+The second half of this unit solves a related, very practical problem: many classes in real projects are little more than a bundle of attributes with almost no custom behaviour — a config object, a DTO (data transfer object), a record fetched from a database. Writing `__init__`, `__repr__`, and `__eq__` by hand for every one of these is repetitive, and repetition is exactly where bugs creep in. The `@dataclass` decorator generates all of this for you. By the end of this unit, you will also know how to keep growing collections of classes organized into modules and packages, exactly as production codebases do.
 
 ---
 
@@ -192,7 +192,7 @@ flowchart LR
 
 ### 3.8 Organizing Classes into Modules and Packages
 
-A **module** is simply a `.py` file. As a project grows past one or two classes, cramming everything into a single file becomes its own problem — so related classes get grouped into their own modules, and other files reach them with `import`.
+With `Student`, `Point`, `Wallet`, and `Ticket` all defined, a natural question follows: where should these classes actually live as a project grows? A **module** is simply a `.py` file. As a project grows past one or two classes, cramming everything into a single file becomes its own problem — so related classes get grouped into their own modules, and other files reach them with `import`.
 
 ```python
 # wallet.py

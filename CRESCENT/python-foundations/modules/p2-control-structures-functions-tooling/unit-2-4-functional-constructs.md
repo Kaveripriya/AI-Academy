@@ -296,7 +296,7 @@ for _ in range(4):
 
 - **Banking & FinTech:** Decorators wrap core banking functions to log every fund transfer, time slow database queries, or enforce authentication checks — all without touching the original transfer logic itself.
 - **UPI / Payment Systems:** Generators produce transaction IDs or OTP-style codes one at a time as they are needed, exactly like the industry example above, instead of pre-computing a huge batch that mostly goes unused.
-- **E-commerce:** `sorted(orders, key=lambda order: order_amount)` ranks orders, products, or search results by price, rating, or relevance in a single line, and decorators time how long checkout or payment steps take.
+- **E-commerce:** `sorted(order_amounts, key=lambda amount: amount)` ranks orders, products, or search results by price, rating, or relevance in a single line, and decorators time how long checkout or payment steps take.
 - **Healthcare:** A generator can stream patient vitals readings from a monitoring device one reading at a time, rather than holding an entire day's readings in memory before processing any of them.
 - **Education:** A generator can lazily produce the next unattempted quiz question for a student, only creating each question's data when the student actually reaches it.
 - **Railway Booking (IRCTC-style systems):** A generator streams available seat numbers coach by coach, and a lambda passed to `sorted()` ranks trains by fare or by journey duration.
@@ -357,7 +357,7 @@ for order_id, amount in zip(order_id_generator(1001), sorted_amounts):
 ### Step 4: Explain Each Line
 
 - `import time` — gives access to `time.time()`, used to measure elapsed time.
-- `def order_id_generator(start):` ... `yield current` — a generator function; each call to it resumes exactly after the last `yield`, increments `current`, and yields again — forever, since the `while True` loop never ends on its own.
+- `def order_id_generator(start):` ... `yield current` — a generator function; each time it is resumed (here, by `zip()` pulling the next value), it picks up exactly after the last `yield`, increments `current`, and yields again — forever, since the `while True` loop never ends on its own.
 - `def track_time(func):` — the decorator; it receives the function being decorated.
 - `def wrapper(*args, **kwargs):` — accepts any arguments so `track_time` can wrap any function, not just `process_order`.
 - `start_time = time.time()` / `end_time = time.time()` — mark the moment before and after the real function call.

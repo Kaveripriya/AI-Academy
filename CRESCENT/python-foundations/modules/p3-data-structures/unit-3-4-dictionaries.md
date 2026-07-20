@@ -64,7 +64,7 @@ Because so much real-world data — user profiles, product catalogs, API respons
 
 | Term | Simple Meaning |
 |---|---|
-| **Dictionary** | A mutable, unordered-by-position collection of key-value pairs, written with `{}`; type `dict`. |
+| **Dictionary** | A mutable collection of key-value pairs, accessed by key rather than by numeric position (though it does preserve insertion order since Python 3.7); written with `{}`; type `dict`. |
 | **Key** | The unique label used to look up a value; must be an immutable (hashable) type such as `str`, `int`, or `tuple`. |
 | **Value** | The data stored against a key; can be any type at all, including a list or another dictionary. |
 | **Key-value pair** | One entry in a dictionary — a key and the value it points to, written `key: value`. |

@@ -23,7 +23,7 @@ By now you have worked with lists (Unit 3.1) and tuples (Unit 3.2). Both remembe
 
 A **set** is Python's built-in answer to exactly this kind of question. Picture a set as a bag of unique items — you can drop things in, but the bag never lets a duplicate sit inside it, and it doesn't care in what order things went in.
 
-In the Indian IT industry, sets show up constantly and quietly: a banking system removing duplicate transaction IDs during reconciliation, a UPI app checking a payer's VPA against a blacklist in a split second, an e-commerce recommendation engine comparing what two customers bought to find overlap, a college placement cell de-duplicating a messy Google Form export. Learning to reach for a set instead of writing a manual duplicate-checking loop is a small decision that consistently separates clean, fast code from slow, bug-prone code.
+In the Indian IT industry, sets show up constantly and quietly: a banking system removing duplicate transaction IDs during reconciliation, a UPI app checking a payer's VPA (Virtual Payment Address — the `name@bank` ID behind a UPI payment) against a blacklist in a split second, an e-commerce recommendation engine comparing what two customers bought to find overlap, a college placement cell de-duplicating a messy Google Form export. Learning to reach for a set instead of writing a manual duplicate-checking loop is a small decision that consistently separates clean, fast code from slow, bug-prone code.
 
 This unit covers creating sets, the four set operations, membership testing, safe mutation, and set comprehensions.
 
@@ -75,7 +75,7 @@ A set exists to solve exactly this problem, in one line, without the slowdown:
 unique_numbers = set([1, 2, 2, 3, 3, 3])
 ```
 
-**Membership testing** — asking "is this value present?" — is the other reason sets exist. Real systems ask this question constantly: "is this UPI ID blocked?", "has this OTP already been used?", "is this pincode serviceable?" A set answers such questions in roughly constant time, no matter how large it grows, because of how it is stored internally (covered in §3.9).
+**Membership testing** — asking "is this value present?" — is the other reason sets exist. Real systems ask this question constantly: "is this UPI ID blocked?", "has this OTP already been used?", "is this pincode serviceable?" A set answers such questions in roughly constant time, no matter how large it grows, because of how it is stored internally (explained later in this unit, under the Interview Insights notes).
 
 ### 3.3 Key Terminology
 
@@ -417,7 +417,7 @@ Only Python Basics: {'meera iyer'}
 
 ### Step 7: Why the Output Is Produced
 
-Lower-casing every name before building each set ensures that `"Meera Iyer"` and `"meera iyer"` are treated as the exact same value, so the set's uniqueness guarantee correctly merges them into one entry instead of counting them as two different students. Once both raw lists are cleaned into `python_students` and `ai_students`, the union combines every distinct name across both sets, the intersection keeps only names appearing in both sets ("arjun rao" and "divya shah" appear in both raw lists), and the difference keeps names present in `python_students` but absent from `ai_students` — which leaves only "meera iyer", since "arjun rao" and "divya shah" are removed because they also appear in `ai_students`.
+Lower-casing every name before building each set ensures that `"Meera Iyer"` and `"meera iyer"` are treated as the exact same value, so the set's uniqueness guarantee correctly merges them into one entry instead of counting them as two different students. Once both raw lists are cleaned into `python_students` and `ai_students`, the union combines every distinct name across both sets. The intersection keeps only names appearing in both sets — "arjun rao" and "divya shah" show up in both raw lists, so both are kept. The difference then keeps names present in `python_students` but absent from `ai_students`, which leaves only "meera iyer", since "arjun rao" and "divya shah" are removed because they also appear in `ai_students`.
 
 ---
 
