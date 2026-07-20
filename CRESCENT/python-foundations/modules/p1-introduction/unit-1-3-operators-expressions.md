@@ -102,6 +102,19 @@ Arithmetic, comparison, and logical operators, together with the rules that gove
 | `or` | logical OR — true if at least one side is true | `True or False` | `True` |
 | `not` | logical NOT — flips a single value | `not True` | `False` |
 
+Logical operators stop evaluating the moment the final answer is already known. This diagram shows what Python actually does when it evaluates `A and B` and `A or B`:
+
+```mermaid
+flowchart TD
+    A1["Evaluate left side of A and B"] --> A2{Is left side falsy?}
+    A2 -->|Yes| A3["Result is already False<br/>right side is SKIPPED"]
+    A2 -->|No| A4["Must check right side<br/>result = value of B"]
+
+    O1["Evaluate left side of A or B"] --> O2{Is left side truthy?}
+    O2 -->|Yes| O3["Result is already True<br/>right side is SKIPPED"]
+    O2 -->|No| O4["Must check right side<br/>result = value of B"]
+```
+
 ### 3.5 Rules
 
 - The *type* of an arithmetic result depends on the operands: if both are `int`, `+`/`-`/`*` give back an `int`; the moment even one operand is a `float`, the result "promotes" to `float`. So `7 + 3` is `10`, but `7 + 3.0` is `10.0`.
@@ -197,22 +210,8 @@ flowchart TB
 
 A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `-2 ** 2` gives `-4`, not `4`. Arithmetic runs before comparison, and comparison runs before logic, so `2 + 3 > 4 and 1 < 2` reads as `((2 + 3) > 4) and (1 < 2)`. And when two operators share a precedence level (like `*` and `/`), Python evaluates left to right — **left-associativity** — so `20 / 4 * 2` is `(20 / 4) * 2 = 10.0`, not `2.5`. You don't have to memorize the ladder; any time the order isn't obvious, wrap the part you want done first in parentheses — they always win, cost nothing, and can never turn a correct expression into a wrong one.
 
-### 3.10 Diagram: Short-Circuit Evaluation Flow
 
-Logical operators stop evaluating the moment the final answer is already known. This diagram shows what Python actually does when it evaluates `A and B` and `A or B`:
-
-```mermaid
-flowchart TD
-    A1["Evaluate left side of A and B"] --> A2{Is left side falsy?}
-    A2 -->|Yes| A3["Result is already False<br/>right side is SKIPPED"]
-    A2 -->|No| A4["Must check right side<br/>result = value of B"]
-
-    O1["Evaluate left side of A or B"] --> O2{Is left side truthy?}
-    O2 -->|Yes| O3["Result is already True<br/>right side is SKIPPED"]
-    O2 -->|No| O4["Must check right side<br/>result = value of B"]
-```
-
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — arithmetic operators, including the true-division vs floor-division surprise:
 
