@@ -157,6 +157,12 @@ flowchart LR
     D --> E["wrapper converts it to 'HELLO'<br/>and returns it"]
 ```
 
+**Generator**
+
+A **generator function** is a function that produces a sequence of values one at a time, pausing after each one, instead of computing and returning them all at once. It looks almost exactly like a normal function, except its body contains at least one **`yield`** statement instead of (or alongside) `return`. Calling a generator function does not run its body immediately — it hands back a paused **generator object**, and the body only actually runs, one step at a time, as values are requested from it — typically by a `for` loop or `next()`.
+
+Generators exist because a regular function that `return`s a value must finish building that entire value before it can hand it back. That is wasteful for a sequence with a million entries when you only need the first few, and outright impossible for a sequence that has no natural end. A generator solves this by producing values **lazily** — only the value currently being asked for exists in memory at any moment.
+
 **Generator function syntax:**
 
 ```python
@@ -170,6 +176,35 @@ def generator_name(parameters):
 | `def generator_name(...)` | Looks exactly like a normal function definition. | No special keyword marks it as a generator — Python decides based on the body. |
 | `yield value` | Hands back `value` and pauses the function right there. | Presence of `yield` anywhere in the body is what makes this a generator function instead of a regular one. |
 | Calling `generator_name(...)` | Does **not** run the body. | It returns a generator object; the body only runs as values are requested. |
+
+**Simple example:**
+
+```python
+def count_up_to(limit):
+    current = 1
+    while current <= limit:
+        yield current
+        current += 1
+
+for number in count_up_to(5):
+    print(number)
+```
+
+*Line-by-line explanation:*
+- `def count_up_to(limit):` defines a generator function because its body contains `yield`; calling `count_up_to(5)` does **not** run any of this code yet — it only creates a paused generator object.
+- `current = 1` sets up the counter, but this line has not executed at all until the generator is actually asked for its first value.
+- `while current <= limit:` keeps the generator going as long as there are more numbers to produce.
+- `yield current` hands back the current number and pauses the function exactly here, freezing `current`'s value until the generator is asked for the next one.
+- `current += 1` only runs the *next* time the generator is resumed, right after the previous `yield`.
+- `for number in count_up_to(5):` repeatedly resumes the generator — first run produces `1`, pausing again; the next resumption produces `2`; and so on — until `current` exceeds `5` and the loop ends naturally.
+- Output:
+  ```
+  1
+  2
+  3
+  4
+  5
+  ```
 
 **Comparison Table: List (Eager) vs. Generator (Lazy)**
 
