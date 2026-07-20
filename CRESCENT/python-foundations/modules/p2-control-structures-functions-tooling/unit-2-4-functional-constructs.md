@@ -147,7 +147,7 @@ print(greet())
 - `print(greet())` now actually calls `wrapper()`, since `greet` points to `wrapper` — which calls the real `greet()`, gets back `"hello"`, converts it to `"HELLO"`, and returns that.
 - Output: `HELLO`
 
-**Diagram: How a Decorator Wraps a Function**
+**How a Decorator Wraps a Function**
 
 ```mermaid
 flowchart LR
@@ -181,7 +181,7 @@ def generator_name(parameters):
 | Can be looped over more than once? | Yes, as many times as needed | No — exhausted after one full pass |
 | Created with | `[...]` or `list(...)` | A function containing `yield` |
 
-**Diagram: Generator Lazy-Evaluation Flow**
+**Generator Lazy-Evaluation Flow**
 
 ```mermaid
 flowchart TD
