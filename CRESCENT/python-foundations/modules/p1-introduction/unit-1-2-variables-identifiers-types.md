@@ -115,6 +115,23 @@ print("Hello,", name)
 | `"Enter your name: "` | An optional **prompt** string, shown before the program waits. | Tells the user what kind of value is expected; without it, the program would still wait, but with no visible message. |
 | Return value | **Always a `str`**, no matter what the user types — even `input("Enter your age: ")` with `20` typed in returns the *string* `"20"`, not the number `20`. | This is the single most important fact about `input()`: you must explicitly convert it (using `int()` or `float()`, covered in Unit 1.4) before using it as a number. |
 
+See this for yourself — even though the user types a number below, `type()` proves what `input()` actually handed back:
+
+```python
+age = input("Enter your age: ")
+print(type(age))
+```
+
+*Line-by-line explanation:*
+- `age = input("Enter your age: ")` waits for the user to type a response. Suppose the user types `20` and presses Enter — it *looks* like a number was entered.
+- `print(type(age))` asks Python to report the actual type of whatever `age` refers to.
+- Sample run (user types `20` and presses Enter):
+  ```
+  Enter your age: 20
+  <class 'str'>
+  ```
+  Even though `20` looks exactly like a number, `type()` confirms it is a `str` — `input()` never returns anything but text. If you tried `age + 5` right now, Python would raise a `TypeError`, because you cannot add a number to a string; you would first need to convert `age` with `int(age)`.
+
 **Use case:** `input()` is what turns a fixed script into an interactive program — a login prompt asking for a username, a calculator asking for two numbers, a quiz asking for an answer, or a food delivery app asking for a delivery address all start with `input()` collecting something directly from the person using the program.
 
 **Comparison Table: Statically Typed vs Dynamically Typed Languages**
