@@ -84,12 +84,42 @@ Type conversion, f-strings, type hints, `match`/`case`, and comments each solve 
 | `{expression}` | Any valid Python expression — a variable, a calculation, a comparison. | Its result is converted to text and inserted in place. |
 | `:format_spec` | Optional, after a colon inside the braces. | Controls width, alignment, and decimal precision of the displayed value. |
 
-| Common format specifier | Meaning |
-|---|---|
-| `:.2f` | Show a float to 2 decimal places (ideal for money). |
-| `:d` | Show an integer in plain decimal form. |
-| `:>10` | Right-align the value in a field 10 characters wide. |
-| `:^15` | Center the value in a field 15 characters wide. |
+| Common format specifier | Meaning | Example | Result |
+|---|---|---|---|
+| `:.2f` | Show a float to 2 decimal places (ideal for money). | `f"{19.5:.2f}"` | `"19.50"` |
+| `:d` | Show an integer in plain decimal form. | `f"{7:d}"` | `"7"` |
+| `:>10` | Right-align the value in a field 10 characters wide. | `f"{'Tea':>10}"` | `"       Tea"` (7 spaces then `Tea`) |
+| `:^15` | Center the value in a field 15 characters wide. | `f"{'Tea':^15}"` | `"      Tea      "` (6 spaces, `Tea`, 6 spaces) |
+
+To see exactly what each specifier does to real values, run all four together:
+
+```python
+price = 19.5
+quantity = 7
+item = "Tea"
+
+print(f"{price:.2f}")
+print(f"{quantity:d}")
+print(f"[{item:>10}]")
+print(f"[{item:^15}]")
+```
+
+*Line-by-line explanation:*
+- `f"{price:.2f}"` — `price` is `19.5`; `:.2f` forces exactly two digits after the decimal point, so it prints `19.50`.
+- `f"{quantity:d}"` — `quantity` is the integer `7`; `:d` simply displays it as plain decimal digits, `7`.
+- `f"[{item:>10}]"` — `item` is `"Tea"`, three characters long; `:>10` places it inside an invisible 10-character-wide field and right-aligns it, so 7 spaces are added before it. The square brackets around the f-string are not part of the format specifier — they are only there so you can *see* exactly where the padding spaces are.
+- `f"[{item:^15}]"` — the same idea, but `:^15` centers `"Tea"` inside a 15-character-wide field, splitting the 12 leftover spaces evenly: 6 spaces, then `Tea`, then 6 spaces.
+
+Output (square brackets included so the padding is visible):
+
+```
+19.50
+7
+[       Tea]
+[      Tea      ]
+```
+
+Once you can see the spaces in this one example, every other use of `:.2f`, `:d`, `:>N`, and `:^N` in this unit follows the exact same rule: the letter/symbol says *what* to do (round, pad, align), and the number says *how wide* the field should be.
 
 **Type hint syntax:** `name: type = value`
 
