@@ -200,6 +200,56 @@ print("--------------------------------------")
 - Each `print()` call is independent and produces exactly one line of output, in order.
 - This mirrors something you have almost certainly seen for real: a payment app confirming a UPI transaction. In this unit, you are only printing fixed text — later units (starting with variables in Unit 1.2) will let you print information that *changes*, like a real payment amount.
 
+### 3.13 Step-by-Step Guide: Accessing and Activating Google Colab for the First Time
+
+Before you can run any of the examples above, you need to actually open Google Colab and get it ready to use. If you have never done this before, follow these steps exactly, in order. Don't skip ahead — each step depends on the one before it.
+
+**What you need before you start:**
+- A computer or laptop with an internet connection.
+- A web **browser** — the application you use to visit websites, such as Google Chrome or Microsoft Edge.
+- A **Google account** (the same kind of account you would use for Gmail). If you don't have one, you will need to create one first at `accounts.google.com` — this takes only a couple of minutes.
+
+**Step 1: Open your browser and go to the Colab website.**
+Type `colab.research.google.com` into the address bar at the top of your browser (this is called a **URL** — the address of a specific page on the internet) and press Enter. This takes you directly to Google Colab's homepage.
+
+**Step 2: Sign in with your Google account.**
+If you are not already signed in, Colab will ask you to **sign in** — meaning you enter your Google email and password so Google knows it is really you. Use the same Google account you use for Gmail or Google Drive. Signing in matters because your notebooks (the files you'll create) are saved to *your* Google Drive, not anyone else's.
+
+**Step 3: Look at the "Welcome to Colab" screen.**
+Once signed in, you will usually see a welcome page with some example notebooks and a popup asking you to open a recent file or start something new. You can close this popup for now — you don't need any of these examples yet.
+
+**Step 4: Create a brand-new, empty notebook.**
+Click on **File** in the top-left menu, then click **New notebook**. A **notebook**, as you learned earlier in this unit, is the document where you'll write and run your Python code. Google Colab will now open a fresh, empty notebook for you, with one empty **cell** already waiting.
+
+**Step 5: Give your notebook a proper name.**
+At the top-left of the page, you will see a default name like `Untitled0.ipynb` (the `.ipynb` ending simply means "IPython Notebook" — the file format Colab uses). Click directly on this name and rename it to something meaningful, such as `unit-1-1-first-program`. This small habit will help you a lot later, especially when you have many notebooks and need to find the right one quickly — including while revising for interviews.
+
+**Step 6: Locate the first code cell.**
+Look for the empty box on the page with a small "play" (▶) button or **Run** icon on its left side. This is a **cell** — the box where you type your Python code. Right now it is empty and waiting for you.
+
+**Step 7: Type your first line of code into the cell.**
+Click inside the empty cell and type:
+
+```python
+print("Hello, world!")
+```
+
+**Step 8: Run the cell.**
+There are two ways to run a cell — pick whichever feels easier:
+- Click the ▶ **Run** button on the left side of the cell, or
+- Press **Shift + Enter** on your keyboard (hold Shift, then press Enter).
+
+**Step 9: Read the output.**
+Within a second or two, you should see `Hello, world!` appear directly underneath the cell. This confirms three things at once: Colab is active, your Python interpreter is running, and your very first program worked correctly.
+
+**Step 10: Confirm your work is saved.**
+Google Colab automatically saves your notebook to your Google Drive as you work, usually shown as "Saving..." briefly near the top of the page. You can also save manually at any time using **File → Save**, or the keyboard shortcut **Ctrl + S**. This means you can safely close the browser tab and come back to the exact same notebook later, from any computer, just by signing in again.
+
+**If something doesn't work:**
+- If the page looks stuck or blank, refresh the browser tab and try again.
+- If a popup about "cookies" or "notifications" appears, you can dismiss it — it does not affect your code.
+- If you accidentally close the tab, don't worry — reopen `colab.research.google.com`, and your notebook will be waiting for you in **File → Open notebook → Recent**, since it was already saved to your Google Drive.
+
 ---
 
 ## 4. Real-World Application
@@ -265,15 +315,6 @@ Thank you for ordering with us!
 
 Each `print()` call is executed by the interpreter one at a time, in the exact order it appears in the code. Every call produces exactly one line of output, and the interpreter automatically moves to a new line after each `print()`. There is no branching, no repetition, and no calculation involved — the output is simply the four strings, displayed in sequence, exactly as instructed.
 
-### Step 8: Time Complexity
-
-Not meaningfully applicable at this stage — there is no data structure or algorithm being processed. If you must express it formally: the program performs a fixed number of `print()` calls, so its running time is **O(n)**, where `n` is the number of lines printed (here, a small constant, 4). This becomes a genuinely useful concept once you start working with loops and data structures in later units.
-
-### Step 9: Space Complexity
-
-Also not meaningfully applicable yet — the program stores no data in memory beyond the string literals themselves. Space usage is **O(1)** (constant), since the number of strings is fixed and does not grow with any input.
-
----
 
 ## 6. Key Takeaways
 
