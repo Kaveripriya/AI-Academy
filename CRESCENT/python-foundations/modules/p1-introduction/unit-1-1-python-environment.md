@@ -80,8 +80,18 @@ If you are not already signed in, Colab will ask you to **sign in** — meaning 
 **Step 3: Look at the "Welcome to Colab" screen.**
 Once signed in, you will usually see a welcome page with some example notebooks and a popup asking you to open a recent file or start something new. You can close this popup for now — you don't need any of these examples yet.
 
+![The "Welcome to Colab" page, showing the toolbar of an empty text cell highlighted in red](../../Images/image%20%289%29.png)
+
+*This is what the welcome page looks like once you're signed in — notice the "Welcome to Colab!" heading and the toolbar highlighted above the first cell. That toolbar (bold, italic, insert-link, insert-image, and more) belongs to a text cell, used for writing notes rather than Python code — you'll create your own **code** cell in the next step.*
+
 **Step 4: Create a brand-new, empty notebook.**
 Click on **File** in the top-left menu, then click **New notebook**. A **notebook** is the document where you'll write and run your Python code. Google Colab will now open a fresh, empty notebook for you, with one empty **cell** already waiting.
+
+![The File menu open, with an arrow pointing to "New notebook" (light theme)](../../Images/image%20%287%29.png)
+
+![The same File menu with "New notebook" highlighted (dark theme)](../../Images/image%20%288%29.png)
+
+*Google Colab can appear in a light or dark theme depending on your Google account's display settings — both screenshots above show the same action: open the **File** menu, then click **New notebook**.*
 
 **Step 5: Give your notebook a proper name.**
 At the top-left of the page, you will see a default name like `Untitled0.ipynb` (the `.ipynb` ending simply means "IPython Notebook" — the file format Colab uses). Click directly on this name and rename it to something meaningful, such as `unit-1-1-first-program`. This small habit will help you a lot later, especially when you have many notebooks and need to find the right one quickly — including while revising for interviews.
