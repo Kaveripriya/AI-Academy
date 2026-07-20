@@ -87,7 +87,6 @@ Once signed in, you will usually see a welcome page with some example notebooks 
 **Step 4: Create a brand-new, empty notebook.**
 Click on **File** in the top-left menu, then click **New notebook**. A **notebook** is the document where you'll write and run your Python code. Google Colab will now open a fresh, empty notebook for you, with one empty **cell** already waiting.
 
-<img src="../../Images/image%20%287%29.png" alt="The File menu open, with an arrow pointing to New notebook (light theme)" width="480">
 
 <img src="../../Images/image%20%288%29.png" alt="The same File menu with New notebook highlighted (dark theme)" width="480">
 
