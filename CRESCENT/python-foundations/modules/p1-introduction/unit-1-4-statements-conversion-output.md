@@ -344,7 +344,7 @@ Scan the QR code to complete payment.
 ## 4. Real-World Application
 
 - **Banking & FinTech:** Account statements convert raw decimal values into two-decimal currency strings using f-strings before they ever reach a customer's screen or PDF statement.
-- **UPI / Payment Systems:** Every transaction amount arrives from an API as text and must be converted to `float` before validation or display, exactly as in the industry example above; transaction status is commonly handled with a `match`/`case`-style decision.
+- **UPI / Payment Systems:** Every transaction amount arrives from an API as text and must be converted to `float` before validation or display, exactly as in the example above; transaction status is commonly handled with a `match`/`case`-style decision.
 - **E-commerce:** A cart total computed in paise or with rounding noise is always formatted with `:.2f` before being shown at checkout, so customers never see numbers like `499.00000001`.
 - **Food Delivery:** Order status — `"PLACED"`, `"OUT_FOR_DELIVERY"`, `"DELIVERED"` — is exactly the kind of fixed set of values `match`/`case` is built to handle cleanly.
 - **Healthcare:** A patient's temperature or age, entered through a form as text, must be converted to a number before any medical threshold check can run.

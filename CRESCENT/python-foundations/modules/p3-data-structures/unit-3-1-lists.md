@@ -506,7 +506,7 @@ Number of students who passed: 4
 - **UPI / Payment Systems:** A payment gateway batches pending transactions in a list before processing them, and uses list comprehensions to pull out only the failed or pending ones for retry.
 - **E-commerce:** A shopping cart is a list of item prices or item records; `sorted(cart, reverse=True)[:3]` instantly gives the three most expensive items, and comprehensions apply discounts or GST to every item in one line.
 - **Healthcare:** A ward management system holds a list of patient temperature readings or vitals over a shift, sorted and filtered to flag anyone outside a safe range.
-- **Railway Booking (IRCTC-style systems):** As shown in the industry example above, a PNR's passenger list is naturally a nested list, iterated and filtered to calculate fares by age category.
+- **Railway Booking (IRCTC-style systems):** As shown in the example above, a PNR's passenger list is naturally a nested list, iterated and filtered to calculate fares by age category.
 - **Education:** A gradebook is a list of student scores; sorting ranks the class, and a comprehension can compute a curved score for every student in one expression.
 - **AI/ML & Cloud Apps:** Batches of input data, model predictions, and API responses are almost always assembled and processed as lists before being handed to the next stage of a pipeline.
 

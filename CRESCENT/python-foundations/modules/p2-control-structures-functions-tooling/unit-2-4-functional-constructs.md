@@ -389,7 +389,7 @@ Final payable amount: Rs. 275.0
 ## 4. Real-World Application
 
 - **Banking & FinTech:** Decorators wrap core banking functions to log every fund transfer, time slow database queries, or enforce authentication checks — all without touching the original transfer logic itself.
-- **UPI / Payment Systems:** Generators produce transaction IDs or OTP-style codes one at a time as they are needed, exactly like the industry example above, instead of pre-computing a huge batch that mostly goes unused.
+- **UPI / Payment Systems:** Generators produce transaction IDs or OTP-style codes one at a time as they are needed, exactly like the example above, instead of pre-computing a huge batch that mostly goes unused.
 - **E-commerce:** `sorted(order_amounts, key=lambda amount: amount)` ranks orders, products, or search results by price, rating, or relevance in a single line, and decorators time how long checkout or payment steps take.
 - **Healthcare:** A generator can stream patient vitals readings from a monitoring device one reading at a time, rather than holding an entire day's readings in memory before processing any of them.
 - **Education:** A generator can lazily produce the next unattempted quiz question for a student, only creating each question's data when the student actually reaches it.

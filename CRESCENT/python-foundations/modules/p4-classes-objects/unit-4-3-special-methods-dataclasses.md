@@ -444,7 +444,7 @@ Rohit's wallet: Rs. 380.00
 - **UPI / Payment Systems:** Two payment receipt objects compare equal through a custom `__eq__` that checks transaction IDs, not whether they are literally the same object — exactly the identity-vs-data distinction this unit opened with. A wallet-recharge feature overloads `__add__` to combine a main balance with a cashback balance in one clean expression.
 - **E-commerce:** A `CartItem` dataclass holds `product_name`, `price`, and `quantity` — pure data, generated `__repr__` and `__eq__` included for free, no custom behaviour needed.
 - **Healthcare:** A `PatientRecord` class overrides `__eq__` to detect duplicate patient entries submitted from two different hospital counters, even though they arrive as separate objects.
-- **Railway Booking (IRCTC-style systems):** A `Ticket` dataclass, exactly like the industry example above, models a confirmed booking as pure data, ready to be printed, compared, or stored.
+- **Railway Booking (IRCTC-style systems):** A `Ticket` dataclass, exactly like the example above, models a confirmed booking as pure data, ready to be printed, compared, or stored.
 - **AI/ML:** A model's hyperparameter configuration — `batch_size`, `learning_rate`, `epochs` — is almost always a dataclass, since configuration is pure data with no custom behaviour, precisely the case `@dataclass` exists for.
 - **Cloud Applications:** Microservices routinely pass small, well-defined data objects (dataclasses) between services, relying on their auto-generated `__repr__` to make request/response logging readable.
 

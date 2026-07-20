@@ -334,7 +334,7 @@ True
 Operators and expressions are working quietly behind almost every screen you use in India every day:
 
 - **UPI / Payment Systems:** A payment app compares the entered amount against the account balance (`amount <= balance`) and combines that with a PIN check using `and` — short-circuit evaluation means the balance check can be skipped the instant the PIN comparison already fails.
-- **E-commerce:** A checkout page calculates the final price with arithmetic (`subtotal - discount + delivery_fee`), then uses a comparison to decide whether free shipping applies, exactly as shown in the industry example above.
+- **E-commerce:** A checkout page calculates the final price with arithmetic (`subtotal - discount + delivery_fee`), then uses a comparison to decide whether free shipping applies, exactly as shown in the example above.
 - **Food Delivery:** A food delivery app's "free delivery" banner is a live logical expression, recalculated every time the cart total or distance changes.
 - **Banking & FinTech:** A minimum-balance check (`balance >= 10000`) and a fraud-flag check (`not is_flagged`) are combined with `and` before a transaction is allowed to proceed.
 - **Railway Booking (IRCTC-style systems):** A booking screen checks `available_seats > 0` before allowing confirmation, and uses `%` internally to distribute passengers evenly across coaches.

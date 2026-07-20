@@ -341,7 +341,7 @@ PNR 7788990011: Arjun Rao — Confirmed (3 seats, Coach B4)
 ## 4. Real-World Application
 
 - **Banking & FinTech:** Nightly batch jobs read a CSV of the day's transactions to reconcile accounts; core banking systems log significant events as JSON for audit trails.
-- **UPI / Payment Systems:** Every successful or failed payment is typically written as a JSON record — exactly like the industry example above — so it can be replayed, audited, or shown in a user's transaction history.
+- **UPI / Payment Systems:** Every successful or failed payment is typically written as a JSON record — exactly like the example above — so it can be replayed, audited, or shown in a user's transaction history.
 - **E-commerce:** A "download invoice" or "export orders" button on a shopping site is, on the server, a `csv.writer` writing rows inside a `with` block, so a slow download from a browser can never leave a file handle stuck open.
 - **Healthcare:** Patient records exported for a lab or insurer are commonly CSV; hospital systems exchanging data with external software increasingly use JSON.
 - **Education:** A college's result portal generates a student's marksheet as a CSV export, and its own internal APIs answer student queries with JSON.

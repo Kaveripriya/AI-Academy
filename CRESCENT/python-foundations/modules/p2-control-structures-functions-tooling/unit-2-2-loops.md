@@ -353,7 +353,7 @@ First free seat in Coach 4 is Seat 3
 - **E-commerce:** Calculating the total bill for a cart walks through every item with a `for` loop, adding each item's price to a running total — exactly the "repeat for every item" pattern `for` loops exist for.
 - **Food Delivery:** Assigning delivery partners to orders often uses nested loops — the outer loop walks through orders, the inner loop walks through available partners, and a `break` fires the moment a suitable match is found.
 - **Healthcare:** A hospital's patient monitoring dashboard uses a loop to keep checking a patient's vitals reading, skipping (`continue`) a check if a sensor briefly reports no data, without ending the entire monitoring loop.
-- **Railway Booking (IRCTC-style systems):** Searching for an available seat across coaches, exactly as shown in the industry example above, is a textbook use of nested loops and `break`.
+- **Railway Booking (IRCTC-style systems):** Searching for an available seat across coaches, exactly as shown in the example above, is a textbook use of nested loops and `break`.
 - **Education / Student Life:** A teacher's attendance system loops through roll numbers with `enumerate()` to print position and status together, using `continue` to skip absent students and `break` to stop early if class is dismissed.
 
 ---

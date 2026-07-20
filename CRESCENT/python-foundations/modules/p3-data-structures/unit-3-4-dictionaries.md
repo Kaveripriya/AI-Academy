@@ -365,7 +365,7 @@ Expected output:
 Dictionaries are the workhorse data structure across almost every domain of Indian IT and beyond:
 
 - **Banking & FinTech:** An account record — account number, holder name, balance, account type — is naturally a dictionary, and a bank's entire customer database is conceptually a dictionary of dictionaries keyed by account number.
-- **UPI / Payment Systems:** Every transaction — payer, payee, amount, transaction ID, status — is exchanged between apps and banks as a dictionary serialized to JSON, exactly as shown in the industry example above.
+- **UPI / Payment Systems:** Every transaction — payer, payee, amount, transaction ID, status — is exchanged between apps and banks as a dictionary serialized to JSON, exactly as shown in the example above.
 - **E-commerce:** A product catalog is a dictionary keyed by product ID, each value holding name, price, and stock count; a shopping cart is a dictionary mapping product ID to quantity.
 - **Healthcare:** A patient record system stores a patient's details — name, age, diagnosis, admission status — as a dictionary, often nested with a separate dictionary for vitals or test results.
 - **Education:** A student information system stores marks, attendance, and fee status keyed by roll number or student ID — precisely the nested-dictionary pattern practiced in the worked example.
