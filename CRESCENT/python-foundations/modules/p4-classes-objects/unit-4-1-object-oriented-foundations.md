@@ -19,10 +19,26 @@ By the end of this unit, you will be able to:
 
 ## 2. Overview
 
-Every unit so far in this course — variables, loops, functions, lists, dictionaries — has treated data and the logic that works on that data as two separate things. A dictionary holds a student's marks; a function calculates the average; nothing in the language ties the two together except your own memory of which function belongs with which data. This works fine for a small script, but it breaks down the moment a real application needs to track many related things at once — hundreds of bank accounts, thousands of food delivery orders, an entire college's worth of student records — each with its own data and its own rules.
+So far in this course, we have learned about variables, loops, functions, lists, and dictionaries. These help us store data and write programs. For example, we can store a student's information in a dictionary and use a separate function to calculate the average marks.
 
-**Object-oriented programming (OOP)** closes this gap. It lets you bundle data and the behaviour that acts on it into a single unit modelled directly on a real-world thing — a bank account, a student, an order — instead of scattering related values across independent variables and functions. This is not a Python-specific idea; it is the dominant way software is organized across the industry, whether you eventually work on Django web applications, enterprise Java backends, or machine learning pipelines that model a dataset as an object with methods to clean and transform it.
+### Without a Class
+```python
+student = {
+    "name": "Rahul",
+    "marks": [85, 90, 78]
+}
 
+def calculate_average(marks):
+    return sum(marks) / len(marks)
+
+print(calculate_average(student["marks"]))
+```
+This works well for one student.But what if a college has 5,000 students?
+Each student has a name, roll number, marks, and department.
+Each student needs functions like calculate_average(), display_details(), and check_result().
+Keeping all the student data in dictionaries and all the functions separately becomes difficult to organize
+
+**Object-oriented programming (OOP)** Object-Oriented Programming (OOP) solves this problem by keeping related data and the functions that work on that data together in one place. Think of a Student object. It can store the student's name and marks, and it can also have functions to calculate the average or display the student's details. Everything related to the student stays together.
 This unit introduces the four building blocks every later OOP concept in this course depends on: the **abstract data type** as a way of thinking, the **class** as a blueprint, the **object** as a concrete instance of that blueprint, and the **constructor** and **methods** that give an object its data and behaviour.
 
 ---
