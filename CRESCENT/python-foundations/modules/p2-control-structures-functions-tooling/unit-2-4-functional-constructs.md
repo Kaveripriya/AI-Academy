@@ -94,6 +94,12 @@ lambda parameters: expression
 | Typical use | Reusable logic called from many places | One-off logic passed directly as an argument |
 | Debuggability | Shows its real name in errors and tracebacks | Shows as `<lambda>` in tracebacks, harder to trace |
 
+**Decorator**
+
+A **decorator** is a function that takes another function as input and returns a new, wrapped version of it — adding extra behaviour around the original function without changing a single line of its actual code. Think of it like gift-wrapping paper: the gift inside (your original function) stays exactly the same, but the wrapping (the decorator) adds something extra around it before it reaches whoever calls it.
+
+Decorators exist because the same "extra behaviour" — logging every call, timing how long something takes, checking permissions before running — is often needed on *many different functions*. Without a decorator, you would have to copy-paste that same wrapper code inside every single function that needed it. A decorator lets you write that logic exactly once, then apply it to any function with a single line: `@decorator_name`.
+
 **Decorator syntax:**
 
 ```python
@@ -115,14 +121,40 @@ def target_function(...):
 | `return wrapper` | The outer function returns the inner function itself — not calling it. | This new function is what gets bound to the original name. |
 | `@decorator_name` | Placed directly above a `def`. | Shorthand for `target_function = decorator_name(target_function)`. |
 
+**Simple example:**
+
+```python
+def shout(func):
+    def wrapper():
+        result = func()
+        return result.upper()
+    return wrapper
+
+@shout
+def greet():
+    return "hello"
+
+print(greet())
+```
+
+*Line-by-line explanation:*
+- `def shout(func):` defines the decorator itself; it receives the function being wrapped — here, `greet` — as `func`.
+- `def wrapper():` defines a brand-new function that will completely replace `greet`.
+- `result = func()` calls the *original* `greet()` and stores whatever it returns.
+- `return result.upper()` is the extra behaviour the decorator adds — converting the result to uppercase — before handing it back.
+- `return wrapper` sends back the `wrapper` function itself (not a call to it), so it can take `greet`'s place.
+- `@shout` written directly above `def greet():` means Python runs `greet = shout(greet)` immediately after `greet` is defined.
+- `print(greet())` now actually calls `wrapper()`, since `greet` points to `wrapper` — which calls the real `greet()`, gets back `"hello"`, converts it to `"HELLO"`, and returns that.
+- Output: `HELLO`
+
 **Diagram: How a Decorator Wraps a Function**
 
 ```mermaid
 flowchart LR
-    A["Original function defined<br/>def greet(name): ..."] --> B["@my_decorator applied<br/>greet = my_decorator(greet)"]
-    B --> C["Call greet('Sam')<br/>really calls wrapper('Sam')"]
-    C --> D["wrapper runs extra code,<br/>then calls the original greet"]
-    D --> E["Original result returned<br/>back through wrapper"]
+    A["def greet():<br/>return 'hello'"] --> B["@shout applied<br/>greet = shout(greet)"]
+    B --> C["Call greet()<br/>really calls wrapper()"]
+    C --> D["wrapper calls the original greet()<br/>gets back 'hello'"]
+    D --> E["wrapper converts it to 'HELLO'<br/>and returns it"]
 ```
 
 **Generator function syntax:**

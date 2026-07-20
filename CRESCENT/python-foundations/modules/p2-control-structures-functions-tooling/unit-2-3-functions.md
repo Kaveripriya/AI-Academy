@@ -59,7 +59,7 @@ This is the single most important distinction in this entire unit. `print()` dis
 
 ### 3.2 Parameters, Arguments, and How Values Flow In
 
-A **parameter** is a name listed inside the parentheses when you **define** a function — it is a placeholder for a value that will be supplied later. An **argument** is the actual value you supply when you **call** the function. In `def square(n):`, `n` is the parameter; in `square(5)`, `5` is the argument. Keeping this pair of words straight is a very common interview check, so hold onto it: parameter = the name in the definition, argument = the value in the call.
+A **parameter** is a name listed inside the parentheses when you **define** a function — it is a placeholder for a value that will be supplied later. An **argument** is the actual value you supply when you **call** the function. In the `power` function below, `base` and `exponent` are the parameters — chosen when the function is defined; in the call `power(2, 3)`, `2` and `3` are the arguments — the actual values supplied at that moment. Keeping this pair of words straight is a very common interview check, so hold onto it: parameter = the name in the definition, argument = the value in the call.
 
 **Positional arguments** are matched to parameters purely by their order in the call:
 
