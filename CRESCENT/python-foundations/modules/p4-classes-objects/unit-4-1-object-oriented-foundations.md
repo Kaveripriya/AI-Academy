@@ -126,31 +126,7 @@ obj = ClassName(value1, value2)      # instantiation
 | `def method_name(self, extra_arg):` | A **method definition** — an ordinary `def`, written inside the class body, with `self` first. | Defines behaviour the object can perform, with access to its own attributes through `self`. |
 | `ClassName(value1, value2)` | **Instantiation** — calling the class name like a function. | Creates a new object, runs `__init__` on it with the given arguments, and returns the finished object. |
 
-### 3.5 Rules
-
-- Every line inside a class body must be indented consistently, exactly like the body of a function or a loop.
-- `__init__` is optional, but if a class defines it, Python calls it automatically on every `ClassName(...)` call — you never call `__init__` yourself.
-- Every instance method's first parameter must be `self`; Python supplies the object automatically as that first argument at the call site — you never pass it yourself.
-- An instance attribute must be assigned through `self` (`self.attribute = value`) before it can be read through `self` or through an object; reading an attribute that was never assigned raises an `AttributeError`.
-- A class attribute is defined directly in the class body, outside any method; it is shared by every instance until one instance is assigned its own attribute of the same name, which then shadows the class attribute for that instance only.
-- Instantiating a class always requires the parentheses — `ClassName()`, matching whatever parameters `__init__` declares (besides `self`).
-
-### 3.6 Best Practices
-
-- Name classes in **`PascalCase`** (`Student`, `BankAccount`, `FoodOrder`); name instances in `snake_case`, exactly as you already name any other variable.
-- Keep `__init__` focused purely on setup: assign parameters to attributes and set sensible starting values. Avoid putting unrelated calculations or printing inside it.
-- Name constructor parameters the same as the attribute they populate (`self.name = name`) — it keeps the mapping obvious to anyone reading the code.
-- Give methods verb-like names that describe the action they perform (`deposit`, `mark_delivered`, `calculate_grade`) — the same convention you already follow for functions.
-- Use a class attribute only for a value that is genuinely identical across every instance (like a company or platform name); use an instance attribute, set inside `__init__`, for anything that can vary per object.
-
-### 3.7 Common Mistakes
-
-- **Forgetting `self` as a method's first parameter.** Python still passes the object in automatically, so the call ends up with one argument too many, producing a `TypeError` about argument counts rather than an obvious complaint about a missing `self`.
-- **Confusing a class with an instance.** `Student` is the blueprint; `Student()` produces an object. Trying to read `Student.name` before any object has set `name` as an instance attribute raises an `AttributeError`, because the class itself never held that value — only an instance does.
-- **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself, and calling `account.deposit(100)` later fails because the class has no such bound method to call.
-- **Forgetting the `self.` prefix inside a method.** Writing `balance = balance + amount` instead of `self.balance = self.balance + amount` creates a plain local variable that vanishes when the method ends, leaving the object's real attribute completely unchanged.
-
-### 3.8 Comparison Table: Class vs Object
+**Comparison Table: Class vs Object**
 
 | Aspect | Class | Object (Instance) |
 |---|---|---|
@@ -161,7 +137,7 @@ obj = ClassName(value1, value2)      # instantiation
 | Example | `Student` (the idea of "a student") | `Student("Priya Nair", 91)` (one real student) |
 | Independence | N/A — there is only one blueprint | Every object's attributes are independent of every other object's |
 
-### 3.9 Diagram: One Class, Many Independent Objects
+**Diagram: One Class, Many Independent Objects**
 
 ```mermaid
 ---
@@ -195,7 +171,31 @@ flowchart TB
 
 The single `Student` blueprint never holds any real data itself. Every time it is called through `__init__`, a brand-new object is produced with its own independent attributes — changing `student_1`'s `marks` has no effect whatsoever on `student_2`.
 
-### 3.10 Code Examples
+### 3.5 Rules
+
+- Every line inside a class body must be indented consistently, exactly like the body of a function or a loop.
+- `__init__` is optional, but if a class defines it, Python calls it automatically on every `ClassName(...)` call — you never call `__init__` yourself.
+- Every instance method's first parameter must be `self`; Python supplies the object automatically as that first argument at the call site — you never pass it yourself.
+- An instance attribute must be assigned through `self` (`self.attribute = value`) before it can be read through `self` or through an object; reading an attribute that was never assigned raises an `AttributeError`.
+- A class attribute is defined directly in the class body, outside any method; it is shared by every instance until one instance is assigned its own attribute of the same name, which then shadows the class attribute for that instance only.
+- Instantiating a class always requires the parentheses — `ClassName()`, matching whatever parameters `__init__` declares (besides `self`).
+
+### 3.6 Best Practices
+
+- Name classes in **`PascalCase`** (`Student`, `BankAccount`, `FoodOrder`); name instances in `snake_case`, exactly as you already name any other variable.
+- Keep `__init__` focused purely on setup: assign parameters to attributes and set sensible starting values. Avoid putting unrelated calculations or printing inside it.
+- Name constructor parameters the same as the attribute they populate (`self.name = name`) — it keeps the mapping obvious to anyone reading the code.
+- Give methods verb-like names that describe the action they perform (`deposit`, `mark_delivered`, `calculate_grade`) — the same convention you already follow for functions.
+- Use a class attribute only for a value that is genuinely identical across every instance (like a company or platform name); use an instance attribute, set inside `__init__`, for anything that can vary per object.
+
+### 3.7 Common Mistakes
+
+- **Forgetting `self` as a method's first parameter.** Python still passes the object in automatically, so the call ends up with one argument too many, producing a `TypeError` about argument counts rather than an obvious complaint about a missing `self`.
+- **Confusing a class with an instance.** `Student` is the blueprint; `Student()` produces an object. Trying to read `Student.name` before any object has set `name` as an instance attribute raises an `AttributeError`, because the class itself never held that value — only an instance does.
+- **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself, and calling `account.deposit(100)` later fails because the class has no such bound method to call.
+- **Forgetting the `self.` prefix inside a method.** Writing `balance = balance + amount` instead of `self.balance = self.balance + amount` creates a plain local variable that vanishes when the method ends, leaving the object's real attribute completely unchanged.
+
+### 3.8 Code Examples
 
 **Basic example** — an empty class, instantiated twice, showing that each object is distinct:
 

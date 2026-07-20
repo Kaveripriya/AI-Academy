@@ -78,6 +78,15 @@ Type conversion, f-strings, type hints, `match`/`case`, and comments each solve 
 | `float(x)` | Decimal number (`float`) | `float("3.14")`, `float(42)` | `3.14`, `42.0` |
 | `bool(x)` | Truth value (`bool`) | `bool(0)`, `bool("hi")` | `False`, `True` |
 
+**Comparison Table: Implicit vs. Explicit Type Conversion**
+
+| Aspect | Implicit Conversion | Explicit Conversion |
+|---|---|---|
+| Who performs it | Python, automatically | The programmer, using `int()`, `float()`, `str()`, `bool()` |
+| When it happens | Only between compatible numeric types, e.g. `int` + `float` | Any time you need to change a value's type, including `str` to number |
+| Example | `3 + 4.0` → `7.0` | `int("5") + 3` → `8` |
+| Risk | Very low — Python only does this where no information is lost | Errors possible if the value can't be parsed, e.g. `int("abc")` |
+
 **f-string syntax:** `f"{expression:format_spec}"`
 
 | Part | What it is | Why it's there |
@@ -113,6 +122,15 @@ print(f"[{item:^15}]")
 - `f"[{item:^15}]"` — the same idea, but `:^15` centers `"Tea"` inside a 15-character-wide field, splitting the 12 leftover spaces evenly: 6 spaces, then `Tea`, then 6 spaces.
 
 Once you can see the spaces in this one example, every other use of `:.2f`, `:d`, `:>N`, and `:^N` in this unit follows the exact same rule: the letter/symbol says *what* to do (round, pad, align), and the number says *how wide* the field should be.
+
+**Comparison Table: f-strings vs. `.format()` vs. `%` formatting**
+
+| Aspect | f-string | `.format()` | `%` formatting |
+|---|---|---|---|
+| Syntax | `f"{name}"` | `"{}".format(name)` | `"%s" % name` |
+| Readability | Highest — variable sits right where it's used | Moderate — placeholders separate from values | Lowest — easy to mismatch positions |
+| Introduced | Python 3.6 (PEP 498) | Python 2.6+ | Original Python string formatting |
+| Recommended for new code | Yes | Acceptable, mostly in older codebases | Avoid in new code |
 
 **Type hint syntax:** `name: type = value`
 
@@ -175,27 +193,7 @@ match subject:
 - **Believing a type hint is enforced** — `age: int = "twenty"` runs without error; the hint is documentation, not a guarantee.
 - **Placing `case _:` before other cases** — since matching stops at the first hit, an early wildcard makes every case below it unreachable.
 
-### 3.8 Comparison Tables
-
-**Implicit vs. Explicit Type Conversion**
-
-| Aspect | Implicit Conversion | Explicit Conversion |
-|---|---|---|
-| Who performs it | Python, automatically | The programmer, using `int()`, `float()`, `str()`, `bool()` |
-| When it happens | Only between compatible numeric types, e.g. `int` + `float` | Any time you need to change a value's type, including `str` to number |
-| Example | `3 + 4.0` → `7.0` | `int("5") + 3` → `8` |
-| Risk | Very low — Python only does this where no information is lost | Errors possible if the value can't be parsed, e.g. `int("abc")` |
-
-**f-strings vs. `.format()` vs. `%` formatting**
-
-| Aspect | f-string | `.format()` | `%` formatting |
-|---|---|---|---|
-| Syntax | `f"{name}"` | `"{}".format(name)` | `"%s" % name` |
-| Readability | Highest — variable sits right where it's used | Moderate — placeholders separate from values | Lowest — easy to mismatch positions |
-| Introduced | Python 3.6 (PEP 498) | Python 2.6+ | Original Python string formatting |
-| Recommended for new code | Yes | Acceptable, mostly in older codebases | Avoid in new code |
-
-### 3.9 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — converting a value between types:
 

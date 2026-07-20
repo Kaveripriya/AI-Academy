@@ -78,6 +78,41 @@ Because this course works entirely through the GitHub website, "syntax" here mea
 
 The key takeaway from this table: on the GitHub web interface, steps 3 through 5 collapse into one click. You do not need to separately "stage," "commit," and "push" the way someone working from a local computer with the git command line would — that distinction becomes relevant later in your career if you move to command-line Git, but is not required for this course.
 
+**Diagram: The Edit → Commit → Push Loop (Web Interface)**
+
+```mermaid
+flowchart LR
+    A["Open repository<br/>on github.com"] --> B["Edit or add a file<br/>using the web editor"]
+    B --> C["Write a clear<br/>commit message"]
+    C --> D["Click 'Commit changes'"]
+    D --> E["Change is saved AND<br/>pushed to GitHub instantly"]
+    E --> F["Visible immediately in the<br/>repository's Commits tab"]
+```
+
+**Diagram: Local Work vs GitHub (Conceptual)**
+
+```mermaid
+flowchart TD
+    subgraph Local["Your working copy (conceptual)"]
+        L1["Edit files"] --> L2["Add / stage changes"]
+        L2 --> L3["Commit — save a checkpoint"]
+    end
+    L3 -->|"Push"| R["GitHub — remote repository"]
+    R -->|"Pull / fetch"| L1
+    R --> R1["Commits tab: full history"]
+    R --> R2["Visible to teammates,<br/>instructors, reviewers"]
+```
+
+**Comparison Table: Local Repository vs Remote Repository**
+
+| Aspect | Local Repository | Remote Repository (GitHub) |
+|---|---|---|
+| Where it lives | On the machine or environment where the work happens | Hosted online at github.com |
+| Who can see it | Only whoever has access to that machine | Anyone with repository access, from anywhere with internet |
+| Survives device loss? | No — a lost or damaged device can mean losing the repository | Yes — the copy on GitHub is independent of any one device |
+| How this course uses it | Not used directly — this course works through the browser | Used directly for every action: creating files, committing, reviewing history |
+| Typical use later in a career | Where day-to-day editing and committing happens via the git command line | Where work is shared, reviewed, and combined with a team's work |
+
 ### 3.5 Rules
 
 - A commit should represent one logical, self-contained change — not an unrelated mix of edits bundled together.
@@ -101,42 +136,7 @@ The key takeaway from this table: on the GitHub web interface, steps 3 through 5
 - **Leaving the default commit message.** GitHub's web editor pre-fills a generic message like `"Update filename.py"` — accepting it without editing it wastes the one part of a commit meant to explain your reasoning.
 - **Confusing Git with GitHub.** Assuming GitHub *is* version control, rather than a website that hosts a Git repository, leads to confusion later when working with local, command-line Git.
 
-### 3.8 Comparison Table: Local Repository vs Remote Repository
-
-| Aspect | Local Repository | Remote Repository (GitHub) |
-|---|---|---|
-| Where it lives | On the machine or environment where the work happens | Hosted online at github.com |
-| Who can see it | Only whoever has access to that machine | Anyone with repository access, from anywhere with internet |
-| Survives device loss? | No — a lost or damaged device can mean losing the repository | Yes — the copy on GitHub is independent of any one device |
-| How this course uses it | Not used directly — this course works through the browser | Used directly for every action: creating files, committing, reviewing history |
-| Typical use later in a career | Where day-to-day editing and committing happens via the git command line | Where work is shared, reviewed, and combined with a team's work |
-
-### 3.9 Diagram: The Edit → Commit → Push Loop (Web Interface)
-
-```mermaid
-flowchart LR
-    A["Open repository<br/>on github.com"] --> B["Edit or add a file<br/>using the web editor"]
-    B --> C["Write a clear<br/>commit message"]
-    C --> D["Click 'Commit changes'"]
-    D --> E["Change is saved AND<br/>pushed to GitHub instantly"]
-    E --> F["Visible immediately in the<br/>repository's Commits tab"]
-```
-
-### 3.10 Diagram: Local Work vs GitHub (Conceptual)
-
-```mermaid
-flowchart TD
-    subgraph Local["Your working copy (conceptual)"]
-        L1["Edit files"] --> L2["Add / stage changes"]
-        L2 --> L3["Commit — save a checkpoint"]
-    end
-    L3 -->|"Push"| R["GitHub — remote repository"]
-    R -->|"Pull / fetch"| L1
-    R --> R1["Commits tab: full history"]
-    R --> R2["Visible to teammates,<br/>instructors, reviewers"]
-```
-
-### 3.11 Examples
+### 3.8 Examples
 
 **Example 1 — a bad commit message.**
 

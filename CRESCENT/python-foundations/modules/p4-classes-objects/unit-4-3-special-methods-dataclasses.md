@@ -102,6 +102,27 @@ class ClassName:
 | `other` | The second value involved (only present for two-operand special methods like `__eq__`, `__add__`). | Lets the method compare or combine `self` with whatever was on the other side. |
 | `return result` | A value the calling code receives back. | `print()`, `==`, and `+` all *use* what your dunder method returns — forgetting to `return` means they silently get `None`. |
 
+**Comparison Table: `__str__` vs `__repr__`**
+
+| Aspect | `__str__` | `__repr__` |
+|---|---|---|
+| Audience | End user / human reading output | Developer debugging or logging |
+| Called by | `print()`, `str()`, f-strings (when defined) | `repr()`, interactive shell echoing a value, and as the fallback for `print()` |
+| Goal | Readable, friendly description | Unambiguous, ideally code-like description |
+| If missing | Falls back to `__repr__` (via `object`'s default `__str__`) | No further fallback — defaults to `<ClassName object at 0x...>` |
+| Typical content | `"Priya (Roll No. 101)"` | `"Student(name='Priya', roll_number=101)"` |
+
+**Diagram: How `print(obj)` Resolves to a Dunder Method**
+
+```mermaid
+flowchart TD
+    A["print(obj) is called"] --> B{"Does the class define __str__?"}
+    B -- Yes --> C["Python calls obj.__str__()"]
+    B -- No --> D{"Does the class define __repr__?"}
+    D -- Yes --> E["object's default __str__ calls obj.__repr__() instead"]
+    D -- No --> F["Falls back to object's own default:<br/>ClassName object at 0x..."]
+```
+
 **Defining a dataclass** — a decorator plus type-hinted class attributes, with no `__init__` written by hand:
 
 ```python
@@ -119,6 +140,28 @@ class ClassName:
 | `@dataclass` | The decorator, placed directly above the class definition. | Tells Python to inspect this class's type-hinted attributes and generate `__init__`, `__repr__`, and `__eq__` from them. |
 | `field_one: type` | A **field** — a class attribute written with a type hint but no default value. | Becomes a required parameter, in this order, in the generated `__init__`. |
 | `field_two: type = default_value` | A field with a default value. | Becomes an optional parameter; every defaulted field must come *after* every required one. |
+
+**Comparison Table: Regular Class vs `@dataclass`**
+
+| Aspect | Regular (hand-written) Class | `@dataclass` |
+|---|---|---|
+| `__init__` | Written by hand | Generated automatically from type-hinted fields |
+| `__repr__` / `__eq__` | Written by hand, if wanted at all | Generated automatically |
+| `__str__` | Written by hand, if wanted | Never generated — must still be written by hand |
+| Best suited for | Classes with custom behaviour, validation, or invariants | Classes that are mostly data (configs, records, DTOs) |
+| Boilerplate | More typing, more places to introduce bugs | Minimal — a short, type-hinted field list |
+| Extra features | None built in | `frozen=True` for immutability, `order=True` for `<`, `<=`, `>`, `>=` |
+
+**Diagram: What `@dataclass` Generates**
+
+```mermaid
+flowchart LR
+    F["Type-hinted fields<br/>name: str<br/>roll_number: int"] --> D["@dataclass decorator<br/>reads the fields"]
+    D --> I["Generates __init__"]
+    D --> R["Generates __repr__"]
+    D --> E["Generates __eq__"]
+    D --> N["Does NOT generate __str__"]
+```
 
 ### 3.5 Rules
 
@@ -147,28 +190,7 @@ class ClassName:
 - **Placing a required field after a defaulted one in a dataclass** — raises a `TypeError` at class-definition time, before the program even runs.
 - **Assuming `+` works automatically between custom objects** — without `__add__` defined, `obj1 + obj2` raises `TypeError: unsupported operand type(s)`, since `object` has no idea what "adding" your class should mean.
 
-### 3.8 Comparison Table: `__str__` vs `__repr__`
-
-| Aspect | `__str__` | `__repr__` |
-|---|---|---|
-| Audience | End user / human reading output | Developer debugging or logging |
-| Called by | `print()`, `str()`, f-strings (when defined) | `repr()`, interactive shell echoing a value, and as the fallback for `print()` |
-| Goal | Readable, friendly description | Unambiguous, ideally code-like description |
-| If missing | Falls back to `__repr__` (via `object`'s default `__str__`) | No further fallback — defaults to `<ClassName object at 0x...>` |
-| Typical content | `"Priya (Roll No. 101)"` | `"Student(name='Priya', roll_number=101)"` |
-
-### 3.9 Comparison Table: Regular Class vs `@dataclass`
-
-| Aspect | Regular (hand-written) Class | `@dataclass` |
-|---|---|---|
-| `__init__` | Written by hand | Generated automatically from type-hinted fields |
-| `__repr__` / `__eq__` | Written by hand, if wanted at all | Generated automatically |
-| `__str__` | Written by hand, if wanted | Never generated — must still be written by hand |
-| Best suited for | Classes with custom behaviour, validation, or invariants | Classes that are mostly data (configs, records, DTOs) |
-| Boilerplate | More typing, more places to introduce bugs | Minimal — a short, type-hinted field list |
-| Extra features | None built in | `frozen=True` for immutability, `order=True` for `<`, `<=`, `>`, `>=` |
-
-### 3.10 Organizing Classes into Modules and Packages
+### 3.8 Organizing Classes into Modules and Packages
 
 A **module** is simply a `.py` file. As a project grows past one or two classes, cramming everything into a single file becomes its own problem — so related classes get grouped into their own modules, and other files reach them with `import`.
 
@@ -198,29 +220,7 @@ Rohit
 
 `from wallet import Wallet` tells Python: locate a module named `wallet` (it finds `wallet.py` in the same directory), run that file once, and bind the name `Wallet` into this file's own namespace. Import the same module a second time from anywhere else in the program, and Python reuses the module object it already built rather than re-running the file. A **library** — a broader term you will hear constantly in the industry — is simply a collection of modules (often distributed as a **package**, a directory of related modules) written to be reused across many projects; the `dataclasses` module you have been importing throughout this unit is itself one small part of Python's own **standard library**, the large collection of modules that ships with Python itself. As a project grows, you might end up with `wallet.py`, `ticket.py`, and `student.py` sitting side by side — or grouped further into a package such as `banking/` containing `account.py` and `transaction.py` together.
 
-### 3.11 Diagram: How `print(obj)` Resolves to a Dunder Method
-
-```mermaid
-flowchart TD
-    A["print(obj) is called"] --> B{"Does the class define __str__?"}
-    B -- Yes --> C["Python calls obj.__str__()"]
-    B -- No --> D{"Does the class define __repr__?"}
-    D -- Yes --> E["object's default __str__ calls obj.__repr__() instead"]
-    D -- No --> F["Falls back to object's own default:<br/>ClassName object at 0x..."]
-```
-
-### 3.12 Diagram: What `@dataclass` Generates
-
-```mermaid
-flowchart LR
-    F["Type-hinted fields<br/>name: str<br/>roll_number: int"] --> D["@dataclass decorator<br/>reads the fields"]
-    D --> I["Generates __init__"]
-    D --> R["Generates __repr__"]
-    D --> E["Generates __eq__"]
-    D --> N["Does NOT generate __str__"]
-```
-
-### 3.13 Code Examples
+### 3.9 Code Examples
 
 **Basic example** — the default output, then a class-defined `__repr__`:
 

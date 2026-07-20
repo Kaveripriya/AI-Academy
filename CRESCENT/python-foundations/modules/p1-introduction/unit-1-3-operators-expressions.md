@@ -94,6 +94,16 @@ Arithmetic, comparison, and logical operators, together with the rules that gove
 | `<=` | less than or equal to | `5 <= 5` | `True` |
 | `>=` | greater than or equal to | `3 >= 5` | `False` |
 
+**Comparison Table: `=` vs `==`**
+
+| Aspect | `=` (Assignment) | `==` (Equality Comparison) |
+|---|---|---|
+| Purpose | Binds a name to a value (from Unit 1.2) | Asks whether two values are equal |
+| Result | No result value — it performs an action | Always produces a `bool`: `True` or `False` |
+| Example | `x = 5` — stores `5` in `x` | `x == 5` — asks "does `x` currently equal `5`?" |
+| Where it's used | Only in a statement, to create or update a variable | Inside any expression — conditions, print statements, calculations |
+| Beginner risk | Using it where a question was intended | Using it where a value was meant to be stored |
+
 **Logical operators** — work on `bool` operands (or any value, via truthiness):
 
 | Operator | Name | Example | Result |
@@ -115,48 +125,7 @@ flowchart TD
     O2 -->|No| O4["Must check right side<br/>result = value of B"]
 ```
 
-### 3.5 Rules
-
-- The *type* of an arithmetic result depends on the operands: if both are `int`, `+`/`-`/`*` give back an `int`; the moment even one operand is a `float`, the result "promotes" to `float`. So `7 + 3` is `10`, but `7 + 3.0` is `10.0`.
-- `/` (true division) **always** returns a `float`, even when the numbers divide evenly — `6 / 2` is `3.0`, not `3`.
-- `//` (floor division) rounds *toward negative infinity*, never toward zero. For positive numbers this matches "drop the decimal part," but for negatives it does not: `-7 // 2` is `-4` (the true answer, `-3.5`, rounded *down*), not `-3`.
-- `%` (modulo) gives the remainder, and it takes the **sign of the divisor** — so `-7 % 2` is `1`, not `-1`. `//` and `%` fit together: `(a // b) * b + (a % b)` always reconstructs `a`.
-- Dividing by zero with `/`, `//`, or `%` raises a `ZeroDivisionError` — Python never silently returns `0` or `infinity`.
-- Every comparison operator (`==`, `!=`, `<`, `>`, `<=`, `>=`) always produces a `bool` — never anything else.
-- Comparisons can be **chained**: `1 < x < 10` is evaluated as a single combined condition, exactly like "is `x` between 1 and 10?"
-- `and` and `or` are **short-circuit**: the right-hand side is skipped entirely once the left-hand side has already decided the result.
-- The **falsy** values in Python are a short, fixed list: `False`, `0`, `0.0`, and `""` (the empty string). Every other value — including negative numbers and the text `"False"` — is **truthy**.
-- Operator precedence is fixed and cannot be changed, but parentheses `()` always override it.
-
-### 3.6 Best Practices
-
-- Use parentheses to make your intended order of evaluation obvious, even when precedence would already give the right answer — clarity for the next reader matters more than saving a few characters.
-- Never assume `/` behaves like `//`, or the reverse — decide up front whether you need a fractional result or a whole-number count, and pick the operator that matches.
-- Compare values of compatible types; comparing a number to text (like `5 == "5"`) is legal Python but always gives `False`, since they are different types.
-- Write chained comparisons (`18 <= age < 65`) instead of `18 <= age and age < 65` — they mean the same thing, but the chained form reads closer to plain English.
-- Rely on truthiness for a direct check (`if cart_items:`) instead of writing it out longhand (`if cart_items != ""`) — Python code that uses truthiness idiomatically is considered more "Pythonic."
-- When a condition is long, break it across variables with descriptive names (as shown in the Worked Example) rather than writing one giant expression — it is far easier to debug.
-
-### 3.7 Common Mistakes
-
-- **Confusing `=` with `==`** — a single `=` assigns a value; a double `==` asks a question and returns `True`/`False`. This is the single most common beginner bug in this entire unit.
-- **Expecting `/` to behave like floor division** — forgetting that `/` always returns a `float`, even for `10 / 2`.
-- **Misreading `-2 ** 2`** — because `**` binds *tighter* than unary minus, this reads as "negate `2 ** 2`," giving `-4`, not `4`. To square `-2` itself, write `(-2) ** 2`.
-- **Ignoring precedence in mixed expressions** — assuming Python evaluates strictly left to right and getting `2 + 3 * 4` wrong by computing `2 + 3` first instead of `3 * 4` first.
-- **Treating the string `"False"` as falsy** — it is a non-empty string, so Python treats it as truthy; only the actual boolean `False` and the specific falsy values are false-ish.
-- **Not realizing short-circuit evaluation can hide bugs** — code on the right-hand side of `and`/`or` that would normally crash (like a division by zero) may never run at all, silently masking a problem you meant to catch.
-
-### 3.8 Comparison Table: `=` vs `==`
-
-| Aspect | `=` (Assignment) | `==` (Equality Comparison) |
-|---|---|---|
-| Purpose | Binds a name to a value (from Unit 1.2) | Asks whether two values are equal |
-| Result | No result value — it performs an action | Always produces a `bool`: `True` or `False` |
-| Example | `x = 5` — stores `5` in `x` | `x == 5` — asks "does `x` currently equal `5`?" |
-| Where it's used | Only in a statement, to create or update a variable | Inside any expression — conditions, print statements, calculations |
-| Beginner risk | Using it where a question was intended | Using it where a value was meant to be stored |
-
-### 3.9 Diagram: Operator Precedence Ladder
+**Diagram: Operator Precedence Ladder**
 
 When an expression has more than one operator, Python does not read left to right — it follows a fixed ranking called **operator precedence**. Here is the ladder, highest (evaluated first) at the top:
 
@@ -210,8 +179,38 @@ flowchart TB
 
 A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `-2 ** 2` gives `-4`, not `4`. Arithmetic runs before comparison, and comparison runs before logic, so `2 + 3 > 4 and 1 < 2` reads as `((2 + 3) > 4) and (1 < 2)`. And when two operators share a precedence level (like `*` and `/`), Python evaluates left to right — **left-associativity** — so `20 / 4 * 2` is `(20 / 4) * 2 = 10.0`, not `2.5`. You don't have to memorize the ladder; any time the order isn't obvious, wrap the part you want done first in parentheses — they always win, cost nothing, and can never turn a correct expression into a wrong one.
 
+### 3.5 Rules
 
-### 3.10 Code Examples
+- The *type* of an arithmetic result depends on the operands: if both are `int`, `+`/`-`/`*` give back an `int`; the moment even one operand is a `float`, the result "promotes" to `float`. So `7 + 3` is `10`, but `7 + 3.0` is `10.0`.
+- `/` (true division) **always** returns a `float`, even when the numbers divide evenly — `6 / 2` is `3.0`, not `3`.
+- `//` (floor division) rounds *toward negative infinity*, never toward zero. For positive numbers this matches "drop the decimal part," but for negatives it does not: `-7 // 2` is `-4` (the true answer, `-3.5`, rounded *down*), not `-3`.
+- `%` (modulo) gives the remainder, and it takes the **sign of the divisor** — so `-7 % 2` is `1`, not `-1`. `//` and `%` fit together: `(a // b) * b + (a % b)` always reconstructs `a`.
+- Dividing by zero with `/`, `//`, or `%` raises a `ZeroDivisionError` — Python never silently returns `0` or `infinity`.
+- Every comparison operator (`==`, `!=`, `<`, `>`, `<=`, `>=`) always produces a `bool` — never anything else.
+- Comparisons can be **chained**: `1 < x < 10` is evaluated as a single combined condition, exactly like "is `x` between 1 and 10?"
+- `and` and `or` are **short-circuit**: the right-hand side is skipped entirely once the left-hand side has already decided the result.
+- The **falsy** values in Python are a short, fixed list: `False`, `0`, `0.0`, and `""` (the empty string). Every other value — including negative numbers and the text `"False"` — is **truthy**.
+- Operator precedence is fixed and cannot be changed, but parentheses `()` always override it.
+
+### 3.6 Best Practices
+
+- Use parentheses to make your intended order of evaluation obvious, even when precedence would already give the right answer — clarity for the next reader matters more than saving a few characters.
+- Never assume `/` behaves like `//`, or the reverse — decide up front whether you need a fractional result or a whole-number count, and pick the operator that matches.
+- Compare values of compatible types; comparing a number to text (like `5 == "5"`) is legal Python but always gives `False`, since they are different types.
+- Write chained comparisons (`18 <= age < 65`) instead of `18 <= age and age < 65` — they mean the same thing, but the chained form reads closer to plain English.
+- Rely on truthiness for a direct check (`if cart_items:`) instead of writing it out longhand (`if cart_items != ""`) — Python code that uses truthiness idiomatically is considered more "Pythonic."
+- When a condition is long, break it across variables with descriptive names (as shown in the Worked Example) rather than writing one giant expression — it is far easier to debug.
+
+### 3.7 Common Mistakes
+
+- **Confusing `=` with `==`** — a single `=` assigns a value; a double `==` asks a question and returns `True`/`False`. This is the single most common beginner bug in this entire unit.
+- **Expecting `/` to behave like floor division** — forgetting that `/` always returns a `float`, even for `10 / 2`.
+- **Misreading `-2 ** 2`** — because `**` binds *tighter* than unary minus, this reads as "negate `2 ** 2`," giving `-4`, not `4`. To square `-2` itself, write `(-2) ** 2`.
+- **Ignoring precedence in mixed expressions** — assuming Python evaluates strictly left to right and getting `2 + 3 * 4` wrong by computing `2 + 3` first instead of `3 * 4` first.
+- **Treating the string `"False"` as falsy** — it is a non-empty string, so Python treats it as truthy; only the actual boolean `False` and the specific falsy values are false-ish.
+- **Not realizing short-circuit evaluation can hide bugs** — code on the right-hand side of `and`/`or` that would normally crash (like a division by zero) may never run at all, silently masking a problem you meant to catch.
+
+### 3.8 Code Examples
 
 **Basic example** — arithmetic operators, including the true-division vs floor-division surprise:
 
@@ -410,7 +409,7 @@ Discount eligible: True
 - **Arithmetic operators** include `+ - * **`, plus two kinds of division — `/` (true division, always a `float`) and `//` (floor division, rounds toward negative infinity) — and `%` (remainder, whose sign follows the divisor).
 - **Operator precedence** fixes which operator runs first (`**` before unary minus, the `*`/`/`/`//`/`%` family before `+`/`-`, arithmetic before comparison, comparison before logical, and `not` before `and` before `or`); parentheses always override it.
 - **Comparison operators** (`==`, `!=`, `<`, `>`, `<=`, `>=`) each produce a `bool` and can be chained, as in `1 < x < 10`.
-- The single most common beginner bug is confusing `=` (assignment) with `==` (equality comparison) — keep the Section 3.8 comparison table in mind.
+- The single most common beginner bug is confusing `=` (assignment) with `==` (equality comparison) — keep the `=` vs `==` comparison table in Section 3.4 in mind.
 - **Logical operators** `and`, `or`, and `not` combine or invert conditions using **short-circuit evaluation**, skipping the right side the moment the result is already decided.
 - **Truthiness** means every value acts as true or false in a logical context — `False`, `0`, `0.0`, and `""` are falsy; everything else is truthy.
 - Being ready to explain operator precedence, short-circuit evaluation, and truthiness in your own words is common ground for entry-level Python interview questions.

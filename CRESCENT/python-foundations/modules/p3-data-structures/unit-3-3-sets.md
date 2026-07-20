@@ -45,6 +45,17 @@ You write a set using curly braces `{}` around comma-separated values, or by pas
 fruits = {"apple", "banana", "mango"}
 ```
 
+**Comparison Table: List vs Set**
+
+| Aspect | List | Set |
+|---|---|---|
+| Allows duplicates | Yes | **No** — duplicates are dropped automatically |
+| Preserves insertion order | Yes | **No** — order is not guaranteed |
+| Indexing / slicing | Yes (`my_list[0]`) | **No** — not subscriptable |
+| Membership check (`in`) speed | Slower as the list grows (scans from the start) | **Fast** — roughly constant time via hashing |
+| Written with | `[ ]` | `{ }` or `set()` |
+| Typical use case | Ordered data, data with intentional repeats | Uniqueness, membership checks, overlap between collections |
+
 ### 3.2 Why This Concept Exists
 
 Without a dedicated data structure for uniqueness, a programmer would have to write a manual check every single time duplicates mattered:
@@ -64,7 +75,7 @@ A set exists to solve exactly this problem, in one line, without the slowdown:
 unique_numbers = set([1, 2, 2, 3, 3, 3])
 ```
 
-**Membership testing** — asking "is this value present?" — is the other reason sets exist. Real systems ask this question constantly: "is this UPI ID blocked?", "has this OTP already been used?", "is this pincode serviceable?" A set answers such questions in roughly constant time, no matter how large it grows, because of how it is stored internally (covered in §3.11).
+**Membership testing** — asking "is this value present?" — is the other reason sets exist. Real systems ask this question constantly: "is this UPI ID blocked?", "has this OTP already been used?", "is this pincode serviceable?" A set answers such questions in roughly constant time, no matter how large it grows, because of how it is stored internally (covered in §3.9).
 
 ### 3.3 Key Terminology
 
@@ -95,6 +106,20 @@ unique_numbers = set([1, 2, 2, 3, 3, 3])
 | `a - b` | **Difference** — elements in `a` that are not in `b`. | `{1,2} - {2,3}` → `{1}` |
 | `a ^ b` | **Symmetric difference** — elements in exactly one of `a`, `b`. | `{1,2} ^ {2,3}` → `{1,3}` |
 
+**Diagram: Set Operations**
+
+```mermaid
+flowchart TD
+    A["Set A: pincodes served by Restaurant X"] --> U["Union A | B<br/>everything served by X or Y"]
+    B["Set B: pincodes served by Restaurant Y"] --> U
+    A --> I["Intersection A & B<br/>pincodes both serve"]
+    B --> I
+    A --> D["Difference A - B<br/>pincodes only X serves"]
+    B --> D
+    A --> S["Symmetric Difference A ^ B<br/>pincodes served by exactly one"]
+    B --> S
+```
+
 ### 3.5 Rules
 
 - A set can only store **hashable (immutable)** values — numbers, strings, and tuples are allowed; a list or another set is not, and Python raises `TypeError: unhashable type` if you try.
@@ -122,32 +147,7 @@ unique_numbers = set([1, 2, 2, 3, 3, 3])
 - **Trying to put a mutable value (like a list) inside a set** — this raises `TypeError: unhashable type: 'list'`, since a set can only hold immutable, hashable elements.
 - **Using `remove()` on a value that might not exist.** This raises a `KeyError`. Use `discard()` when a missing value should simply be ignored.
 
-### 3.8 Comparison Table: List vs Set
-
-| Aspect | List | Set |
-|---|---|---|
-| Allows duplicates | Yes | **No** — duplicates are dropped automatically |
-| Preserves insertion order | Yes | **No** — order is not guaranteed |
-| Indexing / slicing | Yes (`my_list[0]`) | **No** — not subscriptable |
-| Membership check (`in`) speed | Slower as the list grows (scans from the start) | **Fast** — roughly constant time via hashing |
-| Written with | `[ ]` | `{ }` or `set()` |
-| Typical use case | Ordered data, data with intentional repeats | Uniqueness, membership checks, overlap between collections |
-
-### 3.9 Diagram: Set Operations
-
-```mermaid
-flowchart TD
-    A["Set A: pincodes served by Restaurant X"] --> U["Union A | B<br/>everything served by X or Y"]
-    B["Set B: pincodes served by Restaurant Y"] --> U
-    A --> I["Intersection A & B<br/>pincodes both serve"]
-    B --> I
-    A --> D["Difference A - B<br/>pincodes only X serves"]
-    B --> D
-    A --> S["Symmetric Difference A ^ B<br/>pincodes served by exactly one"]
-    B --> S
-```
-
-### 3.10 Membership Testing and Mutation
+### 3.8 Membership Testing and Mutation
 
 **Membership testing** uses the same `in` operator you already know from lists and strings:
 
@@ -189,7 +189,7 @@ Output:
 
 Default to `discard()` unless a missing value would genuinely be a bug you want Python to flag with an error.
 
-### 3.11 Set Comprehensions
+### 3.9 Set Comprehensions
 
 A **set comprehension** builds a set in one line, using the same idea as a list comprehension but with curly braces instead of square brackets. The result is automatically unordered and de-duplicated:
 
@@ -221,7 +221,7 @@ Output:
 
 Three inputs collapse to two distinct, normalized email addresses — the lower-casing and the de-duplication both happen in the same expression.
 
-### 3.12 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — creating a set and testing membership:
 

@@ -41,6 +41,17 @@ person = ("Ada", 36, True)
 
 "Ordered" means every value has a fixed position (an **index**), exactly like a list. "Immutable" means that once the tuple is built, you cannot add, remove, or replace any of its elements — the collection is locked for its entire lifetime. A tuple can hold values of different types in the same tuple, just like a list can.
 
+**Comparison Table: List vs Tuple**
+
+| Aspect | List | Tuple |
+|---|---|---|
+| Mutability | Mutable — can be changed after creation | Immutable — cannot be changed after creation |
+| Syntax | Square brackets `[1, 2, 3]` | Parentheses (or just commas) `(1, 2, 3)` |
+| Methods available | Many — `append()`, `insert()`, `remove()`, `pop()`, `sort()`, and more | Only two — `count()` and `index()` |
+| Hashable | No — cannot be used as a dictionary key or set element | Yes — can be used as a dictionary key or set element |
+| Typical use case | A collection that grows, shrinks, or reorders over time | A fixed group of related values, or a function's multiple return values |
+| Performance | Slightly slower to iterate; more memory overhead for the same data | Slightly faster to iterate; lower memory overhead, since Python can optimise fixed-size storage |
+
 ### 3.2 Why This Concept Exists
 
 A list is deliberately flexible — that flexibility is exactly why it exists. But flexibility has a cost: any piece of code that receives a list can accidentally (or deliberately) change it, and every other piece of code holding a reference to that same list will see the change too. For data that is genuinely meant to travel together and never change — a coordinate pair, a date `(day, month, year)`, a fixed configuration record — that flexibility is a liability, not a feature.
@@ -89,6 +100,16 @@ a, b, c = (10, 20, 30)
 | `=` | The assignment operator. | Same operator you already know — it works on multiple names at once when the right side is a tuple (or any iterable) of matching length. |
 | `(10, 20, 30)` | The tuple being unpacked. | The number of names on the left must match the number of values on the right, or Python raises a `ValueError`. |
 
+**Diagram: Tuple Unpacking Flow**
+
+```mermaid
+flowchart LR
+    A["Tuple on the right side<br/>('Priya', 21, 'CSE')"] --> B["Python checks:<br/>count matches variables?"]
+    B -->|Yes| C["Each value bound to the<br/>variable in the same position"]
+    B -->|No| D["ValueError:<br/>too many/few values to unpack"]
+    C --> E["name = 'Priya'<br/>age = 21<br/>branch = 'CSE'"]
+```
+
 ### 3.5 Rules
 
 - A tuple is created by the **comma**, not the parentheses — `1, 2, 3` and `(1, 2, 3)` produce the identical tuple.
@@ -114,28 +135,7 @@ a, b, c = (10, 20, 30)
 - **Calling `tuple()` with loose arguments** — `tuple(1, 2, 3)` raises a `TypeError`, because `tuple()` takes exactly one iterable, not several separate values.
 - **Assuming immutability applies to everything inside** — a tuple that contains a list (e.g. `record = ("Ada", [90, 85])`) cannot swap out that inner list for a different object, but the inner list itself can still be edited in place — a subtlety worth remembering.
 
-### 3.8 Comparison Table: List vs Tuple
-
-| Aspect | List | Tuple |
-|---|---|---|
-| Mutability | Mutable — can be changed after creation | Immutable — cannot be changed after creation |
-| Syntax | Square brackets `[1, 2, 3]` | Parentheses (or just commas) `(1, 2, 3)` |
-| Methods available | Many — `append()`, `insert()`, `remove()`, `pop()`, `sort()`, and more | Only two — `count()` and `index()` |
-| Hashable | No — cannot be used as a dictionary key or set element | Yes — can be used as a dictionary key or set element |
-| Typical use case | A collection that grows, shrinks, or reorders over time | A fixed group of related values, or a function's multiple return values |
-| Performance | Slightly slower to iterate; more memory overhead for the same data | Slightly faster to iterate; lower memory overhead, since Python can optimise fixed-size storage |
-
-### 3.9 Diagram: Tuple Unpacking Flow
-
-```mermaid
-flowchart LR
-    A["Tuple on the right side<br/>('Priya', 21, 'CSE')"] --> B["Python checks:<br/>count matches variables?"]
-    B -->|Yes| C["Each value bound to the<br/>variable in the same position"]
-    B -->|No| D["ValueError:<br/>too many/few values to unpack"]
-    C --> E["name = 'Priya'<br/>age = 21<br/>branch = 'CSE'"]
-```
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — creating a tuple and accessing its elements:
 

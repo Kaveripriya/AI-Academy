@@ -89,6 +89,31 @@ with open("data.csv", "r", newline="") as file:
 
 Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *robust* reader is placing the `try`/`except` **inside** the `for` loop, wrapping only one row at a time — not around the whole loop, which would still stop everything at the first failure.
 
+**Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)**
+
+| Aspect | Fail-Fast | Fail-Soft (Skip and Log) |
+|---|---|---|
+| Behaviour on a bad row | Stops immediately, raises the exception | Logs the bad row, continues to the next one |
+| What happens to good rows after the bad one | Never processed | Processed normally |
+| Best suited for | A single, critical operation that must not continue with bad data — e.g., validating a single bank transfer before it executes | Batch processing of many independent rows — e.g., loading a CSV of a thousand student records or bookings |
+| Risk if used in the wrong place | Loses all remaining good work over one bad record | Could hide a systemic problem if failures are only logged and never actually reviewed |
+| What this unit builds | The naive first version in §3.8 | The robust version in §3.8, and the worked example in §5 |
+
+**Diagram: The Skip-and-Log Flow**
+
+```mermaid
+flowchart TD
+    A[Read one row] --> B{Try to convert<br/>and validate}
+    B -->|Succeeds| C[Add to valid_records]
+    B -->|Raises an exception| D[Add to invalid_records / log it]
+    C --> E{More rows left?}
+    D --> E
+    E -->|Yes| A
+    E -->|No| F[Report: X valid, Y invalid]
+```
+
+*Every row follows this same loop — a failure on one row (the right-hand path) never prevents the next row (looping back to A) from being read.*
+
 ### 3.5 Rules
 
 - The `try`/`except` block must sit **inside** the `for` loop, around the processing of one single row — placing it around the entire loop defeats the purpose, since one failure would then exit the loop entirely.
@@ -114,32 +139,7 @@ Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *r
 - **Running summary math (totals, averages) over a collection that mixes valid and invalid rows** — a skipped row that contributed no real number can still silently drag down an average if it's counted in the total.
 - **Assuming a row that converts successfully is automatically valid** — `int("150")` succeeds, but 150 may still break a business rule (like a valid marks range of 0–100) that Python has no way of knowing about on its own.
 
-### 3.8 Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)
-
-| Aspect | Fail-Fast | Fail-Soft (Skip and Log) |
-|---|---|---|
-| Behaviour on a bad row | Stops immediately, raises the exception | Logs the bad row, continues to the next one |
-| What happens to good rows after the bad one | Never processed | Processed normally |
-| Best suited for | A single, critical operation that must not continue with bad data — e.g., validating a single bank transfer before it executes | Batch processing of many independent rows — e.g., loading a CSV of a thousand student records or bookings |
-| Risk if used in the wrong place | Loses all remaining good work over one bad record | Could hide a systemic problem if failures are only logged and never actually reviewed |
-| What this unit builds | The naive first version in §3.10 | The robust version in §3.10, and the worked example in §5 |
-
-### 3.9 Diagram: The Skip-and-Log Flow
-
-```mermaid
-flowchart TD
-    A[Read one row] --> B{Try to convert<br/>and validate}
-    B -->|Succeeds| C[Add to valid_records]
-    B -->|Raises an exception| D[Add to invalid_records / log it]
-    C --> E{More rows left?}
-    D --> E
-    E -->|Yes| A
-    E -->|No| F[Report: X valid, Y invalid]
-```
-
-*Every row follows this same loop — a failure on one row (the right-hand path) never prevents the next row (looping back to A) from being read.*
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 This unit builds one growing example rather than several unrelated ones — starting from a version that crashes, and improving it step by step into a robust reader.
 

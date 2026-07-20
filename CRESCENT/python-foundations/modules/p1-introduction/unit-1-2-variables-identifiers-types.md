@@ -89,6 +89,23 @@ score = 100      # first assignment — score is created
 score = 150      # reassignment — score's old value (100) is replaced
 ```
 
+**Comparison Table: Statically Typed vs Dynamically Typed Languages**
+
+| Aspect | Statically Typed (e.g., Java, C) | Dynamically Typed (e.g., Python) |
+|---|---|---|
+| Type declaration | You must declare the type up front, e.g. `int age = 30;` | You never declare a type — Python infers it from the value |
+| When type is checked | Before the program runs (compile time) | While the program runs (run time) |
+| Can a variable change type? | No — a variable keeps its declared type forever | Yes — the same name can refer to an `int` now and a `str` later |
+| Beginner impact | More upfront typing, catches some mistakes earlier | Faster to write, but you must track types yourself using `type()` |
+
+**Diagram: Dynamic Typing Over Time**
+
+```mermaid
+flowchart TD
+    S1["data = 100<br/>type(data) → int"] --> S2["data = 'one hundred'<br/>type(data) → str"]
+    S2 --> N["Same name, different type<br/>because type belongs to the VALUE, not the name"]
+```
+
 ### 3.5 Rules
 
 **Identifier rules (enforced by Python — break one and your code will not run):**
@@ -120,24 +137,7 @@ score = 150      # reassignment — score's old value (100) is replaced
 - **Assuming case doesn't matter** — writing `total` in one line and `Total` in another creates two separate, unrelated variables, not a typo Python will forgive.
 - **Confusing `"5"` (a string) with `5` (an integer)** — they look similar but are different types; `type()` will immediately clear this up.
 
-### 3.8 Comparison Table: Statically Typed vs Dynamically Typed Languages
-
-| Aspect | Statically Typed (e.g., Java, C) | Dynamically Typed (e.g., Python) |
-|---|---|---|
-| Type declaration | You must declare the type up front, e.g. `int age = 30;` | You never declare a type — Python infers it from the value |
-| When type is checked | Before the program runs (compile time) | While the program runs (run time) |
-| Can a variable change type? | No — a variable keeps its declared type forever | Yes — the same name can refer to an `int` now and a `str` later |
-| Beginner impact | More upfront typing, catches some mistakes earlier | Faster to write, but you must track types yourself using `type()` |
-
-### 3.9 Diagram: Dynamic Typing Over Time
-
-```mermaid
-flowchart TD
-    S1["data = 100<br/>type(data) → int"] --> S2["data = 'one hundred'<br/>type(data) → str"]
-    S2 --> N["Same name, different type<br/>because type belongs to the VALUE, not the name"]
-```
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — creating and printing a single variable:
 

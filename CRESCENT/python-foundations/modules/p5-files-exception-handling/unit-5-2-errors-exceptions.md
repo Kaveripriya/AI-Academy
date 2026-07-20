@@ -116,6 +116,35 @@ finally:
 | `finally:` | Runs no matter what happened above. | The one place to put cleanup code you can always count on running. |
 | `raise SomeError("message")` | Deliberately triggers an exception with a custom message. | Lets your own code signal a problem — built-in or custom. |
 
+**Diagram: `try` / `except` / `else` / `finally` Control Flow**
+
+```mermaid
+flowchart TD
+    A["Start: try block runs"] --> B{"Did an exception occur?"}
+    B -->|No| C["else block runs, if present"]
+    B -->|Yes| D{"Does a matching except exist?"}
+    D -->|Yes — first match, top to bottom| E["Matching except block runs"]
+    D -->|No matching except| F["Exception propagates upward, uncaught"]
+    C --> G["finally block runs"]
+    E --> G
+    F --> G
+    G --> H["Program continues normally,<br/>or the exception re-raises if it was never caught"]
+```
+*No matter which path is taken above, `finally` always executes before the block is truly done.*
+
+**Comparison Table: Common Exception Types**
+
+| Exception | When it happens | Example |
+|---|---|---|
+| `ValueError` | A value has the right type but an inappropriate value | `int("abc")` |
+| `TypeError` | An operation is applied to a value of the wrong type entirely | `"5" + 5` |
+| `ZeroDivisionError` | A number is divided by zero | `10 / 0` |
+| `FileNotFoundError` | You try to open a file that doesn't exist | `open("sales.csv")` when the file was deleted |
+| `KeyError` | You access a dictionary key that doesn't exist | `student_marks["Rohit"]` when `"Rohit"` isn't a key |
+| `IndexError` | You access a list/tuple index that is out of range | `marks[10]` when the list only has 3 items |
+
+A useful pair to keep straight for interviews: `ValueError` means *right type, wrong content* (`int("cat")` — a string, just not a numeric one); `TypeError` means *wrong type entirely* (`len(5)` — an integer has no length at all).
+
 A custom exception is just a class that inherits from `Exception`, exactly like the class inheritance you built in Part 4:
 
 ```python
@@ -185,36 +214,7 @@ graph TD
 - **Listing a parent exception class before a child** in multiple `except` clauses, so the child's specific block never actually executes.
 - **Forgetting that `else` is skipped** entirely the moment any exception occurs, even one caught by a different `except` than expected.
 
-### 3.8 Comparison Table: Common Exception Types
-
-| Exception | When it happens | Example |
-|---|---|---|
-| `ValueError` | A value has the right type but an inappropriate value | `int("abc")` |
-| `TypeError` | An operation is applied to a value of the wrong type entirely | `"5" + 5` |
-| `ZeroDivisionError` | A number is divided by zero | `10 / 0` |
-| `FileNotFoundError` | You try to open a file that doesn't exist | `open("sales.csv")` when the file was deleted |
-| `KeyError` | You access a dictionary key that doesn't exist | `student_marks["Rohit"]` when `"Rohit"` isn't a key |
-| `IndexError` | You access a list/tuple index that is out of range | `marks[10]` when the list only has 3 items |
-
-A useful pair to keep straight for interviews: `ValueError` means *right type, wrong content* (`int("cat")` — a string, just not a numeric one); `TypeError` means *wrong type entirely* (`len(5)` — an integer has no length at all).
-
-### 3.9 Diagram: `try` / `except` / `else` / `finally` Control Flow
-
-```mermaid
-flowchart TD
-    A["Start: try block runs"] --> B{"Did an exception occur?"}
-    B -->|No| C["else block runs, if present"]
-    B -->|Yes| D{"Does a matching except exist?"}
-    D -->|Yes — first match, top to bottom| E["Matching except block runs"]
-    D -->|No matching except| F["Exception propagates upward, uncaught"]
-    C --> G["finally block runs"]
-    E --> G
-    F --> G
-    G --> H["Program continues normally,<br/>or the exception re-raises if it was never caught"]
-```
-*No matter which path is taken above, `finally` always executes before the block is truly done.*
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — converting text to a number, with one specific `except`:
 

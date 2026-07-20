@@ -96,6 +96,39 @@ del d[key]                         # delete a key-value pair
 | `d[key] = value` | **Assignment** into a dictionary. | If `key` is new, it is added; if `key` already exists, its value is overwritten. There is no separate "insert" syntax. |
 | `del d[key]` | The **`del`** statement. | Removes a key and its value entirely; raises `KeyError` if the key does not exist. |
 
+**Comparison Table: List vs Set vs Dict**
+
+| Aspect | List | Set | Dict |
+|---|---|---|---|
+| Access by | position, `lst[i]` | membership only (`in`) | **key**, `d[key]` |
+| Ordering | insertion order | unordered | insertion order (since Python 3.7) |
+| Duplicates | allowed | never | no duplicate **keys** (values may repeat) |
+| Written with | `[ ]` | `{ }` / `set()` | `{key: value}` |
+| Typical use case | an ordered sequence of items | unique items, fast membership tests | labelled records, lookup tables, counting |
+
+**Diagram: Key-Value Mapping**
+
+```mermaid
+flowchart LR
+    K1["Key: 'name'"] --> V1["Value: 'Ananya'"]
+    K2["Key: 'roll_no'"] --> V2["Value: 101"]
+    K3["Key: 'marks'"] --> V3["Value: 87"]
+```
+
+Each key on the left points to exactly one value on the right — that arrow *is* the dictionary. Look up `"marks"` and you are handed `87` directly; there is no scanning involved.
+
+**Diagram: A Nested Dictionary**
+
+```mermaid
+flowchart TD
+    D["students dict"] --> R1["key: 101"]
+    R1 --> S1["value: {'name': 'Ananya', 'marks': 87}"]
+    D --> R2["key: 102"]
+    R2 --> S2["value: {'name': 'Rohit', 'marks': 74}"]
+```
+
+The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itself a smaller dictionary holding that student's fields. Reaching `"Ananya"` needs two lookups chained together: `students[101]["name"]`.
+
 ### 3.5 Rules
 
 - **Keys must be unique.** A dictionary can never hold the same key twice; assigning to an existing key overwrites its value instead of creating a second entry.
@@ -118,42 +151,9 @@ del d[key]                         # delete a key-value pair
 - **Forgetting `.get()` as a safer alternative.** New learners often write `if key in d: value = d[key]` when `value = d.get(key, default)` does the same job in one line and is far less error-prone.
 - **Confusing keys and values while looping.** Writing `for x in d:` gives you the **keys**, not the values — a very common mix-up. If you print `x` expecting a value and see a key instead, this is almost always why.
 - **Trying to use a mutable type as a key.** `d[[1, 2]] = "value"` raises `TypeError: unhashable type: 'list'` — lists cannot be keys because they can change after being stored.
-- **Expecting `sorted(d)` to sort by value.** `sorted(d)` sorts the **keys**; sorting by value requires `sorted(d.items(), key=lambda kv: kv[1])`, covered in §3.12.
+- **Expecting `sorted(d)` to sort by value.** `sorted(d)` sorts the **keys**; sorting by value requires `sorted(d.items(), key=lambda kv: kv[1])`, covered in §3.9.
 
-### 3.8 Comparison Table: List vs Set vs Dict
-
-| Aspect | List | Set | Dict |
-|---|---|---|---|
-| Access by | position, `lst[i]` | membership only (`in`) | **key**, `d[key]` |
-| Ordering | insertion order | unordered | insertion order (since Python 3.7) |
-| Duplicates | allowed | never | no duplicate **keys** (values may repeat) |
-| Written with | `[ ]` | `{ }` / `set()` | `{key: value}` |
-| Typical use case | an ordered sequence of items | unique items, fast membership tests | labelled records, lookup tables, counting |
-
-### 3.9 Diagram: Key-Value Mapping
-
-```mermaid
-flowchart LR
-    K1["Key: 'name'"] --> V1["Value: 'Ananya'"]
-    K2["Key: 'roll_no'"] --> V2["Value: 101"]
-    K3["Key: 'marks'"] --> V3["Value: 87"]
-```
-
-Each key on the left points to exactly one value on the right — that arrow *is* the dictionary. Look up `"marks"` and you are handed `87` directly; there is no scanning involved.
-
-### 3.10 Diagram: A Nested Dictionary
-
-```mermaid
-flowchart TD
-    D["students dict"] --> R1["key: 101"]
-    R1 --> S1["value: {'name': 'Ananya', 'marks': 87}"]
-    D --> R2["key: 102"]
-    R2 --> S2["value: {'name': 'Rohit', 'marks': 74}"]
-```
-
-The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itself a smaller dictionary holding that student's fields. Reaching `"Ananya"` needs two lookups chained together: `students[101]["name"]`.
-
-### 3.11 Built-in Functions and Methods
+### 3.8 Built-in Functions and Methods
 
 | Function / Method | What it does |
 |---|---|
@@ -172,7 +172,7 @@ The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itsel
 
 `keys()`, `values()`, and `items()` each return a **view object**, not a plain list — a view stays "live" and reflects later changes to the dictionary; wrap it in `list(...)` if you need an actual, independent list.
 
-### 3.12 Code Examples
+### 3.9 Code Examples
 
 **Basic example** — creating a dictionary and accessing a value:
 

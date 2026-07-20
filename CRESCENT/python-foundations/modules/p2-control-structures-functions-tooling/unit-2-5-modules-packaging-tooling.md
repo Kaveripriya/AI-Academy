@@ -82,6 +82,21 @@ Every professional Python project you touch — in this course and in your caree
 | `import module as alias` | `import math as m` | Loads the whole module but gives it a shorter or clearer name to use afterward: `m.sqrt(9)`. |
 | `from module import name as alias` | `from math import sqrt as square_root` | Combines both — pulls out one item and renames it. |
 
+**Diagram: How Python Resolves an `import`**
+
+```mermaid
+flowchart TD
+    A["import some_name"] --> B{"Already loaded\nthis session?"}
+    B -->|Yes| C["Reuse the loaded module\nno work repeated"]
+    B -->|No| D{"Is it part of the\nstandard library?"}
+    D -->|Yes| E["Load it directly\nno installation needed"]
+    D -->|No| F{"Is it installed in the\ncurrently active environment?"}
+    F -->|Yes| G["Load it from there\ne.g. a pip/Poetry install"]
+    F -->|No| H{"Is it a .py file in a\nfolder Python searches?"}
+    H -->|Yes| I["Load your own file\nas a module"]
+    H -->|No| J["ModuleNotFoundError"]
+```
+
 **Command-line tooling (run in a terminal, not inside a `.py` file):**
 
 | Command | What It Does |
@@ -95,6 +110,31 @@ Every professional Python project you touch — in this course and in your caree
 | `poetry add requests` | Adds `requests` as a dependency, records its version, and installs it into a Poetry-managed virtual environment. |
 | `poetry install` | Reads the project's existing dependency file and installs exactly what is listed — used by anyone cloning the project. |
 | `pytest` | Scans the project for test files and test functions, runs every one, and reports which passed and which failed. |
+
+**Comparison Table: `pip` + `venv` vs Poetry**
+
+| Aspect | `pip` + `venv` (manual, two tools) | Poetry (single integrated tool) |
+|---|---|---|
+| Creating an isolated environment | `python -m venv venv`, then activate it manually | Handled automatically behind the scenes |
+| Installing a package | `pip install requests` | `poetry add requests` |
+| Recording exact versions | Manual — you must remember to run `pip freeze > requirements.txt` | Automatic — written to `pyproject.toml` and `poetry.lock` on every `add` |
+| Reproducing the setup elsewhere | `pip install -r requirements.txt`, after creating and activating a matching venv yourself | `poetry install` — one command does everything |
+| Beginner learning curve | Lower — two small, well-known tools | Slightly higher — one tool, more moving parts to learn at once |
+| Common in industry | Still very common, especially in older or smaller projects | Increasingly standard in newer, professionally managed Python projects |
+
+**Diagram: A Professional Project's Dependency & Testing Workflow**
+
+```mermaid
+flowchart LR
+    S1["Create project"] --> S2["Create & activate\na virtual environment\n(or run poetry new)"]
+    S2 --> S3["Install dependencies\npip install / poetry add"]
+    S3 --> S4["Write application code\nin its own module(s)"]
+    S4 --> S5["Write test functions\nnamed test_*"]
+    S5 --> S6["Run pytest"]
+    S6 --> S7{"All tests pass?"}
+    S7 -->|Yes| S8["Commit code + dependency file\n(requirements.txt / pyproject.toml)"]
+    S7 -->|No| S4
+```
 
 ### 3.5 Rules
 
@@ -122,47 +162,7 @@ Every professional Python project you touch — in this course and in your caree
 - **Never pinning versions.** Leaving a dependency file to say just `requests` instead of `requests==2.31.0` means "works on my machine today" can silently stop being true on someone else's machine tomorrow, once a newer version changes behaviour.
 - **Writing test functions that don't start with `test_`.** Pytest will not find or run `check_add()` — only `test_add()` — no matter how correct the logic inside it is.
 
-### 3.8 Comparison Table: `pip` + `venv` vs Poetry
-
-| Aspect | `pip` + `venv` (manual, two tools) | Poetry (single integrated tool) |
-|---|---|---|
-| Creating an isolated environment | `python -m venv venv`, then activate it manually | Handled automatically behind the scenes |
-| Installing a package | `pip install requests` | `poetry add requests` |
-| Recording exact versions | Manual — you must remember to run `pip freeze > requirements.txt` | Automatic — written to `pyproject.toml` and `poetry.lock` on every `add` |
-| Reproducing the setup elsewhere | `pip install -r requirements.txt`, after creating and activating a matching venv yourself | `poetry install` — one command does everything |
-| Beginner learning curve | Lower — two small, well-known tools | Slightly higher — one tool, more moving parts to learn at once |
-| Common in industry | Still very common, especially in older or smaller projects | Increasingly standard in newer, professionally managed Python projects |
-
-### 3.9 Diagram: How Python Resolves an `import`
-
-```mermaid
-flowchart TD
-    A["import some_name"] --> B{"Already loaded\nthis session?"}
-    B -->|Yes| C["Reuse the loaded module\nno work repeated"]
-    B -->|No| D{"Is it part of the\nstandard library?"}
-    D -->|Yes| E["Load it directly\nno installation needed"]
-    D -->|No| F{"Is it installed in the\ncurrently active environment?"}
-    F -->|Yes| G["Load it from there\ne.g. a pip/Poetry install"]
-    F -->|No| H{"Is it a .py file in a\nfolder Python searches?"}
-    H -->|Yes| I["Load your own file\nas a module"]
-    H -->|No| J["ModuleNotFoundError"]
-```
-
-### 3.10 Diagram: A Professional Project's Dependency & Testing Workflow
-
-```mermaid
-flowchart LR
-    S1["Create project"] --> S2["Create & activate\na virtual environment\n(or run poetry new)"]
-    S2 --> S3["Install dependencies\npip install / poetry add"]
-    S3 --> S4["Write application code\nin its own module(s)"]
-    S4 --> S5["Write test functions\nnamed test_*"]
-    S5 --> S6["Run pytest"]
-    S6 --> S7{"All tests pass?"}
-    S7 -->|Yes| S8["Commit code + dependency file\n(requirements.txt / pyproject.toml)"]
-    S7 -->|No| S4
-```
-
-### 3.11 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — importing one standard library module:
 

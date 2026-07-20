@@ -99,35 +99,7 @@ class C(A, B):
 | `_name` | A single leading underscore on an attribute or method name. | Signals "protected — internal use only," by convention. |
 | `__name` | A double leading underscore on an attribute or method name. | Triggers name mangling to `_ClassName__name`, mainly to avoid accidental name collisions across a hierarchy. |
 
-### 3.5 Rules
-
-- A subclass is declared with `class Child(Parent):`; the parenthesized name(s) are the direct superclass(es).
-- If a subclass does not define its own `__init__`, Python uses the superclass's `__init__` automatically.
-- If a subclass **does** define its own `__init__`, the superclass's `__init__` does **not** run automatically — it must be called explicitly with `super().__init__(...)`.
-- Method lookup always follows the MRO: Python checks the object's own class first, then walks the MRO in order until it finds the method.
-- `super()` always means "the next class in the computed MRO," not literally "my parent class" — this distinction only becomes visible with multiple inheritance (see §3.10).
-- A double leading underscore (`__name`) is rewritten by Python, at compile time, to `_ClassName__name`, using the exact name of the class where that line of code is written.
-- `isinstance(obj, Cls)` returns `True` if `Cls` appears anywhere in the object's class's MRO, not only if it is the immediate class.
-
-### 3.6 Best Practices
-
-- Favor **composition over deep inheritance chains** — if a relationship isn't genuinely "is-a" (a `SavingsAccount` **is a** `BankAccount`), consider giving one class an instance of another instead of forcing an inheritance relationship that doesn't really fit.
-- Keep hierarchies shallow. Two or three levels are usually enough; a chain five levels deep becomes hard to trace and debug.
-- Always call `super().__init__()` at the start of a subclass's `__init__`, before adding anything new — this guarantees the superclass's part of the object is fully built first.
-- Use a single leading underscore (`_balance`) as your default way to mark internal attributes; reach for a double leading underscore only when you specifically need to avoid a name collision across a hierarchy.
-- Prefer well-defined methods (like `deposit()`, `withdraw()`) over direct attribute access, even for attributes without any underscore — it keeps validation logic in one place.
-- When using multiple inheritance, keep each parent class narrowly focused on one responsibility (often called a **mixin**), so the MRO stays predictable.
-
-### 3.7 Common Mistakes
-
-- **Forgetting to call `super().__init__()`** — the superclass's attributes are never set, and any method relying on them later fails with an `AttributeError`.
-- **Assuming a subclass "automatically" has the parent's data** — inheriting a *method* only makes it available; the object's actual *data* exists only if `__init__` genuinely ran and assigned it.
-- **Diamond-problem confusion in multiple inheritance** — assuming `super()` inside a class always jumps to "its" direct parent; it actually jumps to the next class in the MRO, which in a diamond shape is often a sibling class, not the shared ancestor.
-- **Assuming Python enforces true private variables** — `self.__pin` is still reachable from outside as `self._ClassName__pin`; double underscore prevents accidental name collisions, it does not provide real security.
-- **Building unnecessarily deep inheritance chains** just to reuse a couple of methods, when a simpler, flatter design (or composition) would be easier to read and maintain.
-- **Overriding a method without knowing you're overriding it** — accidentally reusing a superclass's method name and silently losing access to its original behavior.
-
-### 3.8 Comparison Table: Single Inheritance vs Multi-Level vs Multiple Inheritance
+**Comparison Table: Single Inheritance vs Multi-Level vs Multiple Inheritance**
 
 | Aspect | Single Inheritance | Multi-Level Inheritance | Multiple Inheritance |
 |---|---|---|---|
@@ -137,15 +109,7 @@ class C(A, B):
 | Main risk | Very low — straightforward to reason about | Chains that grow too long become hard to trace | The diamond problem — ambiguity about method order, resolved by MRO |
 | Typical use | A specific case of a general class (`SavingsAccount` from `BankAccount`) | Layered specialization (`Employee` → `Manager` → `SeniorManager`) | Combining independent behaviors (mixins) into one class |
 
-### 3.9 Comparison Table: Public vs Protected vs Private Naming Convention
-
-| Naming Style | Example | Meaning | Enforced by Python? |
-|---|---|---|---|
-| Public | `self.balance` | No restriction signaled; any code may read or write it freely. | N/A — this is the default |
-| Protected (`_name`) | `self._balance` | Convention: "internal use — don't rely on this from outside code." | No — purely a social agreement between developers |
-| Private (`__name`) | `self.__pin` | Triggers name mangling to `self._ClassName__pin`, mainly to prevent accidental name collisions across a class hierarchy. | Partially — the original name stops working, but the mangled name is still fully accessible |
-
-### 3.10 Diagram: Class Hierarchy and MRO
+**Diagram: Class Hierarchy and MRO**
 
 ```mermaid
 flowchart BT
@@ -168,7 +132,43 @@ flowchart BT
 
 This diagram shows a realistic banking hierarchy: `SavingsAccount` extends `BankAccount` through ordinary single inheritance, while `PremiumSavingsAccount` uses **multiple inheritance** to combine `SavingsAccount` with an unrelated `SMSAlertMixin`. Python computes the `__mro__` the moment `PremiumSavingsAccount` is defined — it searches `SavingsAccount`'s own chain fully before moving to `SMSAlertMixin`, which is why `BankAccount` appears before `SMSAlertMixin` in the order, even though `SMSAlertMixin` was written second in the class definition.
 
-### 3.11 Code Examples
+**Comparison Table: Public vs Protected vs Private Naming Convention**
+
+| Naming Style | Example | Meaning | Enforced by Python? |
+|---|---|---|---|
+| Public | `self.balance` | No restriction signaled; any code may read or write it freely. | N/A — this is the default |
+| Protected (`_name`) | `self._balance` | Convention: "internal use — don't rely on this from outside code." | No — purely a social agreement between developers |
+| Private (`__name`) | `self.__pin` | Triggers name mangling to `self._ClassName__pin`, mainly to prevent accidental name collisions across a class hierarchy. | Partially — the original name stops working, but the mangled name is still fully accessible |
+
+### 3.5 Rules
+
+- A subclass is declared with `class Child(Parent):`; the parenthesized name(s) are the direct superclass(es).
+- If a subclass does not define its own `__init__`, Python uses the superclass's `__init__` automatically.
+- If a subclass **does** define its own `__init__`, the superclass's `__init__` does **not** run automatically — it must be called explicitly with `super().__init__(...)`.
+- Method lookup always follows the MRO: Python checks the object's own class first, then walks the MRO in order until it finds the method.
+- `super()` always means "the next class in the computed MRO," not literally "my parent class" — this distinction only becomes visible with multiple inheritance (see the diagram in §3.4).
+- A double leading underscore (`__name`) is rewritten by Python, at compile time, to `_ClassName__name`, using the exact name of the class where that line of code is written.
+- `isinstance(obj, Cls)` returns `True` if `Cls` appears anywhere in the object's class's MRO, not only if it is the immediate class.
+
+### 3.6 Best Practices
+
+- Favor **composition over deep inheritance chains** — if a relationship isn't genuinely "is-a" (a `SavingsAccount` **is a** `BankAccount`), consider giving one class an instance of another instead of forcing an inheritance relationship that doesn't really fit.
+- Keep hierarchies shallow. Two or three levels are usually enough; a chain five levels deep becomes hard to trace and debug.
+- Always call `super().__init__()` at the start of a subclass's `__init__`, before adding anything new — this guarantees the superclass's part of the object is fully built first.
+- Use a single leading underscore (`_balance`) as your default way to mark internal attributes; reach for a double leading underscore only when you specifically need to avoid a name collision across a hierarchy.
+- Prefer well-defined methods (like `deposit()`, `withdraw()`) over direct attribute access, even for attributes without any underscore — it keeps validation logic in one place.
+- When using multiple inheritance, keep each parent class narrowly focused on one responsibility (often called a **mixin**), so the MRO stays predictable.
+
+### 3.7 Common Mistakes
+
+- **Forgetting to call `super().__init__()`** — the superclass's attributes are never set, and any method relying on them later fails with an `AttributeError`.
+- **Assuming a subclass "automatically" has the parent's data** — inheriting a *method* only makes it available; the object's actual *data* exists only if `__init__` genuinely ran and assigned it.
+- **Diamond-problem confusion in multiple inheritance** — assuming `super()` inside a class always jumps to "its" direct parent; it actually jumps to the next class in the MRO, which in a diamond shape is often a sibling class, not the shared ancestor.
+- **Assuming Python enforces true private variables** — `self.__pin` is still reachable from outside as `self._ClassName__pin`; double underscore prevents accidental name collisions, it does not provide real security.
+- **Building unnecessarily deep inheritance chains** just to reuse a couple of methods, when a simpler, flatter design (or composition) would be easier to read and maintain.
+- **Overriding a method without knowing you're overriding it** — accidentally reusing a superclass's method name and silently losing access to its original behavior.
+
+### 3.8 Code Examples
 
 **Basic example** — single-level inheritance with overriding:
 
@@ -355,10 +355,10 @@ print(PremiumSavingsAccount.__mro__)
 
 ## 4. Real-World Application
 
-- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern in §3.11's industry example.
+- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern in §3.8's industry example.
 - **UPI / Payment Systems:** A payment gateway might have a base `PaymentMethod` class, extended by `UPIPayment`, `CardPayment`, and `NetBankingPayment`, each overriding a `process()` method with its own validation logic while sharing common logging and retry behavior.
 - **E-commerce:** A `Product` base class is extended by `ElectronicsProduct` and `GroceryProduct`, each adding fields like `warranty_period` or `expiry_date`, while both inherit shared pricing and discount logic.
-- **Food Delivery:** A `DeliveryPartner` base class is extended by `BikePartner` and `CarPartner`; combining a partner class with an independent `RatingMixin` through multiple inheritance is a realistic use of the MRO concept from §3.10.
+- **Food Delivery:** A `DeliveryPartner` base class is extended by `BikePartner` and `CarPartner`; combining a partner class with an independent `RatingMixin` through multiple inheritance is a realistic use of the MRO concept from §3.4.
 - **Healthcare:** A `Patient` base class is extended by `InpatientRecord` and `OutpatientRecord`, each adding fields specific to that kind of visit while sharing common demographic fields through inheritance.
 - **Railway Booking (IRCTC-style systems):** A `Passenger` base class extended by `SeniorCitizenPassenger` or `TatkalBooking`, each overriding fare-calculation logic while reusing shared booking and cancellation methods.
 - **Exception Hierarchies:** Python's own built-in errors form exactly this structure — `ValueError` and `TypeError` both extend `Exception` — and production code routinely extends further, e.g., `InvalidPinError(ValidationError)`, so `isinstance(err, ValidationError)` catches every specific subtype without checking each one by name.

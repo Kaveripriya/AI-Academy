@@ -150,7 +150,51 @@ def factorial(n):
 factorial(4)   # 4 * 3 * 2 * 1 = 24
 ```
 
-Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. Section 3.14 below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
+Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. The diagram below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
+
+**Diagram: Recursion Call Stack — `factorial(4)`**
+
+```mermaid
+flowchart TB
+    f4["<b>factorial(4)</b><br><span style='font-size:11px;color:#6d28d9'>initial call</span>"]
+    f3["<b>factorial(3)</b>"]
+    f2["<b>factorial(2)</b>"]
+    f1["<b>factorial(1)</b>"]
+    f0["<b>factorial(0)</b><br><span style='font-size:11px;color:#6d28d9'>n == 0 -&gt; base case</span>"]
+    result["<b>Result: 24</b><br><span style='font-size:11px;color:#6d28d9'>fully unwound</span>"]
+
+    f4 -->|calls| f3
+    f3 -->|calls| f2
+    f2 -->|calls| f1
+    f1 -->|calls| f0
+    f0 -->|"returns 1"| f1
+    f1 -->|"1 x 1 = 1"| f2
+    f2 -->|"2 x 1 = 2"| f3
+    f3 -->|"3 x 2 = 6"| f4
+    f4 -->|"4 x 6 = 24"| result
+
+    class f4 start
+    class f3 auto
+    class f2 auto
+    class f1 auto
+    class f0 done
+    class result done
+
+    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px,color:#1a1a1a
+    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px,color:#1a1a1a
+    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px,color:#1a1a1a
+```
+
+**Comparison Table: Recursion vs. Iteration**
+
+| Aspect | Recursion | Iteration (loops) |
+|---|---|---|
+| Mechanism | A function calls itself on a smaller input | A loop (`for`/`while`) repeats a block of code |
+| Requires | A base case and a recursive case | A loop condition and, usually, an accumulator |
+| Memory use | Uses the call stack — one frame per pending call | Uses a fixed, small amount of memory regardless of repeat count |
+| Risk if wrong | Missing/unreachable base case → `RecursionError` | Wrong condition → infinite loop (program never raises an error, just never stops) |
+| Best suited for | Problems naturally defined in terms of a smaller copy of themselves (factorial, tree-shaped data) | Straightforward repetition over a known range or condition |
+| Readability | Can be shorter and closer to the mathematical definition | Often more familiar and easier to trace step by step |
 
 If the base case were missing, or written so it could never actually be reached, the function would keep calling itself forever, pushing a fresh frame onto the call stack on every call. Python limits how deep this stack is allowed to grow. Once a program exceeds that limit, Python stops it cleanly and raises a `RecursionError` reporting "maximum recursion depth exceeded" — a controlled failure, not a silent hang or a crashed interpreter.
 
@@ -229,6 +273,16 @@ Calling the function reuses the same familiar shape you've used since Unit 1.1:
 function_name(argument1, argument2)
 ```
 
+**Diagram: Function Call Flow**
+
+```mermaid
+flowchart LR
+    A["Caller writes:<br/>total(3, 4, 5)"] --> B["Arguments 3, 4, 5<br/>bound to parameter *args"]
+    B --> C["Function body runs:<br/>loop adds each value"]
+    C --> D["return running<br/>sends 12 back"]
+    D --> E["Caller receives 12<br/>e.g. print(total(3, 4, 5))"]
+```
+
 ### 3.9 Rules
 
 **Definition and call rules:**
@@ -271,61 +325,7 @@ function_name(argument1, argument2)
 - **Mixing up parameter and argument** — using the two terms interchangeably in an interview is a common giveaway of shaky fundamentals.
 - **Calling a function before it is defined** — Python reads top to bottom, so a call above the matching `def` raises a `NameError`.
 
-### 3.12 Comparison Table: Recursion vs. Iteration
-
-| Aspect | Recursion | Iteration (loops) |
-|---|---|---|
-| Mechanism | A function calls itself on a smaller input | A loop (`for`/`while`) repeats a block of code |
-| Requires | A base case and a recursive case | A loop condition and, usually, an accumulator |
-| Memory use | Uses the call stack — one frame per pending call | Uses a fixed, small amount of memory regardless of repeat count |
-| Risk if wrong | Missing/unreachable base case → `RecursionError` | Wrong condition → infinite loop (program never raises an error, just never stops) |
-| Best suited for | Problems naturally defined in terms of a smaller copy of themselves (factorial, tree-shaped data) | Straightforward repetition over a known range or condition |
-| Readability | Can be shorter and closer to the mathematical definition | Often more familiar and easier to trace step by step |
-
-### 3.13 Diagram: Function Call Flow
-
-```mermaid
-flowchart LR
-    A["Caller writes:<br/>total(3, 4, 5)"] --> B["Arguments 3, 4, 5<br/>bound to parameter *args"]
-    B --> C["Function body runs:<br/>loop adds each value"]
-    C --> D["return running<br/>sends 12 back"]
-    D --> E["Caller receives 12<br/>e.g. print(total(3, 4, 5))"]
-```
-
-### 3.14 Diagram: Recursion Call Stack — `factorial(4)`
-
-```mermaid
-flowchart TB
-    f4["<b>factorial(4)</b><br><span style='font-size:11px;color:#6d28d9'>initial call</span>"]
-    f3["<b>factorial(3)</b>"]
-    f2["<b>factorial(2)</b>"]
-    f1["<b>factorial(1)</b>"]
-    f0["<b>factorial(0)</b><br><span style='font-size:11px;color:#6d28d9'>n == 0 -&gt; base case</span>"]
-    result["<b>Result: 24</b><br><span style='font-size:11px;color:#6d28d9'>fully unwound</span>"]
-
-    f4 -->|calls| f3
-    f3 -->|calls| f2
-    f2 -->|calls| f1
-    f1 -->|calls| f0
-    f0 -->|"returns 1"| f1
-    f1 -->|"1 x 1 = 1"| f2
-    f2 -->|"2 x 1 = 2"| f3
-    f3 -->|"3 x 2 = 6"| f4
-    f4 -->|"4 x 6 = 24"| result
-
-    class f4 start
-    class f3 auto
-    class f2 auto
-    class f1 auto
-    class f0 done
-    class result done
-
-    classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px,color:#1a1a1a
-    classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px,color:#1a1a1a
-    classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px,color:#1a1a1a
-```
-
-### 3.15 Code Examples
+### 3.12 Code Examples
 
 **Basic example** — defining and calling a function with no parameters:
 

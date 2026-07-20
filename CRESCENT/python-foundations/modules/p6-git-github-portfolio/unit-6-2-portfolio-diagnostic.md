@@ -37,6 +37,17 @@ A **portfolio repository** is a single, permanent GitHub repository that you cre
 
 A **diagnostic** (also called a **checkpoint assessment**) is a small, focused task used to confirm that a learner has reached a required level of skill before being allowed to move to the next stage. It is not meant to teach anything new or to be difficult — every skill it requires has already been practised earlier. Its only purpose is to verify readiness. The **Part A diagnostic** in this unit is exactly that: one short task combining a Python skill (reading and summarizing data from a file) and a Git skill (committing and pushing that result), reviewed and signed off by your instructor before you begin Part B.
 
+**Diagram: Part A to Part B Flow**
+
+```mermaid
+flowchart LR
+    A["Part A: Python Foundations<br/>Units 1.1 - 6.1"] --> B["Build portfolio repository<br/>Unit 6.2"]
+    B --> C["Submit Part A diagnostic<br/>Python + Git skill together"]
+    C --> D{"Instructor<br/>reviews commit"}
+    D -->|Sign-off given| E["Part B:<br/>AI Fundamentals"]
+    D -->|Gaps found| A
+```
+
 ### 3.2 Why This Concept Exists
 
 Two separate problems make this unit necessary, and both come down to the same idea: skill that nobody can see is skill nobody can act on.
@@ -70,6 +81,28 @@ A good portfolio repository does not need to be complex — it needs to be predi
 
 Keep the layout flat rather than deeply nested. A handful of clearly named top-level folders is easier for a visitor to scan than several layers of subfolders they must click through just to find something.
 
+**Comparison Table: Messy vs Well-Organized Portfolio Repository**
+
+| Aspect | Messy Repository | Well-Organized Repository |
+|---|---|---|
+| README | Missing, or one vague line | Clear title, description, and index of contents |
+| Folder names | `misc/`, `week3/`, `stuff/` | `csv_summary_tool/`, `student_records/` |
+| Commit history | Few commits, vague messages like `update` | Frequent commits with clear, specific messages |
+| File organization | Unrelated files mixed together | One folder per project, related files kept together |
+| Visibility | Private, or forgotten after creation | Public and actively maintained |
+| Reader's experience | Has to open every file to understand anything | Can predict where something lives from folder/README alone |
+
+**Diagram: Portfolio Repository Structure**
+
+```mermaid
+flowchart TD
+    R["your-name-ai-native-portfolio/"] --> RM["README.md<br/>who you are + index of contents"]
+    R --> P1["python-foundations/<br/>unit practice work"]
+    R --> P2["csv_summary_tool/<br/>project + its own README.md"]
+    R --> P3["student_records/<br/>project + its own README.md"]
+    R --> D["diagnostics/<br/>checkpoint submissions"]
+```
+
 ### 3.5 Rules
 
 The Part A diagnostic itself is intentionally narrow in what it demands — but what it demands, it demands exactly:
@@ -95,40 +128,7 @@ The Part A diagnostic itself is intentionally narrow in what it demands — but 
 - **Vague folder and file names** — `test1.py`, `final.py`, `stuff/` — that force a reader to open every file just to understand what is there.
 - **Keeping the repository private "until it's finished"** — a portfolio is never really finished; it is meant to be watched growing, not hidden until perfect.
 
-### 3.8 Comparison Table: Messy vs Well-Organized Portfolio Repository
-
-| Aspect | Messy Repository | Well-Organized Repository |
-|---|---|---|
-| README | Missing, or one vague line | Clear title, description, and index of contents |
-| Folder names | `misc/`, `week3/`, `stuff/` | `csv_summary_tool/`, `student_records/` |
-| Commit history | Few commits, vague messages like `update` | Frequent commits with clear, specific messages |
-| File organization | Unrelated files mixed together | One folder per project, related files kept together |
-| Visibility | Private, or forgotten after creation | Public and actively maintained |
-| Reader's experience | Has to open every file to understand anything | Can predict where something lives from folder/README alone |
-
-### 3.9 Diagram: Portfolio Repository Structure
-
-```mermaid
-flowchart TD
-    R["your-name-ai-native-portfolio/"] --> RM["README.md<br/>who you are + index of contents"]
-    R --> P1["python-foundations/<br/>unit practice work"]
-    R --> P2["csv_summary_tool/<br/>project + its own README.md"]
-    R --> P3["student_records/<br/>project + its own README.md"]
-    R --> D["diagnostics/<br/>checkpoint submissions"]
-```
-
-### 3.10 Diagram: Part A to Part B Flow
-
-```mermaid
-flowchart LR
-    A["Part A: Python Foundations<br/>Units 1.1 - 6.1"] --> B["Build portfolio repository<br/>Unit 6.2"]
-    B --> C["Submit Part A diagnostic<br/>Python + Git skill together"]
-    C --> D{"Instructor<br/>reviews commit"}
-    D -->|Sign-off given| E["Part B:<br/>AI Fundamentals"]
-    D -->|Gaps found| A
-```
-
-### 3.11 Examples
+### 3.8 Examples
 
 **Sample README.md snippet** for a portfolio repository's top level:
 
@@ -209,7 +209,7 @@ Create the repository once, write a specific and honest README, move your best p
 ### Step 4: Explain Each Step
 
 - Steps 1-3 create the permanent repository and its first, visible entry point — the README — using the exact GitHub workflow from Unit 6.1.
-- Step 4 applies the README structure from §3.11: a clear title, a one-line description, and an index of contents, so a visitor understands the repository within seconds.
+- Step 4 applies the README structure from §3.8: a clear title, a one-line description, and an index of contents, so a visitor understands the repository within seconds.
 - Step 5 applies the folder-structure guidance from §3.4 and §3.6 — one project per folder, named for its contents, moved and committed incrementally so the commit history itself shows steady progress.
 - Steps 6-7 produce the actual diagnostic submission described in §3.5 — a small script combining a Python skill (reading and summarizing data) with a Git skill (commit and push).
 - Step 8 completes the process described in §3.1 and §3.3 — the diagnostic is only considered passed once an instructor reviews the real commit on GitHub and gives sign-off.

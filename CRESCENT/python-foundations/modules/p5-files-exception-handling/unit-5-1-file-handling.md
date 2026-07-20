@@ -88,6 +88,37 @@ with open(filename, mode) as file:   # preferred — closes automatically
 | `as file` | Binds the returned file object to a name. | Lets you call methods (`.read()`, `.write()`, ...) on that name inside the block. |
 | `with ... :` | Wraps the block in a context manager. | Guarantees `file.close()` runs automatically when the block ends — normally or via an error. |
 
+**Comparison Table: Manual `open()`/`close()` vs `with` Context Manager**
+
+| Aspect | Manual `open()` / `close()` | `with` Context Manager |
+|---|---|---|
+| Syntax | `file = open(...)` then `file.close()` later | `with open(...) as file:` — no explicit `close()` needed |
+| Closes on success | Yes, if the `close()` line is reached | Yes, always |
+| Closes if an error occurs mid-block | **No** — the `close()` line is skipped entirely | **Yes** — cleanup runs automatically as the block is exited |
+| Risk of a forgotten `close()` | High — easy to forget, especially in longer functions | None — closing is handled by the language itself |
+| Recommended for new code | No | Yes — the standard, expected approach |
+
+**Diagram: The File Lifecycle**
+
+```mermaid
+flowchart LR
+    A["open(filename, mode)<br/>returns a file object"] --> B["Read or write<br/>using the file object"]
+    B --> C["close()<br/>flushes buffered data to disk<br/>and releases the file"]
+    C --> D["File safely saved<br/>and available to others"]
+```
+
+**Diagram: How `with` Guarantees Cleanup Even on Error**
+
+```mermaid
+flowchart TD
+    S["with open(...) as file:"] --> W["Code inside the block runs"]
+    W --> N["Block finishes normally"]
+    W --> E["An error is raised inside the block"]
+    N --> CL["file.close() runs automatically"]
+    E --> CL
+    CL --> X["Either way, the file is closed<br/>before control leaves the with block"]
+```
+
 ```python
 import csv
 
@@ -152,38 +183,7 @@ with open("student.json", "r") as file:
 - **Forgetting the CSV header row exists** — the first row read is the header, not data; passing it straight into `int()` or similar crashes with a `ValueError`.
 - **Confusing `load`/`dump` with `loads`/`dumps`** — the plain versions work on files; the ones ending in `s` work on strings already sitting in a variable. Using the wrong pair raises a `TypeError`.
 
-### 3.8 Comparison Table: Manual `open()`/`close()` vs `with` Context Manager
-
-| Aspect | Manual `open()` / `close()` | `with` Context Manager |
-|---|---|---|
-| Syntax | `file = open(...)` then `file.close()` later | `with open(...) as file:` — no explicit `close()` needed |
-| Closes on success | Yes, if the `close()` line is reached | Yes, always |
-| Closes if an error occurs mid-block | **No** — the `close()` line is skipped entirely | **Yes** — cleanup runs automatically as the block is exited |
-| Risk of a forgotten `close()` | High — easy to forget, especially in longer functions | None — closing is handled by the language itself |
-| Recommended for new code | No | Yes — the standard, expected approach |
-
-### 3.9 Diagram: The File Lifecycle
-
-```mermaid
-flowchart LR
-    A["open(filename, mode)<br/>returns a file object"] --> B["Read or write<br/>using the file object"]
-    B --> C["close()<br/>flushes buffered data to disk<br/>and releases the file"]
-    C --> D["File safely saved<br/>and available to others"]
-```
-
-### 3.10 Diagram: How `with` Guarantees Cleanup Even on Error
-
-```mermaid
-flowchart TD
-    S["with open(...) as file:"] --> W["Code inside the block runs"]
-    W --> N["Block finishes normally"]
-    W --> E["An error is raised inside the block"]
-    N --> CL["file.close() runs automatically"]
-    E --> CL
-    CL --> X["Either way, the file is closed<br/>before control leaves the with block"]
-```
-
-### 3.11 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — writing one line to a file, then reading it back:
 

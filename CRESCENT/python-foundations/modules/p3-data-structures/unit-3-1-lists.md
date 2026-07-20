@@ -115,6 +115,19 @@ my_list[start:stop:step]
 | `my_list.remove(x)` | Deletes the first element equal to `x`. |
 | `my_list.sort()` | Sorts the list in place, in ascending order by default. |
 
+**Comparison Table: Python List vs. Array (Other Languages)**
+
+Many languages you may encounter later (C, Java, and others) have a data structure called an **array**, which looks similar to a Python list at first glance but behaves quite differently:
+
+| Aspect | Python `list` | Array (e.g., in C, Java) |
+|---|---|---|
+| Fixed size? | No — grows and shrinks freely with `append`, `pop`, `insert`, etc. | Usually fixed at creation; resizing often needs a new array |
+| Mixed types allowed? | Yes — a single list can hold `int`, `str`, `bool`, even other lists, together | Usually no — most arrays hold only one declared type |
+| Declared in advance? | No — Python infers everything at run time (dynamic typing, as in Unit 1.2) | Often yes — many languages require declaring the element type up front |
+| Built-in methods | Rich set: `append`, `sort`, `index`, comprehensions, and more | Typically minimal; extra behaviour needs separate library code |
+
+This is why Python lists are often described as more flexible but with some run-time overhead compared to a fixed, single-type array in a statically typed language.
+
 ### 3.5 Creating and Indexing a List
 
 Each element of a list has a numbered position, its **index**. Python indexes from **zero** — the first element sits at index `0`, the second at `1`, and so on. You reach an element with the list's name followed by the index in square brackets: `my_list[i]`.
@@ -313,20 +326,7 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 - **Writing `my_list = my_list.sort()`** — this discards the list entirely, because `sort()` returns `None`.
 - **Confusing `append()` with `extend()`** — `my_list.append([1, 2])` adds one nested list as a single element; `my_list.extend([1, 2])` adds `1` and `2` as two separate elements.
 
-### 3.15 Comparison Table: Python List vs. Array (Other Languages)
-
-Many languages you may encounter later (C, Java, and others) have a data structure called an **array**, which looks similar to a Python list at first glance but behaves quite differently:
-
-| Aspect | Python `list` | Array (e.g., in C, Java) |
-|---|---|---|
-| Fixed size? | No — grows and shrinks freely with `append`, `pop`, `insert`, etc. | Usually fixed at creation; resizing often needs a new array |
-| Mixed types allowed? | Yes — a single list can hold `int`, `str`, `bool`, even other lists, together | Usually no — most arrays hold only one declared type |
-| Declared in advance? | No — Python infers everything at run time (dynamic typing, as in Unit 1.2) | Often yes — many languages require declaring the element type up front |
-| Built-in methods | Rich set: `append`, `sort`, `index`, comprehensions, and more | Typically minimal; extra behaviour needs separate library code |
-
-This is why Python lists are often described as more flexible but with some run-time overhead compared to a fixed, single-type array in a statically typed language.
-
-### 3.16 Code Examples
+### 3.15 Code Examples
 
 **Basic example** — creating a list and inspecting it:
 

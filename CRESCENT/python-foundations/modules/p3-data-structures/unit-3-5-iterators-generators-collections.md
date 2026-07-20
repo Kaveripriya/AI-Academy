@@ -67,6 +67,16 @@ The `collections` module exists because three patterns are so common that Python
 
 ### 3.4 Syntax
 
+**Comparison Table: Iterable vs Iterator**
+
+| Aspect | Iterable | Iterator |
+|---|---|---|
+| Definition | Any object you can loop over | The object that actually produces values one at a time |
+| Has `__next__`? | Not necessarily | Yes, always |
+| Can you call `next()` on it directly? | No — you must first call `iter()` on it | Yes, directly |
+| Reusable? | Yes — a fresh iterator is created each time you loop over it | No — exhausts after one full pass |
+| Examples | `list`, `tuple`, `set`, `dict`, `str` | The object returned by `iter(some_list)`, or any generator |
+
 | Syntax | Purpose | Example |
 |---|---|---|
 | `iter(obj)` | Get a fresh iterator from an iterable. | `it = iter([10, 20, 30])` |
@@ -76,6 +86,28 @@ The `collections` module exists because three patterns are so common that Python
 | `Counter(iterable)` | Tally occurrences of every item in one call. | `Counter(["A", "B", "A"])` |
 | `defaultdict(factory)` | Create a dict that auto-fills missing keys using `factory()`. | `defaultdict(list)` |
 | `namedtuple(typename, [fields])` | Create a tuple subclass with named, readable fields. | `namedtuple("Point", ["x", "y"])` |
+
+**Diagram: The Iterator Protocol**
+
+```mermaid
+flowchart LR
+    A["Iterable<br/>e.g. a list"] -->|"iter(iterable)"| B["Iterator object<br/>remembers position"]
+    B -->|"next(it)"| C["One value returned"]
+    C --> D{"Any values left?"}
+    D -->|Yes| B
+    D -->|No| E["StopIteration raised<br/>for loop stops silently"]
+```
+
+**Diagram: Generator Pause and Resume**
+
+```mermaid
+flowchart TD
+    S1["Call generator function<br/>→ returns generator object<br/>(body NOT run yet)"] --> S2["next() called<br/>→ runs until first yield"]
+    S2 --> S3["Value yielded,<br/>function state frozen in place"]
+    S3 --> S4["next() called again<br/>→ resumes right after yield"]
+    S4 --> S5["Runs until next yield<br/>or function ends"]
+    S5 --> S6["No yield left to reach<br/>→ StopIteration raised"]
+```
 
 ### 3.5 Rules
 
@@ -110,39 +142,7 @@ The `collections` module exists because three patterns are so common that Python
 - **Creating a `defaultdict` without a factory function, or with the wrong one** — `defaultdict()` with no argument behaves like a plain `dict` and still raises `KeyError`; passing `0` instead of `int` raises a `TypeError`, because the factory must be callable.
 - **Trying to modify a `namedtuple` field like a list element** — `student.marks = 90` raises an `AttributeError`, because a `namedtuple`, like any tuple, is immutable.
 
-### 3.8 Comparison Table: Iterable vs Iterator
-
-| Aspect | Iterable | Iterator |
-|---|---|---|
-| Definition | Any object you can loop over | The object that actually produces values one at a time |
-| Has `__next__`? | Not necessarily | Yes, always |
-| Can you call `next()` on it directly? | No — you must first call `iter()` on it | Yes, directly |
-| Reusable? | Yes — a fresh iterator is created each time you loop over it | No — exhausts after one full pass |
-| Examples | `list`, `tuple`, `set`, `dict`, `str` | The object returned by `iter(some_list)`, or any generator |
-
-### 3.9 Diagram: The Iterator Protocol
-
-```mermaid
-flowchart LR
-    A["Iterable<br/>e.g. a list"] -->|"iter(iterable)"| B["Iterator object<br/>remembers position"]
-    B -->|"next(it)"| C["One value returned"]
-    C --> D{"Any values left?"}
-    D -->|Yes| B
-    D -->|No| E["StopIteration raised<br/>for loop stops silently"]
-```
-
-### 3.10 Diagram: Generator Pause and Resume
-
-```mermaid
-flowchart TD
-    S1["Call generator function<br/>→ returns generator object<br/>(body NOT run yet)"] --> S2["next() called<br/>→ runs until first yield"]
-    S2 --> S3["Value yielded,<br/>function state frozen in place"]
-    S3 --> S4["next() called again<br/>→ resumes right after yield"]
-    S4 --> S5["Runs until next yield<br/>or function ends"]
-    S5 --> S6["No yield left to reach<br/>→ StopIteration raised"]
-```
-
-### 3.11 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — the iterator protocol, by hand:
 

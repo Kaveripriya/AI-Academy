@@ -83,6 +83,17 @@ lambda parameters: expression
 | `parameters` | Zero or more parameter names, comma-separated, with no parentheses. | Same role as parameters in a `def` — the inputs the lambda accepts. |
 | `expression` | A single expression, evaluated and returned automatically. | There is no `return` keyword — the result of the expression *is* the return value. |
 
+**Comparison Table: Regular Function vs. Lambda Function**
+
+| Aspect | Regular Function (`def`) | Lambda Function |
+|---|---|---|
+| Definition syntax | `def name(params): return expr` | `lambda params: expr` |
+| Name | Always named | Anonymous, unless assigned to a variable |
+| Number of statements | Any number of statements, loops, conditionals | Exactly one expression, nothing more |
+| Docstring support | Yes | No |
+| Typical use | Reusable logic called from many places | One-off logic passed directly as an argument |
+| Debuggability | Shows its real name in errors and tracebacks | Shows as `<lambda>` in tracebacks, harder to trace |
+
 **Decorator syntax:**
 
 ```python
@@ -104,6 +115,16 @@ def target_function(...):
 | `return wrapper` | The outer function returns the inner function itself — not calling it. | This new function is what gets bound to the original name. |
 | `@decorator_name` | Placed directly above a `def`. | Shorthand for `target_function = decorator_name(target_function)`. |
 
+**Diagram: How a Decorator Wraps a Function**
+
+```mermaid
+flowchart LR
+    A["Original function defined<br/>def greet(name): ..."] --> B["@my_decorator applied<br/>greet = my_decorator(greet)"]
+    B --> C["Call greet('Sam')<br/>really calls wrapper('Sam')"]
+    C --> D["wrapper runs extra code,<br/>then calls the original greet"]
+    D --> E["Original result returned<br/>back through wrapper"]
+```
+
 **Generator function syntax:**
 
 ```python
@@ -117,6 +138,28 @@ def generator_name(parameters):
 | `def generator_name(...)` | Looks exactly like a normal function definition. | No special keyword marks it as a generator — Python decides based on the body. |
 | `yield value` | Hands back `value` and pauses the function right there. | Presence of `yield` anywhere in the body is what makes this a generator function instead of a regular one. |
 | Calling `generator_name(...)` | Does **not** run the body. | It returns a generator object; the body only runs as values are requested. |
+
+**Comparison Table: List (Eager) vs. Generator (Lazy)**
+
+| Aspect | List | Generator |
+|---|---|---|
+| When values are produced | All at once, immediately | One at a time, only when requested |
+| Memory usage | Holds every value at once | Holds only the current value |
+| Can represent an infinite sequence? | No — would never finish building | Yes — values are produced on demand |
+| Can be looped over more than once? | Yes, as many times as needed | No — exhausted after one full pass |
+| Created with | `[...]` or `list(...)` | A function containing `yield` |
+
+**Diagram: Generator Lazy-Evaluation Flow**
+
+```mermaid
+flowchart TD
+    S1["Call generator function<br/>gen = count_up_to(5)"] --> S2["Generator object created —<br/>body has NOT run yet"]
+    S2 --> S3["for loop asks for the next value"]
+    S3 --> S4["Body runs until yield,<br/>hands back one value, then pauses"]
+    S4 --> S5["Loop uses that one value"]
+    S5 -->|more values needed| S3
+    S5 -->|loop ends or break| S6["Generator stays paused —<br/>rest of the sequence is never computed"]
+```
 
 ### 3.5 Rules
 
@@ -146,52 +189,7 @@ def generator_name(parameters):
 - **Assuming a generator can be looped over twice** — once a `for` loop has fully consumed a generator object, looping over the same object again produces nothing; you need to call the generator function again for a fresh one.
 - **Writing an infinite generator and forgetting a stopping condition in the calling code** — a `while True: yield ...` generator never ends on its own; the `for` loop that consumes it must `break` once it has enough values.
 
-### 3.8 Comparison Tables
-
-**Regular Function vs. Lambda Function**
-
-| Aspect | Regular Function (`def`) | Lambda Function |
-|---|---|---|
-| Definition syntax | `def name(params): return expr` | `lambda params: expr` |
-| Name | Always named | Anonymous, unless assigned to a variable |
-| Number of statements | Any number of statements, loops, conditionals | Exactly one expression, nothing more |
-| Docstring support | Yes | No |
-| Typical use | Reusable logic called from many places | One-off logic passed directly as an argument |
-| Debuggability | Shows its real name in errors and tracebacks | Shows as `<lambda>` in tracebacks, harder to trace |
-
-**List (Eager) vs. Generator (Lazy)**
-
-| Aspect | List | Generator |
-|---|---|---|
-| When values are produced | All at once, immediately | One at a time, only when requested |
-| Memory usage | Holds every value at once | Holds only the current value |
-| Can represent an infinite sequence? | No — would never finish building | Yes — values are produced on demand |
-| Can be looped over more than once? | Yes, as many times as needed | No — exhausted after one full pass |
-| Created with | `[...]` or `list(...)` | A function containing `yield` |
-
-### 3.9 Diagram: How a Decorator Wraps a Function
-
-```mermaid
-flowchart LR
-    A["Original function defined<br/>def greet(name): ..."] --> B["@my_decorator applied<br/>greet = my_decorator(greet)"]
-    B --> C["Call greet('Sam')<br/>really calls wrapper('Sam')"]
-    C --> D["wrapper runs extra code,<br/>then calls the original greet"]
-    D --> E["Original result returned<br/>back through wrapper"]
-```
-
-### 3.10 Diagram: Generator Lazy-Evaluation Flow
-
-```mermaid
-flowchart TD
-    S1["Call generator function<br/>gen = count_up_to(5)"] --> S2["Generator object created —<br/>body has NOT run yet"]
-    S2 --> S3["for loop asks for the next value"]
-    S3 --> S4["Body runs until yield,<br/>hands back one value, then pauses"]
-    S4 --> S5["Loop uses that one value"]
-    S5 -->|more values needed| S3
-    S5 -->|loop ends or break| S6["Generator stays paused —<br/>rest of the sequence is never computed"]
-```
-
-### 3.11 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — a lambda that squares a number:
 

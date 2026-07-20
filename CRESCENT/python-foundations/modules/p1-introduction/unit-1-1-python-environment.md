@@ -64,6 +64,26 @@ In short: Python exists in your syllabus because it lowers the barrier to entry 
 | **`print()` function** | A built-in Python function that displays whatever you give it as output on the screen. |
 | **String** | A piece of text data, written between quotation marks, e.g. `"Hello, world!"`. |
 
+**Comparison Table: Compiled vs Interpreted Languages**
+
+| Aspect | Compiled Language (e.g., C, Java) | Interpreted Language (e.g., Python) |
+|---|---|---|
+| Translation timing | All at once, ahead of time | Line by line, as the program runs |
+| Output of translation | A separate file (e.g., `.exe`, `.class`) | No separate file for you to manage |
+| Feedback speed | You must recompile before testing again | You can test a single line immediately |
+| Typical use in this course | Not used | Used throughout, via the Python interpreter in Colab |
+| Beginner-friendliness | Extra setup and translation step | Faster feedback loop, better for learning |
+
+**Diagram: The REPL / Interactive Mode Loop**
+
+```mermaid
+flowchart TD
+    R["Read: you type an instruction"] --> E["Evaluate: interpreter runs it"]
+    E --> P["Print: result is shown to you"]
+    P --> L["Loop: wait for your next instruction"]
+    L --> R
+```
+
 ### 3.4 Step-by-Step Guide: Accessing and Activating Google Colab for the First Time
 
 Before you go any further, get Google Colab open and ready — this is where you will write and run every example in this unit. If you have never done this before, follow these steps exactly, in order. Don't skip ahead — each step depends on the one before it.
@@ -115,6 +135,15 @@ There are two ways to run a cell — pick whichever feels easier:
 **Step 9: Read the output.**
 Within a second or two, you should see `Hello, world!` appear directly underneath the cell. This confirms three things at once: Colab is active, your Python interpreter is running, and your very first program worked correctly.
 
+**Diagram: How Your Code Becomes Output**
+
+```mermaid
+flowchart LR
+    A["You type Python code<br/>in a Colab cell"] --> B["Python Interpreter<br/>reads the code"]
+    B --> C["Interpreter executes<br/>one instruction at a time"]
+    C --> D["Output appears<br/>below the cell"]
+```
+
 **Step 10: Confirm your work is saved.**
 Google Colab automatically saves your notebook to your Google Drive as you work, usually shown as "Saving..." briefly near the top of the page. You can also save manually at any time using **File → Save**, or the keyboard shortcut **Ctrl + S**. This means you can safely close the browser tab and come back to the exact same notebook later, from any computer, just by signing in again.
 
@@ -163,36 +192,7 @@ Let's break this down piece by piece, because as a fresher you must be able to n
 - **Confusing "writing code" with "running code"**: typing a program into a cell does nothing until you actually execute that cell.
 - **Panicking at the first error message** instead of reading it — Python's error messages almost always tell you exactly what went wrong and on which line.
 
-### 3.9 Comparison Table: Compiled vs Interpreted Languages
-
-| Aspect | Compiled Language (e.g., C, Java) | Interpreted Language (e.g., Python) |
-|---|---|---|
-| Translation timing | All at once, ahead of time | Line by line, as the program runs |
-| Output of translation | A separate file (e.g., `.exe`, `.class`) | No separate file for you to manage |
-| Feedback speed | You must recompile before testing again | You can test a single line immediately |
-| Typical use in this course | Not used | Used throughout, via the Python interpreter in Colab |
-| Beginner-friendliness | Extra setup and translation step | Faster feedback loop, better for learning |
-
-### 3.10 Diagram: How Your Code Becomes Output
-
-```mermaid
-flowchart LR
-    A["You type Python code<br/>in a Colab cell"] --> B["Python Interpreter<br/>reads the code"]
-    B --> C["Interpreter executes<br/>one instruction at a time"]
-    C --> D["Output appears<br/>below the cell"]
-```
-
-### 3.11 Diagram: The REPL / Interactive Mode Loop
-
-```mermaid
-flowchart TD
-    R["Read: you type an instruction"] --> E["Evaluate: interpreter runs it"]
-    E --> P["Print: result is shown to you"]
-    P --> L["Loop: wait for your next instruction"]
-    L --> R
-```
-
-### 3.12 Code Examples
+### 3.9 Code Examples
 
 **Basic example** — the smallest possible program:
 
