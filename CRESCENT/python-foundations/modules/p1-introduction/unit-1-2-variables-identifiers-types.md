@@ -120,13 +120,7 @@ score = 150      # reassignment — score's old value (100) is replaced
 - **Assuming case doesn't matter** — writing `total` in one line and `Total` in another creates two separate, unrelated variables, not a typo Python will forgive.
 - **Confusing `"5"` (a string) with `5` (an integer)** — they look similar but are different types; `type()` will immediately clear this up.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A frequently asked fresher interview question: *"Is Python statically typed or dynamically typed?"* Answer confidently: Python is **dynamically typed** — you never declare a variable's type in advance; Python determines it automatically from the assigned value, and the same name can refer to different types at different times in the program.
-- Be ready to explain the difference between a **rule** and a **convention**: identifier rules are enforced by the language (violating one stops your program from running at all), while `snake_case` is a convention — a team agreement that keeps code consistent and readable, not something Python itself checks.
-- Interviewers sometimes probe whether you understand that `=` in Python is *assignment*, not mathematical equality — comparison uses a different operator (`==`), which you will meet in Unit 1.3.
-
-### 3.9 Comparison Table: Statically Typed vs Dynamically Typed Languages
+### 3.8 Comparison Table: Statically Typed vs Dynamically Typed Languages
 
 | Aspect | Statically Typed (e.g., Java, C) | Dynamically Typed (e.g., Python) |
 |---|---|---|
@@ -135,16 +129,7 @@ score = 150      # reassignment — score's old value (100) is replaced
 | Can a variable change type? | No — a variable keeps its declared type forever | Yes — the same name can refer to an `int` now and a `str` later |
 | Beginner impact | More upfront typing, catches some mistakes earlier | Faster to write, but you must track types yourself using `type()` |
 
-### 3.10 Diagram: How Assignment Works
-
-```mermaid
-flowchart LR
-    A["Right-hand side is evaluated first<br/>e.g. 100 + 50"] --> B["Result is produced<br/>e.g. 150"]
-    B --> C["Name on the left is bound<br/>to that result"]
-    C --> D["Variable now refers<br/>to the new value"]
-```
-
-### 3.11 Diagram: Dynamic Typing Over Time
+### 3.9 Diagram: Dynamic Typing Over Time
 
 ```mermaid
 flowchart TD
@@ -152,7 +137,7 @@ flowchart TD
     S2 --> N["Same name, different type<br/>because type belongs to the VALUE, not the name"]
 ```
 
-### 3.12 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — creating and printing a single variable:
 
@@ -305,6 +290,14 @@ Booking confirmed status: True
 ### Step 7: Why the Output Is Produced
 
 Each `type()` call reports exactly the type Python inferred at the moment of assignment — a quoted value becomes `str`, a decimal value becomes `float`, a whole number becomes `int`, and `True`/`False` becomes `bool`. The final line reflects the reassignment: `booking_confirmed` was created as `False`, then explicitly reassigned to `True` before the last `print()` ran, so the *old* value is never seen again — only the current one is shown.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A frequently asked fresher interview question: *"Is Python statically typed or dynamically typed?"* Answer confidently: Python is **dynamically typed** — you never declare a variable's type in advance; Python determines it automatically from the assigned value, and the same name can refer to different types at different times in the program.
+- Be ready to explain the difference between a **rule** and a **convention**: identifier rules are enforced by the language (violating one stops your program from running at all), while `snake_case` is a convention — a team agreement that keeps code consistent and readable, not something Python itself checks.
+- Interviewers sometimes probe whether you understand that `=` in Python is *assignment*, not mathematical equality — comparison uses a different operator (`==`), which you will meet in Unit 1.3.
 
 ---
 
