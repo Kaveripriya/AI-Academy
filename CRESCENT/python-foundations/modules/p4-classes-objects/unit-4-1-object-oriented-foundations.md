@@ -6,85 +6,149 @@
 
 By the end of this unit, you will be able to:
 
-✓ Explain what an abstract data type (ADT) is and why bundling state with behaviour is a useful way to model a real-world thing in code.  
-✓ Distinguish a **class** (a blueprint) from an **object**/**instance** (a specific thing built from that blueprint), and create instances from a class.  
-✓ Write a constructor (`__init__`) that initializes instance attributes, and explain the difference between an instance attribute and a class attribute.  
-✓ Define instance methods, correctly use the `self` parameter, and call methods on an object.
+- **Explain** what an abstract data type (ADT) is and why bundling state and behaviour together models a real-world thing more faithfully than separate variables and functions.
+- **Differentiate** a **class** (a blueprint) from an **object**/**instance** (a specific thing built from that blueprint).
+- **Implement** a constructor (`__init__`) that initializes instance attributes for every new object.
+- **Create** instance methods, correctly using `self` as the first parameter, and call them on an object.
+- **Identify** the difference between an instance attribute and a class attribute, and know when each is appropriate.
+- **Debug** the most common beginner mistakes in Python OOP, such as a missing `self` parameter.
 
 ---
 
 ## 2. Overview
 
-Every program you've written so far keeps data and the logic that acts on it as two separate things: a variable here, a statement over there. That works for one task, but it falls apart once you're tracking several related values about the same thing — a task's name, priority, and done status — alongside logic that needs all three at once.
+Every unit so far in this course — variables, loops, functions, lists, dictionaries — has treated data and the logic that works on that data as two separate things. A dictionary holds a student's marks; a function calculates the average; nothing in the language ties the two together except your own memory of which function belongs with which data. This works fine for a small script, but it breaks down the moment a real application needs to track many related things at once — hundreds of bank accounts, thousands of food delivery orders, an entire college's worth of student records — each with its own data and its own rules.
 
-**Object-oriented programming (OOP)** fixes this by packaging state (data) and behaviour (the logic that acts on it) into a single unit called an **object**. This unit gives you the vocabulary and mechanics — classes, objects, `__init__`, `self`, instance and class attributes, methods — that every later refinement in this programme (inheritance, encapsulation, operator overloading, dataclasses) builds on top of.
+**Object-oriented programming (OOP)** closes this gap. It lets you bundle data and the behaviour that acts on it into a single unit modelled directly on a real-world thing — a bank account, a student, an order — instead of scattering related values across independent variables and functions. This is not a Python-specific idea; it is the dominant way software is organized across the industry, whether you eventually work on Django web applications, enterprise Java backends, or machine learning pipelines that model a dataset as an object with methods to clean and transform it.
+
+This unit introduces the four building blocks every later OOP concept in this course depends on: the **abstract data type** as a way of thinking, the **class** as a blueprint, the **object** as a concrete instance of that blueprint, and the **constructor** and **methods** that give an object its data and behaviour.
 
 ---
 
 ## 3. Description
 
-### 3.1 Abstract Data Types — Thinking in Objects
+### 3.1 Definition
 
-An **abstract data type (ADT)** describes a "thing" by what it *is* and what it *can do*, without worrying about implementation. A `Task` is an ADT if you can say: it has a name, a priority, and a done status (its **state**), and it can be marked complete (its **behaviour**). Before classes, you'd model this with loose variables and a function:
+An **abstract data type (ADT)** describes a "thing" purely by what it *is* (its data) and what it *can do* (its behaviour), without worrying yet about how that is implemented in code. A `Student` is an ADT the moment you can say: it has a name and marks (its **state**), and it can compute a grade (its **behaviour**).
 
-```python
-task_name = "Write topic corpus"
-task_priority = "normal"
-task_done = False
-
-def mark_complete(done):
-    return True
-
-task_done = mark_complete(task_done)
-```
-
-This works for one task, but nothing ties `task_name` to `task_priority` to `task_done` — they're just variables sitting near each other. Nothing stops you from passing the wrong one into a function by mistake and quietly corrupting a task's priority instead of its completion flag. A class is really two things wearing one name: a **contract** (what attributes and methods you can rely on any instance having) and an **implementation** (how those are stored and written) — bundling data and the functions that operate on it so the association is enforced by the language itself, not by your memory.
-
-### 3.2 Classes and Objects
-
-A **class** is a blueprint. It defines what attributes and methods every object built from it will have, but a class alone isn't a usable "thing" — it's the plan. An **object**, also called an **instance**, is a specific thing created from that blueprint, with its own actual values. You can create as many instances as you like, and each one holds independent state:
+A **class** is how Python lets you implement an ADT: a blueprint that defines what attributes and methods every object built from it will have. An **object**, also called an **instance**, is one specific thing created from that blueprint, holding its own actual values. A class alone builds nothing — it only describes the shape; you must create an object from it before you have anything you can use:
 
 ```python
-class Task:
+class Student:
     pass
 
-first_task = Task()
-second_task = Task()
-
-print(type(first_task))
-print(first_task is second_task)
+first_student = Student()
+print(type(first_student))
 ```
 
 Output:
 
 ```
-<class '__main__.Task'>
-False
+<class '__main__.Student'>
 ```
 
-`type(first_task)` reports the class an object was built from — the same way `type()` reported `float` or `str` in an earlier unit. `first_task is second_task` prints `False` because `is` compares object identity: two calls to `Task()` allocate two distinct objects in memory, even from the identical blueprint. By convention, class names use `PascalCase` (`Task`, `Person`), while instance names follow the `snake_case` rule you already know — not enforced by Python, but followed by every professional codebase so a name alone signals blueprint vs. thing-built-from-it.
+`class Student:` defines the blueprint (`pass` means "no body yet — deliberately left empty"). `Student()` creates one object from that blueprint, and `type()` confirms the object belongs to the `Student` class — the same `type()` function you have used since Unit 1.2 to inspect `int`, `str`, and every other value's type.
 
-### 3.3 The Constructor — Instance vs. Class Attributes
+### 3.2 Why This Concept Exists
 
-An empty class isn't useful. The **constructor**, `__init__`, is a special method Python calls automatically on every new instance to set up its starting state:
+Without classes, tracking several related things forces you into one of two poor options: keep separate flat variables for each one (`student1_name`, `student1_marks`, `student2_name`, `student2_marks`, ...), which does not scale past a handful of items; or keep loosely related data in a dictionary or list with functions that operate on it from the outside, trusting yourself to always pass the right piece into the right function. Neither approach stops a mistake like passing one student's marks into a function meant for another student's data.
+
+Classes solve three problems that show up in every real application:
+
+- **Model** a real-world thing directly in code (a bank account, a student, a delivery order) instead of approximating it with loose variables.
+- **Bundle** state and behaviour so the connection between a `balance` and a `deposit()` operation is enforced by the language, not by your memory.
+- **Scale** to many independent things — a bank serving lakhs of customers, or a college with thousands of students — by creating one object per real-world thing, each holding its own private copy of the data.
+
+This is why "classes and objects" is universally the topic that follows functions in every OOP curriculum: it is the mechanism that virtually every production Python codebase — Django models, Flask API request handlers, machine learning pipeline stages — is organized around.
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Abstract data type (ADT)** | A description of a "thing" by its state (data) and behaviour (what it can do), independent of implementation. |
+| **Class** | A blueprint that defines what attributes and methods every object built from it will have. |
+| **Object / Instance** | A specific thing created from a class, holding its own actual values. |
+| **Attribute** | A variable that belongs to a class or object — the "state" half of an ADT. |
+| **Instance attribute** | An attribute that belongs to one specific object alone, usually set via `self.attribute = value` inside `__init__`. |
+| **Class attribute** | An attribute defined directly in the class body, shared by every instance unless one instance overrides it locally. |
+| **Method** | A function defined inside a class body — the "behaviour" half of an ADT. |
+| **Constructor (`__init__`)** | A special method Python calls automatically every time a new object is created, used to set up its starting state. |
+| **`self`** | The first parameter of every instance method; it refers to the specific object the method was called on. |
+| **Instantiation** | The act of creating an object from a class, done by calling the class name like a function: `ClassName(...)`. |
+
+### 3.4 Syntax
 
 ```python
-class Task:
-    category = "general"      # class attribute — shared by every Task
+class ClassName:
+    class_attribute = value          # shared by every instance
 
-    def __init__(self, name, priority):
-        self.name = name          # instance attribute
-        self.priority = priority  # instance attribute
-        self.done = False         # instance attribute
+    def __init__(self, param1, param2):
+        self.param1 = param1         # instance attribute
+        self.param2 = param2         # instance attribute
+
+    def method_name(self, extra_arg):
+        # method body, can read/change self.param1, self.param2
+        ...
+
+obj = ClassName(value1, value2)      # instantiation
 ```
 
-`self.name = name` creates an **instance attribute** — a variable that belongs to *this* object alone. `category`, defined directly in the class body rather than inside `__init__`, is a **class attribute**: shared by every instance unless one instance is given its own copy that shadows it. Notice `priority` has no default value — every `Task(...)` call must supply both `name` and `priority` as required, positional arguments, the same way you already call `print()` and `type()`.
+| Part | What it is | Why it's there |
+|---|---|---|
+| `class ClassName:` | The **class keyword** followed by the class name and a colon, opening the class body. | Declares a new blueprint; everything indented under it belongs to that blueprint. |
+| `def __init__(self, ...):` | The **constructor** — a method with the exact reserved name `__init__`. | Python calls this automatically every time you instantiate the class, before the new object is handed back to you. |
+| `self` | The first parameter of every instance method, including `__init__`. | Lets the method reach back to the specific object it is operating on; Python supplies it automatically. |
+| `self.param1 = param1` | An **attribute assignment** — takes the parameter received and stores it on the object. | Creates an instance attribute that will exist on this object for as long as the object exists. |
+| `def method_name(self, extra_arg):` | A **method definition** — an ordinary `def`, written inside the class body, with `self` first. | Defines behaviour the object can perform, with access to its own attributes through `self`. |
+| `ClassName(value1, value2)` | **Instantiation** — calling the class name like a function. | Creates a new object, runs `__init__` on it with the given arguments, and returns the finished object. |
 
-The diagram below traces exactly this: one `Task` blueprint, `__init__` building two separate instances from it, and what happens when a class attribute is overridden on just one of them.
+### 3.5 Rules
+
+- Every line inside a class body must be indented consistently, exactly like the body of a function or a loop.
+- `__init__` is optional, but if a class defines it, Python calls it automatically on every `ClassName(...)` call — you never call `__init__` yourself.
+- Every instance method's first parameter must be `self`; Python supplies the object automatically as that first argument at the call site — you never pass it yourself.
+- An instance attribute must be assigned through `self` (`self.attribute = value`) before it can be read through `self` or through an object; reading an attribute that was never assigned raises an `AttributeError`.
+- A class attribute is defined directly in the class body, outside any method; it is shared by every instance until one instance is assigned its own attribute of the same name, which then shadows the class attribute for that instance only.
+- Instantiating a class always requires the parentheses — `ClassName()`, matching whatever parameters `__init__` declares (besides `self`).
+
+### 3.6 Best Practices
+
+- Name classes in **`PascalCase`** (`Student`, `BankAccount`, `FoodOrder`); name instances in `snake_case`, exactly as you already name any other variable.
+- Keep `__init__` focused purely on setup: assign parameters to attributes and set sensible starting values. Avoid putting unrelated calculations or printing inside it.
+- Name constructor parameters the same as the attribute they populate (`self.name = name`) — it keeps the mapping obvious to anyone reading the code.
+- Give methods verb-like names that describe the action they perform (`deposit`, `mark_delivered`, `calculate_grade`) — the same convention you already follow for functions.
+- Use a class attribute only for a value that is genuinely identical across every instance (like a company or platform name); use an instance attribute, set inside `__init__`, for anything that can vary per object.
+
+### 3.7 Common Mistakes
+
+- **Forgetting `self` as a method's first parameter.** Python still passes the object in automatically, so the call ends up with one argument too many, producing a `TypeError` about argument counts rather than an obvious complaint about a missing `self`.
+- **Confusing a class with an instance.** `Student` is the blueprint; `Student()` produces an object. Trying to read `Student.name` before any object has set `name` as an instance attribute raises an `AttributeError`, because the class itself never held that value — only an instance does.
+- **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself, and calling `account.deposit(100)` later fails because the class has no such bound method to call.
+- **Forgetting the `self.` prefix inside a method.** Writing `balance = balance + amount` instead of `self.balance = self.balance + amount` creates a plain local variable that vanishes when the method ends, leaving the object's real attribute completely unchanged.
+
+### 3.8 Important Notes (Interview Insights)
+
+- *"What is the difference between a class and an object?"* is one of the most frequently asked entry-level interview questions. Answer with the blueprint analogy: a class is the plan (e.g., the architectural drawing of a house); an object is one specific thing built from that plan (an actual house, with its own address and its own residents). You can build many houses from one drawing, each independent of the others — exactly like many objects from one class.
+- Be ready to explain `self` in your own words, since it confuses nearly every fresher at first. `self` is simply the parameter that receives the object a method was called on — `account.deposit(100)` is quietly rewritten by Python into `BankAccount.deposit(account, 100)`, so `self` inside the method body always means "this particular object."
+- Interviewers may also ask when to use a class attribute versus an instance attribute — answer that class attributes are for values shared by every instance, while instance attributes, set through `self` inside `__init__`, are for values that differ per object, which in practice is almost everything you model.
+- You will meet naming conventions that hint at "this attribute is meant to stay internal to the class" (a leading underscore, like `_balance`) in Unit 4.2 — Inheritance & Encapsulation. For now, every attribute you write is openly accessible from outside the class.
+
+### 3.9 Comparison Table: Class vs Object
+
+| Aspect | Class | Object (Instance) |
+|---|---|---|
+| What it is | A blueprint / template | A specific thing built from the blueprint |
+| How many exist | Usually one definition in your code | As many as you choose to create |
+| Holds actual data? | No — it only describes what data instances will hold | Yes — each object holds its own real values |
+| Created with | `class ClassName:` | `ClassName(...)` (instantiation) |
+| Example | `Student` (the idea of "a student") | `Student("Priya Nair", 91)` (one real student) |
+| Independence | N/A — there is only one blueprint | Every object's attributes are independent of every other object's |
+
+### 3.10 Diagram: One Class, Many Independent Objects
 
 ```mermaid
 ---
-title: One Class, Many Independent Instances
+title: One Class Blueprint Producing Multiple Objects
 config:
   theme: base
   themeVariables:
@@ -98,123 +162,182 @@ config:
     rankSpacing: 70
 ---
 flowchart TB
-    TASKCLASS["<b>Task</b><br/><span style='font-size:11px;color:#6d28d9'>class attribute: category = 'general'</span>"]:::start
-    CTOR["<b>__init__</b><br/><span style='font-size:11px;color:#6d28d9'>constructor builds each instance</span>"]:::auto
-    FIRST["<b>first_task</b><br/><span style='font-size:11px;color:#6d28d9'>name='Write topic corpus'<br/>priority='normal', done=False<br/>category='general' (inherited)</span>"]:::done
-    SECOND["<b>second_task</b><br/><span style='font-size:11px;color:#6d28d9'>name='Review pull request'<br/>priority='high', done=False<br/>category='personal' (overridden)</span>"]:::done
-    SHARED["<span style='font-size:11px;color:#6d28d9'>shared by every instance<br/>unless one overrides it</span>"]:::ghost
-    OVERRIDE["<span style='font-size:11px;color:#6d28d9'>t1.category='personal' makes<br/>its own copy, shadowing the class</span>"]:::ghost
+    CLASS["<b>Student</b> (class)<br/><span style='font-size:11px;color:#6d28d9'>blueprint: attributes name, marks<br/>method: calculate_grade()</span>"]:::start
+    CTOR["<b>__init__</b><br/><span style='font-size:11px;color:#6d28d9'>constructor builds each object</span>"]:::auto
+    OBJ1["<b>student_1</b> (object)<br/><span style='font-size:11px;color:#6d28d9'>name='Priya Nair', marks=91</span>"]:::done
+    OBJ2["<b>student_2</b> (object)<br/><span style='font-size:11px;color:#6d28d9'>name='Arjun Rao', marks=68</span>"]:::done
 
-    TASKCLASS -- "instantiate" --> CTOR
-    CTOR -- "Task(name, priority)" --> FIRST
-    CTOR -- "Task(name, priority)" --> SECOND
-    TASKCLASS -. "class attr" .-> SHARED
-    SECOND -. "locally shadows" .-> OVERRIDE
+    CLASS -- "instantiate" --> CTOR
+    CTOR -- "Student('Priya Nair', 91)" --> OBJ1
+    CTOR -- "Student('Arjun Rao', 68)" --> OBJ2
 
     classDef start fill:#a5d8ff,stroke:#4a9eed,stroke-width:2px
     classDef auto fill:#d0bfff,stroke:#8b5cf6,stroke-width:2px
     classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px
-    classDef ghost fill:none,stroke:none,color:#6d28d9
 ```
 
-Watch what happens if you change the class attribute through the class itself, versus through one instance:
+The single `Student` blueprint never holds any real data itself. Every time it is called through `__init__`, a brand-new object is produced with its own independent attributes — changing `student_1`'s `marks` has no effect whatsoever on `student_2`.
+
+### 3.11 Code Examples
+
+**Basic example** — an empty class, instantiated twice, showing that each object is distinct:
 
 ```python
-t1 = Task("Write topic corpus", "normal")
-t2 = Task("Review pull request", "high")
+class Student:
+    pass
 
-Task.category = "work"
-print(t1.category, t2.category)
+s1 = Student()
+s2 = Student()
 
-t1.category = "personal"
-print(t1.category, t2.category)
+print(type(s1))
+print(s1 is s2)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `class Student:` defines a blueprint with no attributes or methods of its own yet; `pass` is a placeholder meaning "empty body."
+- `s1 = Student()` and `s2 = Student()` each call the class, creating two separate objects.
+- `print(type(s1))` reports the class an object was built from.
+- `print(s1 is s2)` uses the `is` operator to compare object identity — it checks whether both names point to the exact same object in memory, not whether their contents look alike.
+- Output:
+  ```
+  <class '__main__.Student'>
+  False
+  ```
+- `False` confirms that `Student()` allocated two distinct objects, even though both came from the identical blueprint.
 
-```
-work work
-personal work
-```
-
-`Task.category = "work"` changes the shared value, so every instance without its own `category` attribute sees the new value. But `t1.category = "personal"` does something different: it creates a *new instance attribute* on `t1` alone, which now shadows the class attribute for `t1` only — `t2` still reads the shared class value. Assigning through an instance never changes the class attribute; it only creates or overwrites an attribute local to that one instance. Use class attributes for values genuinely shared across every instance; use instance attributes, set via `self.attribute = value` inside `__init__`, for anything that varies per object — in practice, almost everything you model.
-
-### 3.4 Methods and `self`
-
-A **method** is a function defined inside a class body — the "what it can do" half of the ADT. Every method takes `self` as its first parameter: it's how the method reaches back to the specific object it was called on.
+**Beginner example** — a constructor that sets instance attributes, read directly with no methods yet:
 
 ```python
-class Task:
-    def __init__(self, name, priority):
+class Student:
+    def __init__(self, name, marks):
         self.name = name
-        self.priority = priority
-        self.done = False
+        self.marks = marks
 
-    def mark_complete(self):
-        self.done = True
+s1 = Student("Priya Nair", 91)
+s2 = Student("Arjun Rao", 68)
+
+print(s1.name, s1.marks)
+print(s2.name, s2.marks)
+```
+
+*Line-by-line explanation:*
+- `def __init__(self, name, marks):` declares the constructor, taking `self` plus two required parameters.
+- `self.name = name` and `self.marks = marks` store the two parameters as instance attributes on whichever object is being built.
+- `Student("Priya Nair", 91)` calls the class; Python creates a new object, then calls `__init__` on it automatically with `name="Priya Nair"` and `marks=91`.
+- `s1.name` and `s1.marks` read the attributes back off the object using dot notation.
+- Output:
+  ```
+  Priya Nair 91
+  Arjun Rao 68
+  ```
+- Each `Student` object keeps its own independent copy of `name` and `marks` — changing `s1.marks` later would have no effect on `s2.marks`.
+
+**Practical example** — adding methods so the object can also do something with its own data:
+
+```python
+class Student:
+    def __init__(self, name, marks):
+        self.name = name
+        self.marks = marks
+
+    def calculate_grade(self):
+        if self.marks >= 90:
+            return "A"
+        elif self.marks >= 75:
+            return "B"
+        else:
+            return "C"
 
     def describe(self):
-        return f"{self.name} ({self.priority}) - done={self.done}"
+        return f"{self.name} scored {self.marks} marks - Grade {self.calculate_grade()}"
 
-t1 = Task("Write topic corpus", "normal")
-t1.mark_complete()
-print(t1.describe())
+s1 = Student("Priya Nair", 91)
+print(s1.describe())
 ```
 
-Output:
+*Line-by-line explanation:*
+- `calculate_grade(self)` is a **method** — a function defined inside the class, with `self` as its first parameter, so it can read `self.marks` for whichever object called it.
+- `describe(self)` calls `self.calculate_grade()` — one method calling another method on the same object through `self` — and builds a summary string using an f-string.
+- `s1.describe()` looks up `describe` on `s1`'s class, binds `s1` as `self` for the entire call (including the nested `calculate_grade()` call), and runs the method body.
+- Output:
+  ```
+  Priya Nair scored 91 marks - Grade A
+  ```
 
-```
-Write topic corpus (normal) - done=True
+**Industry-oriented example** — a `FoodOrder` class modelling a food delivery order, in the style of a Swiggy- or Zomato-like backend:
+
+```python
+class FoodOrder:
+    platform_name = "QuickEats"   # class attribute - shared by every order
+
+    def __init__(self, customer_name, restaurant_name, order_amount):
+        self.customer_name = customer_name
+        self.restaurant_name = restaurant_name
+        self.order_amount = order_amount
+        self.is_delivered = False
+
+    def mark_delivered(self):
+        self.is_delivered = True
+
+    def order_summary(self):
+        status = "Delivered" if self.is_delivered else "Preparing/On the way"
+        return f"[{self.platform_name}] {self.customer_name}'s order from {self.restaurant_name} - Rs.{self.order_amount} - {status}"
+
+order1 = FoodOrder("Rohit Verma", "Punjabi Tadka", 349.00)
+order1.mark_delivered()
+print(order1.order_summary())
 ```
 
-When you write `t1.mark_complete()`, Python is quietly rewriting that call behind the scenes into `Task.mark_complete(t1)`. The object to the left of the dot doesn't vanish — it gets slipped in as the method's first argument, automatically, every time. `self` is just the parameter that catches it. This is a naming convention, not a keyword — you could technically call the parameter anything, but every Python codebase you'll ever read uses `self`, so you should too. Under the hood, Python looks up `mark_complete` on `t1`'s class (not on `t1` itself — instances don't carry their own copy of each method), finds the function, and binds it to `t1` so `self` inside the body means "this object."
+*Line-by-line explanation:*
+- `platform_name = "QuickEats"` is a **class attribute**, defined directly in the class body — it is identical for every `FoodOrder` object, since the platform name never varies per order.
+- `__init__` takes three required parameters and stores each as an instance attribute; `self.is_delivered = False` sets a sensible starting state without requiring the caller to supply it.
+- `mark_delivered(self)` is a method with no extra parameters beyond `self` — it simply flips `self.is_delivered` to `True` on whichever order it is called on.
+- `order_summary(self)` reads both instance attributes (`customer_name`, `restaurant_name`, `order_amount`, `is_delivered`) and the class attribute (`platform_name`) together in one f-string.
+- `order1 = FoodOrder(...)` instantiates one order; `order1.mark_delivered()` updates its state; `order1.order_summary()` reads that updated state back.
+- Output:
+  ```
+  [QuickEats] Rohit Verma's order from Punjabi Tadka - Rs.349.0 - Delivered
+  ```
+- This is precisely the shape real food delivery backends use: one object per order, holding its own state, with methods that update and report on that state as the order moves through its lifecycle.
 
 ---
 
 ## 4. Real-World Application
 
-The state-in-`__init__`, behaviour-in-methods, `self`-ties-them-together shape shows up everywhere real Python code models something with a lifecycle. A web application's **account model** typically looks like this even before a database sits behind it: instance attributes such as `username`, `email`, `is_active`, and `login_count`, with methods like `deactivate()` and `record_login()` that mutate that state through `self`.
+The state-in-`__init__`, behaviour-in-methods, `self`-ties-them-together shape shows up wherever real Python code models something with its own identity and lifecycle:
 
-A game's **player entity** follows the identical shape for a different domain: a `Player` with `health` and `score` as instance attributes, so two players in the same game hold completely independent values, the same independence `first_task` and `second_task` demonstrated above. An **inventory record** in a small business system — a `Product` with `sku`, `price`, and `quantity_in_stock`, and methods like `restock()` and `sell()` — needs no class attributes at all, since every product's values genuinely vary per instance; not every class needs one.
+- **Banking & FinTech:** A `BankAccount` class holds `owner_name` and `balance` as instance attributes, with `deposit()` and `withdraw()` methods — every account is a separate object, so one customer's balance can never accidentally leak into another's.
+- **UPI / Payment Systems:** A `Transaction` object bundles a `payer_name`, an `amount`, and a `status`, with a method like `mark_success()` — exactly the kind of object a real payment gateway creates for every single transaction it processes.
+- **E-commerce:** An `Order` class holds a customer, a list of items, and a total, with methods like `apply_coupon()` and `mark_shipped()` — every order placed on a platform is one independent object.
+- **Healthcare:** A `PatientRecord` class holds a patient's name, age, and current diagnosis, with a method like `admit()` or `discharge()` that updates that patient's own state without touching any other patient's record.
+- **Education:** A `Student` class, as built in this unit, holds a name and marks, with a method to compute a grade — the same shape a college's result-processing system relies on for every enrolled student.
+- **Railway Booking (IRCTC-style systems):** A `Ticket` class holds a passenger's name, a fare, and a confirmation status, with a method like `confirm_booking()` — precisely the shape of the worked example below.
+- **AI/ML:** A `Dataset` or `Model` object bundles data (rows, labels, hyperparameters) with methods like `train()` or `predict()`, so a data scientist can create several model objects with different settings without them interfering with one another.
+- **Cloud Applications:** A `CloudResource` object (a virtual machine, a storage bucket) holds its own configuration and status, with methods like `start()` and `stop()`, mirroring exactly how cloud provider SDKs represent the resources they manage.
+
+The pattern never really changes as you move deeper into professional software: identify the real-world thing, decide what it needs to remember (attributes), decide what it needs to do (methods), and let a class tie the two together.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a `BankAccount` class from scratch, following the same four steps every class in this unit has used, then see exactly what happens when a method forgets `self`.
+### Problem Statement
 
-**1. Name the class**, using `PascalCase`.
+You are asked to model a single savings bank account for a banking application: the account holder's name and their current balance, with the ability to deposit money, withdraw money, and display a summary of the account.
 
-```python
-class BankAccount:
-    ...
-```
+### Step 1: Understand the Problem
 
-**2. Write `__init__`**, taking required positional parameters and assigning each to an instance attribute.
+You need one class representing "a bank account." Every account needs to remember two pieces of state — the owner's name and the current balance — and support two operations that change the balance, plus a way to view the account's current details as a readable line of text.
 
-```python
-class BankAccount:
-    def __init__(self, owner_name, balance):
-        self.owner_name = owner_name
-        self.balance = balance
-```
+### Step 2: Plan the Solution
 
-**3. Add a class attribute** — only for a value every instance should share.
+Define a `BankAccount` class. Use `__init__` to set up `owner_name` and `balance` as instance attributes whenever a new account object is created. Add a `deposit()` method that increases `balance`, a `withdraw()` method that decreases it, and a `describe()` method that returns a formatted summary string using `self`'s current attributes.
+
+### Step 3: Write the Python Code
 
 ```python
 class BankAccount:
-    bank_name = "First National"   # class attribute — shared by every account
-
-    def __init__(self, owner_name, balance):
-        self.owner_name = owner_name
-        self.balance = balance
-```
-
-**4. Define methods**, always with `self` first.
-
-```python
-class BankAccount:
-    bank_name = "First National"
+    bank_name = "First National"   # class attribute - shared by every account
 
     def __init__(self, owner_name, balance):
         self.owner_name = owner_name
@@ -227,58 +350,72 @@ class BankAccount:
         self.balance = self.balance - amount
 
     def describe(self):
-        return f"{self.owner_name}'s account at {self.bank_name}: {self.balance}"
-```
+        return f"{self.owner_name}'s account at {self.bank_name}: Rs.{self.balance}"
 
-**5. Put it to use.**
-
-```python
 account = BankAccount("Priya Nair", 500)
 account.deposit(150)
 account.withdraw(80)
 print(account.describe())
 ```
 
-Output:
+### Step 4: Explain Each Line
+
+- `class BankAccount:` opens the blueprint.
+- `bank_name = "First National"` is a class attribute, defined directly in the class body — every `BankAccount` object shares this same value, since the bank's name does not vary per account.
+- `def __init__(self, owner_name, balance):` declares the constructor; it runs automatically the moment `BankAccount(...)` is called.
+- `self.owner_name = owner_name` and `self.balance = balance` store the two constructor arguments as instance attributes on the new object.
+- `def deposit(self, amount):` defines a method with `self` first and one extra parameter, `amount`.
+- `self.balance = self.balance + amount` reads the object's current balance, adds `amount`, and writes the result back into the same attribute.
+- `def withdraw(self, amount):` follows the identical pattern, subtracting instead of adding.
+- `def describe(self):` returns an f-string built from three pieces of the object's own state: `self.owner_name`, the shared `self.bank_name`, and the current `self.balance`.
+- `account = BankAccount("Priya Nair", 500)` instantiates one account: `owner_name="Priya Nair"`, `balance=500`.
+- `account.deposit(150)` looks up `deposit` on the class, binds `account` as `self`, and updates `balance` to `650`.
+- `account.withdraw(80)` repeats the pattern, updating `balance` to `570`.
+- `print(account.describe())` calls `describe()` on the now-updated object and prints the returned string.
+
+### Step 5: Sample Input
 
 ```
-Priya Nair's account at First National: 570
+owner_name = "Priya Nair"
+balance = 500
+deposit(150)
+withdraw(80)
 ```
 
-`account.deposit(150)` looks up `deposit` on the class, binds `account` as `self`, and runs `self.balance = self.balance + amount` — reading `500`, adding `150`, writing `650` back into the same attribute. `account.withdraw(80)` repeats the pattern: reads `650`, writes back `570`.
-
-**6. Now see what happens if `deposit` forgets `self`.**
-
-```python
-class BrokenAccount:
-    def deposit(amount):        # missing self
-        self.balance = self.balance + amount
-
-broken = BrokenAccount()
-broken.deposit(150)
-```
-
-Output:
+### Step 6: Expected Output
 
 ```
-TypeError: deposit() takes 1 positional argument but 2 were given
+Priya Nair's account at First National: Rs.570
 ```
 
-Python still passes `broken` in automatically as the first positional argument, so now `broken` and `150` are both competing to fill the single parameter `amount`.
+### Step 7: Why the Output Is Produced
 
-*Common mistake: forgetting `self` as a method's first parameter. It's the single most common beginner mistake in Python OOP, and it always produces a confusing `TypeError` about argument counts rather than an obvious complaint about a missing `self`.*
+`balance` starts at `500` inside `__init__`. `deposit(150)` reads `500`, adds `150`, and writes `650` back into `self.balance`. `withdraw(80)` then reads `650`, subtracts `80`, and writes `570` back. `describe()` reads the object's current state at the moment it is called — `owner_name="Priya Nair"`, the shared `bank_name="First National"`, and the final `balance=570` — and returns them combined into one formatted string, which `print()` then displays exactly as returned.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- An **abstract data type** describes a thing by its state and behaviour together; a Python class is how you implement that idea.
-- **A class** is a blueprint; **an object (instance)** is a specific thing built from that blueprint, with its own independent state.
-- **`__init__`** runs automatically on creation and is where instance attributes (`self.attribute = value`) are set up; **class attributes**, defined in the class body, are shared defaults across all instances until an instance overrides one locally.
-- **Methods** are functions defined inside a class; **`self`** is how a method refers to the specific object it was called on, and Python supplies it automatically at the call site.
+- An **abstract data type (ADT)** describes a thing by its state and behaviour together; a Python **class** is how you implement that idea in code.
+- A **class** is a blueprint; an **object (instance)** is a specific thing built from that blueprint, with its own independent state.
+- **`__init__`** is the constructor: Python calls it automatically every time you instantiate a class, and it is where instance attributes are normally set up via `self.attribute = value`.
+- **Instance attributes** vary per object; **class attributes**, defined directly in the class body, are shared by every instance until one instance is given its own attribute of the same name, which shadows the class attribute locally.
+- A **method** is a function defined inside a class body; **`self`** is how a method refers to the specific object it was called on, and Python supplies it automatically at the call site.
+- Instantiation always requires parentheses — `ClassName(...)` — because that is what actually triggers `__init__` and hands you back a usable object.
+- The most common beginner mistake is forgetting `self` as a method's first parameter, which produces a confusing `TypeError` about argument counts rather than an obvious complaint about `self`.
+- Being able to clearly explain the difference between a class and an object — and what `self` actually does — is one of the most frequently asked entry-level Python interview questions.
 
-Up next: inheritance and encapsulation — extending one class's behaviour into another, and controlling which parts of an object stay hidden from outside code.
+Coming next: inheritance and encapsulation — extending one class's behaviour into another, and controlling which parts of an object stay hidden from outside code (Unit 4.2 — Inheritance & Encapsulation).
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 4.1 · Version 1.0*
+## 7. Reference Links
+
+- [Python 3 Documentation — Classes (The Python Tutorial)](https://docs.python.org/3/tutorial/classes.html)
+- [Python 3 Documentation — Built-in Types](https://docs.python.org/3/library/stdtypes.html)
+- [Real Python — Object-Oriented Programming (OOP) in Python 3](https://realpython.com/python3-object-oriented-programming/)
+- [W3Schools — Python Classes/Objects](https://www.w3schools.com/python/python_classes.asp)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 4.1 · Version 2.0*

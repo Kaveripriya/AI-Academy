@@ -6,31 +6,150 @@
 
 By the end of this unit, you will be able to:
 
-✓ Combine file handling and exception handling into a single working program.  
-✓ Read a CSV file row by row while separating good rows from bad ones instead of crashing on the first problem.  
-✓ Log invalid rows to their own file so nothing is silently lost.  
-✓ Validate a field against a rule Python can't check on its own (like a valid mark range), and `raise` your own error when it's broken.  
-✓ Extend a working reader to produce a summary — not just pass/fail, but real numbers computed from the clean data.
+- **Explain** what a "robust file reader" means, and why real-world data almost never arrives perfectly clean.
+- **Implement** a CSV reader that combines `with open()`, `csv.reader`, and `try`/`except` to process every row it can and skip only the rows it can't.
+- **Differentiate** between a fail-fast approach (crash on the first bad row) and a fail-soft, "skip and log," graceful-degradation approach.
+- **Apply** the pattern of separating valid records from invalid records into two distinct collections, instead of mixing them together.
+- **Debug** a reader that either crashes on the first bad row or silently drops bad rows without a trace — the two most common mistakes in this pattern.
+- **Create** a complete, professional-quality program that reads a file, validates each row, logs what it rejects, and reports a clean summary — the exact shape of a real production data-loading step.
 
 ---
 
 ## 2. Overview
 
-Units 5.1 and 5.2 taught you two separate skills: opening and reading files safely, and catching exceptions instead of letting them crash your program. This unit exists to answer the question those two skills raise together — what do you actually *do* with a file when some of its rows are fine and some aren't, which is what real data almost always looks like?
+Unit 5.1 taught you how to open, read, and write files — plain text, CSV, and JSON. Unit 5.2 taught you how to catch exceptions with `try`/`except` instead of letting your program crash. Each of those skills, on its own, only tells half the story. This unit is where they finally meet, because that's exactly what happens the moment you point either skill at real data.
 
-A **robust file reader** doesn't stop the moment it hits one bad row. It processes every row it can, sets aside the rows it can't, and keeps a clear, honest record of what got rejected and why — instead of crashing and losing everything, good and bad, the instant something goes wrong.
+Real data is messy. A CSV of railway bookings will have a row where the fare is blank. A file of UPI transactions will have one row where the amount is spelled out as text instead of a number. A spreadsheet of student marks will have a stray row where someone typed "eighty" instead of `80`. This isn't a rare edge case — it is the normal, expected condition of any data a real system receives from the outside world.
 
-That's the same idea a quality inspector on a production line follows: they don't shut down the whole line the moment one faulty item rolls past. They pull it aside, log what was wrong with it, and let the good items keep moving.
+A program that crashes on the very first bad row is not "correct" — it's fragile. It throws away every good row that came after the bad one, just because one row happened to misbehave. A **robust file reader** does something more professional: it processes every row it can, sets aside every row it can't, and keeps an honest, reviewable record of what was rejected and why — never crashing, and never silently losing data either.
 
-This is the pattern behind almost every real data-loading step in an AI project. A training pipeline that halts on the first malformed record is far less useful than one that reports what it skipped and keeps going.
+This unit builds exactly that reader, end to end, using nothing but syntax you already know from Units 5.1 and 5.2. There is no new syntax here — only a new, more disciplined way of combining what you've already learned.
 
 ---
 
 ## 3. Description
 
-### 3.1 The Problem with a Naive Reader
+### 3.1 Definition
 
-Here's `students.csv`, where one row has bad data:
+A **robust file reader** is a program that reads a data file (typically CSV) row by row, attempts to validate and convert each row's data, and — instead of stopping the moment one row fails — separates the rows into two groups: a **valid record** (a row that parsed and validated correctly, ready to be used) and an **invalid record**, also called a **malformed row** (a row that failed to parse or broke a validation rule, set aside instead of processed). The reader finishes the *entire* file no matter how many rows fail, and it reports what it rejected instead of hiding it.
+
+This is not a new Python feature. It is a design pattern — a standard, reusable way of structuring code — built entirely out of the `with open()`, `csv.reader`, and `try`/`except` syntax you already learned in Units 5.1 and 5.2. What's new is the discipline of combining them so that one bad row never takes down the rest of the file.
+
+### 3.2 Why This Concept Exists
+
+A naive reader assumes every row in a file is well-formed — the right number of columns, the right data type in each column, values that make sense. That assumption is almost always wrong the moment data comes from outside your own program: a person typed it, a different system exported it, a sensor recorded it. Somewhere in a file of a thousand rows, a few will be broken.
+
+If your reader crashes on the first broken row, you lose two things at once: the 995 good rows you never got to process, and any record of what was wrong with the 5 bad ones (since the program died before it could report anything). Neither outcome is acceptable in a real system. A payroll system that stops processing salaries because one employee's row has a typo, or a training pipeline that halts an entire model run because one line of a dataset is malformed, is a system that isn't ready for production.
+
+**Graceful degradation** — continuing to do useful work even when part of the input is broken — is the standard professional response. This unit exists to turn that idea from a phrase you've heard into a program you can write.
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Valid record** | A row that was read, converted, and validated successfully — safe to use in the rest of the program. |
+| **Invalid record** | A row that failed to convert or broke a validation rule — set aside instead of used. |
+| **Malformed row** | Another name for an invalid record — a row whose shape or content doesn't match what the program expected. |
+| **Logging** | Recording what happened — here, specifically, keeping a permanent, reviewable note of which rows were rejected and why, instead of letting that information disappear. |
+| **Graceful degradation** | A program continuing to produce useful, partial results when part of its input is broken, rather than stopping entirely. |
+| **Fail-fast** | A design approach where the program stops immediately at the first sign of a problem. |
+| **Fail-soft** | A design approach — also called **skip and log** — where the program records the problem and keeps going, only stopping when the entire input has been processed. |
+| **Batch** | The full set of rows being processed in one run — here, one whole CSV file. |
+
+### 3.4 Syntax
+
+There is no new syntax in this unit — only a recap of how three pieces you already know fit together, in this exact shape, to build a robust reader:
+
+| Piece | Where it comes from | Its job here |
+|---|---|---|
+| `with open(path, "r") as file:` | Unit 5.1 | Opens the file safely and guarantees it closes, even if a row inside the loop raises an error. |
+| `csv.reader(file)` (or `csv.DictReader(file)`) | Unit 5.1 | Turns each line of the file into a row — a list of strings (or a dictionary of column name to value). |
+| `for row in reader:` | Units 2–5.1 | Loops over every row in the file, one at a time, in order. |
+| `try:` / `except SomeError:` | Unit 5.2 | Wraps only the *risky* part of processing one row — the conversion or validation — so a failure on this row is caught without stopping the loop. |
+| `valid_records.append(...)` / `invalid_records.append(...)` | Units 2–3 (lists) | Sorts each row's outcome into one of two separate collections, instead of mixing results together. |
+
+The shape, put together, always looks like this skeleton:
+
+```python
+valid_records = []
+invalid_records = []
+
+with open("data.csv", "r", newline="") as file:
+    reader = csv.reader(file)
+    next(reader)                    # skip header row
+    for row in reader:
+        try:
+            # convert and validate this row
+            valid_records.append(...)
+        except ValueError:
+            invalid_records.append(row)
+```
+
+Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *robust* reader is placing the `try`/`except` **inside** the `for` loop, wrapping only one row at a time — not around the whole loop, which would still stop everything at the first failure.
+
+### 3.5 Rules
+
+- The `try`/`except` block must sit **inside** the `for` loop, around the processing of one single row — placing it around the entire loop defeats the purpose, since one failure would then exit the loop entirely.
+- Only the code that can actually fail (a conversion like `int(row[1])`, or a validation check) needs to be inside `try`. Code that cannot raise an exception doesn't need protecting.
+- Every row must end up in exactly one of the two collections — `valid_records` or `invalid_records` — never both, and never neither.
+- The `except` clause must name the **specific** exception you expect (typically `ValueError` for a bad conversion), not a bare `except:` — Unit 5.2 already established why: a bare `except:` also hides genuine bugs in your own code.
+- The reader must finish reading the entire file regardless of how many rows fail — a robust reader never exits early because of bad data.
+
+### 3.6 Best Practices
+
+- **Never let one bad row crash the whole batch.** The entire point of this pattern is that a single malformed row is an expected, ordinary event — not a program-ending emergency.
+- **Always report what was skipped and why**, even if just to the screen for now — silently discarding a row is just as bad as crashing, because the data disappears either way with no trace it ever existed.
+- **Keep valid and invalid results in separate collections** (or separate files) — never merge them, and never run summary calculations (like an average) over a collection that mixes the two.
+- **Catch the specific exception you expect**, not everything — this keeps you honest about what "an expected bad row" actually looks like, and still lets a genuine bug in your own code surface as a crash you can fix.
+- **Log invalid rows to a real file**, not just a `print()` statement, once this pattern moves from a learning exercise to something a teammate needs to review later.
+- **Validate business rules explicitly with `raise`**, for anything Python's own conversion can't catch — a mark of `150` converts to an `int` just fine, but it's still not a valid mark, and only your own check catches that.
+
+### 3.7 Common Mistakes
+
+- **Crashing the whole program on the first bad row** — wrapping the `try`/`except` around the entire `for` loop (or leaving it out entirely) means one bad row anywhere in the file loses every good row that follows it too.
+- **Silently dropping bad rows with no log or record** — catching the exception but forgetting to `append()` the bad row anywhere means the program stops crashing, which *feels* like success, but the rejected data has genuinely vanished with no trace.
+- **Using a bare `except:`** to "catch everything" — this also swallows real bugs in your own code (a typo in a variable name, for instance) and you never find out.
+- **Running summary math (totals, averages) over a collection that mixes valid and invalid rows** — a skipped row that contributed no real number can still silently drag down an average if it's counted in the total.
+- **Assuming a row that converts successfully is automatically valid** — `int("150")` succeeds, but 150 may still break a business rule (like a valid marks range of 0–100) that Python has no way of knowing about on its own.
+
+### 3.8 Important Notes (Interview Insights)
+
+- This exact pattern — read a row, try to process it, catch the failure, log it, move to the next row — is often called **"skip and log"** in real data engineering and data science teams. It is one of the most common patterns in real ETL (extract-transform-load) pipelines, and mentioning it by name in an interview signals that you understand production-quality data handling, not just toy scripts.
+- A common interview question: *"How would you handle a corrupted or malformed row in a large data file without stopping the whole job?"* The expected answer is exactly this unit's pattern — wrap the per-row processing in `try`/`except`, collect successes and failures separately, and report both, rather than an interviewer being satisfied with just "I'd use try/except somewhere."
+- Be ready to explain **why** you'd choose fail-soft over fail-fast in a data pipeline versus a different context (like a financial transaction, where you often *want* fail-fast) — knowing when each approach is appropriate matters more than knowing only one of them.
+
+### 3.9 Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)
+
+| Aspect | Fail-Fast | Fail-Soft (Skip and Log) |
+|---|---|---|
+| Behaviour on a bad row | Stops immediately, raises the exception | Logs the bad row, continues to the next one |
+| What happens to good rows after the bad one | Never processed | Processed normally |
+| Best suited for | A single, critical operation that must not continue with bad data — e.g., validating a single bank transfer before it executes | Batch processing of many independent rows — e.g., loading a CSV of a thousand student records or bookings |
+| Risk if used in the wrong place | Loses all remaining good work over one bad record | Could hide a systemic problem if failures are only logged and never actually reviewed |
+| What this unit builds | The naive first version in §3.11 | The robust version in §3.11, and the worked example in §5 |
+
+### 3.10 Diagram: The Skip-and-Log Flow
+
+```mermaid
+flowchart TD
+    A[Read one row] --> B{Try to convert<br/>and validate}
+    B -->|Succeeds| C[Add to valid_records]
+    B -->|Raises an exception| D[Add to invalid_records / log it]
+    C --> E{More rows left?}
+    D --> E
+    E -->|Yes| A
+    E -->|No| F[Report: X valid, Y invalid]
+```
+
+*Every row follows this same loop — a failure on one row (the right-hand path) never prevents the next row (looping back to A) from being read.*
+
+### 3.11 Code Examples
+
+This unit builds one growing example rather than several unrelated ones — starting from a version that crashes, and improving it step by step into a robust reader.
+
+**Step A — the naive version, which crashes on the first bad row.**
+
+Here is `students.csv`, where one row has bad data:
 
 ```
 Name,Marks
@@ -39,18 +158,25 @@ Rohan,eighty
 Arjun,91
 ```
 
-A reader that assumes every row is well-formed crashes the instant it reaches Rohan's row — and everything after it, including Arjun's perfectly good entry, never gets processed at all:
-
 ```python
 import csv
 
-with open("students.csv", "r") as file:
+with open("students.csv", "r", newline="") as file:
     reader = csv.reader(file)
     next(reader)               # skip the header row
     for row in reader:
         name, marks = row[0], int(row[1])
         print(name, marks)
 ```
+
+*Line-by-line explanation:*
+- `import csv` — loads the `csv` module from Unit 5.1, so we can read comma-separated rows properly.
+- `with open("students.csv", "r", newline="") as file:` — opens the file for reading, and guarantees it closes automatically even if the code inside crashes (Unit 5.1's `with` statement).
+- `reader = csv.reader(file)` — wraps the open file so each line comes back as a list of strings, one row at a time.
+- `next(reader)` — reads and discards the header row (`Name,Marks`), so the loop below only ever sees actual data rows.
+- `for row in reader:` — loops over every remaining row, one at a time.
+- `name, marks = row[0], int(row[1])` — the risky line: it assumes `row[1]` always holds text that `int()` can convert. There is no protection here at all.
+- `print(name, marks)` — only reached if the line above succeeded.
 
 Output:
 
@@ -59,11 +185,9 @@ Priya 78
 ValueError: invalid literal for int() with base 10: 'eighty'
 ```
 
-Notice what's lost here: not just Rohan's bad row, but Arjun's *good* one right behind it. One bad row took down the rest of the file with it.
+Notice what's lost: not just Rohan's bad row, but Arjun's perfectly good row right behind it. The program never even reaches Arjun, because it died on Rohan first.
 
-### 3.2 Designing a Robust Reader
-
-The fix is to wrap only the risky part — converting the text `"eighty"` into a number — in a `try`/`except` block placed *inside* the loop, so a failure on one row gets caught and logged without ever stopping the loop from reaching the next row.
+**Step B — the robust version, applying the pattern from §3.4.**
 
 ```python
 import csv
@@ -71,7 +195,7 @@ import csv
 valid_records = []
 invalid_records = []
 
-with open("students.csv", "r") as file:
+with open("students.csv", "r", newline="") as file:
     reader = csv.reader(file)
     next(reader)
     for row in reader:
@@ -86,6 +210,15 @@ print("Valid records:", valid_records)
 print("Invalid records:", invalid_records)
 ```
 
+*Line-by-line explanation:*
+- `valid_records = []` and `invalid_records = []` — two empty lists created before the loop starts, one for rows that succeed and one for rows that fail. Every row will land in exactly one of these.
+- The `with open(...)` and `csv.reader(file)` lines are unchanged from Step A — the file-handling part of this pattern doesn't need to change at all.
+- `name = row[0]` — pulled out *before* the `try` block, because reading `row[0]` cannot fail; only the conversion of `row[1]` can.
+- `try: marks = int(row[1])` — this is the one risky line, now wrapped. If `row[1]` is a valid number as text, this succeeds.
+- `valid_records.append((name, marks))` — only runs if the conversion above succeeded; the row is stored as a tuple of `(name, marks)`.
+- `except ValueError: invalid_records.append(row)` — if the conversion fails, the *entire original row* is stored in `invalid_records` instead of the program crashing. The loop then continues to the next row.
+- The two `print()` lines at the end show both outcomes once the whole file has been read.
+
 Output:
 
 ```
@@ -93,20 +226,11 @@ Valid records: [('Priya', 78), ('Arjun', 91)]
 Invalid records: [['Rohan', 'eighty']]
 ```
 
-Same file, same bad row — but now Arjun's record survives. One detail worth noticing: the `except` clause catches `ValueError` specifically, not every possible error. If you wrote a bare `except:` instead, you'd also silently swallow real bugs in your own code (a typo in a variable name, say) and never find out — catch the *specific* failure you're expecting, not everything.
+Same file, same bad row — but now Arjun's record survives, because the `try`/`except` is scoped to one row at a time rather than the whole loop.
 
-```mermaid
-flowchart LR
-    A[Read one row] --> B{Convert & validate}
-    B -->|succeeds| C[valid_records]
-    B -->|raises ValueError| D[invalid_records]
-    C --> E[Write clean CSV]
-    D --> F[Write invalid_rows.csv]
-```
+**Step C — validating a business rule Python's own conversion can't catch.**
 
-### 3.3 Validating Business Rules — Raising Your Own Errors
-
-Not every bad value fails to *convert*. `int("105")` succeeds just fine even though 105 is not a possible exam mark — Python has no way to know that on its own. This is where *you* enforce a rule Python doesn't know about, using `raise`:
+`int("105")` succeeds even though 105 is not a possible exam mark out of 100 — Python has no way to know that on its own. This is where you enforce your own rule using `raise`, exactly as Unit 5.2 taught:
 
 ```python
 try:
@@ -118,48 +242,57 @@ except ValueError:
     invalid_records.append(row)
 ```
 
-A row like `Meena,150` now gets caught by the exact same `except ValueError` — except this time the error came from *your* `raise`, not from `int()` itself. Python-raised and self-raised errors funnel through the same handler, which is the point: your own validation checks and Python's built-in checks are just two sources for the same "this row is bad" signal.
+*Explanation:* the `if not (0 <= marks <= 100):` check runs only after the conversion already succeeded. If the mark is out of range, `raise ValueError(...)` deliberately triggers the same kind of exception `int()` would have raised on its own — so the very same `except ValueError:` below catches it, whether the failure came from Python's own conversion or from your own business rule. A row like `Meena,150` is now correctly rejected too, even though `int("150")` never fails.
 
-### 3.4 Logging Bad Rows Separately
-
-Printing the invalid rows is fine for a quick check, but in a real system you'd write them to their own file, so the rejected data has a permanent, reviewable trail instead of vanishing the moment the program ends:
+**Step D — logging invalid rows to a real file, not just printing them.**
 
 ```python
-with open("invalid_rows.csv", "w") as error_file:
+with open("invalid_rows.csv", "w", newline="") as error_file:
     writer = csv.writer(error_file)
     writer.writerow(["Name", "Marks"])
     writer.writerows(invalid_records)
 ```
 
-Now anyone — a teammate, or you, a week from now — can open `invalid_rows.csv` and see exactly what got rejected, without having to re-run the whole program.
-
-*A design choice worth knowing about: this unit reads rows as plain lists (`row[0]`, `row[1]`), but `csv.DictReader` and `csv.DictWriter` from unit 5.1 do the exact same job addressing columns by name instead — `row["Marks"]` instead of `row[1]`. That reads more clearly and survives a reordered column, at the cost of one extra concept. Either approach is legitimate; pick whichever your row shape and team convention favor.*
+*Explanation:* `csv.writer(error_file)` (Unit 5.1) writes the header row first with `writerow()`, then every rejected row at once with `writerows()`. This turns the rejected data into a permanent, reviewable file — anyone can open `invalid_rows.csv` later and see exactly what was skipped, without needing to re-run the whole program.
 
 ---
 
 ## 4. Real-World Application
 
-A college's bulk student-record upload tool runs on exactly §3.2/§3.3's split: it converts and validates every row, processes what passes, and hands back a downloadable error report for the rest — including rows that failed a business rule, like a mark outside 0-100, not just rows that failed to convert at all. A bank's overnight batch reconciliation does the same at a larger scale, isolating any transaction that doesn't match the expected format into a queue for a human to check, instead of one bad row blocking the night's entire run.
+This pattern shows up everywhere real systems ingest outside data:
+
+- **Railway booking (IRCTC-style systems):** A bulk upload of ticket bookings processes every row with a valid fare and passenger count, and routes rows with a missing or invalid fare into a rejection report a staff member reviews later — instead of one bad booking blocking the entire batch.
+- **Banking & FinTech:** An overnight batch reconciliation job isolates any transaction row that doesn't match the expected format into a review queue, rather than letting one malformed transaction halt the whole night's processing.
+- **UPI / Payment systems:** A settlement file with thousands of UPI transactions logs and skips any row with a corrupted or missing amount field, so the remaining valid transactions still settle on time.
+- **E-commerce:** A bulk product-catalog upload accepts every well-formed product row and reports the rows with a missing price or invalid category, instead of rejecting the entire catalog file.
+- **Healthcare:** A hospital importing patient records from an external lab system logs rows with an invalid date of birth or missing ID, while still importing every record that is complete and correct.
+- **Education:** A college's bulk student-record upload tool converts and validates every row — including a business rule like marks staying within 0–100 — and hands back a downloadable error report for the rest.
+- **AI/ML:** A model training pipeline reading a large CSV dataset skips malformed or incomplete rows and logs them, rather than halting an entire multi-hour training run because of a handful of corrupted lines.
+- **Cloud applications:** A cloud data-ingestion service processing uploaded files at scale applies exactly this pattern per file and per row, since it cannot assume every file uploaded by every customer is perfectly formed.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** The reader from §3.2 already separates good rows from bad ones. Now extend it to do something more useful than just reporting pass/fail — compute a real summary (how many rows succeeded, how many failed, and the class average) using only the clean data.
+### Problem Statement
 
-**1. Start from the working reader**, applied to a new file, `attendance.csv`:
+You receive a CSV file, `bookings.csv`, containing railway ticket bookings. Some rows have missing or invalid fares. Build a reader that processes all valid bookings and logs the invalid ones separately, instead of crashing the moment it hits a bad row.
 
-```
-Name,DaysPresent
-Priya,45
-Rohan,
-Arjun,50
-Meena,48
-```
+### Step 1: Understand the Problem
 
-Rohan's row has a blank value where a number was expected — a different flavor of bad data than `"eighty"` was, but it fails the exact same `int()` conversion, so the exact same `except ValueError` catches it.
+Each row should contain a passenger name and a fare. A row is **valid** only if the fare converts to a number and that number is a sensible fare (greater than 0). A row is **invalid** if the fare is missing, isn't a number at all, or is zero/negative. The program must finish reading the entire file regardless of how many rows fail, and it must report both the valid bookings and the invalid ones, along with a short summary.
 
-**2. Read and separate, exactly as before.**
+### Step 2: Plan the Solution
+
+1. Open `bookings.csv` with `with open(...)` and read it using `csv.reader`.
+2. Skip the header row with `next(reader)`.
+3. Loop over every remaining row.
+4. Inside the loop, wrap the fare conversion in `try`/`except ValueError`.
+5. Add a business-rule check: if the fare converts but is not greater than 0, `raise ValueError` yourself.
+6. Append successful rows to `valid_records`, and failed rows to `invalid_records`.
+7. After the loop, print a summary count and both lists.
+
+### Step 3: Write the Python Code
 
 ```python
 import csv
@@ -167,55 +300,94 @@ import csv
 valid_records = []
 invalid_records = []
 
-with open("attendance.csv", "r") as file:
+with open("bookings.csv", "r", newline="") as file:
     reader = csv.reader(file)
-    next(reader)
+    next(reader)                       # skip header row
     for row in reader:
         name = row[0]
         try:
-            days = int(row[1])
-            valid_records.append((name, days))
+            fare = float(row[1])
+            if fare <= 0:
+                raise ValueError(f"fare {fare} is not a valid amount")
+            valid_records.append((name, fare))
         except ValueError:
             invalid_records.append(row)
-```
 
-**3. Now go further than a pass/fail report — compute a summary from the valid data only.**
-
-```python
 total_rows = len(valid_records) + len(invalid_records)
-average_days = sum(days for _, days in valid_records) / len(valid_records)
 
-print(f"Processed {total_rows} rows: {len(valid_records)} valid, {len(invalid_records)} skipped.")
-print(f"Average attendance (valid rows only): {average_days:.1f} days")
-print("Skipped rows:", invalid_records)
+print(f"Processed {total_rows} rows: {len(valid_records)} valid, {len(invalid_records)} invalid.")
+print("Valid bookings:", valid_records)
+print("Invalid bookings (skipped):", invalid_records)
 ```
 
-Output:
+### Step 4: Explain Each Line
+
+- `import csv` — loads the module used to read comma-separated rows correctly (Unit 5.1).
+- `valid_records = []` / `invalid_records = []` — two separate lists created up front; every row will end up in exactly one of them.
+- `with open("bookings.csv", "r", newline="") as file:` — opens the file safely; `with` guarantees it closes automatically even if a row later raises an error.
+- `reader = csv.reader(file)` — turns each line of the file into a row (a list of strings).
+- `next(reader)` — reads and discards the header row (`Name,Fare`), so the loop only sees actual booking rows.
+- `for row in reader:` — loops over every remaining row, one at a time, continuing all the way to the end of the file no matter what happens to any individual row.
+- `name = row[0]` — pulled out before the `try` block, since reading a string from a list position cannot itself raise an exception here.
+- `try: fare = float(row[1])` — attempts to convert the fare column to a number. `float` is used instead of `int` because a real fare can have paise (e.g., `745.50`).
+- `if fare <= 0: raise ValueError(...)` — a business rule Python's own `float()` conversion cannot check: a fare of `0` or a negative number converts just fine as a number, but it isn't a sensible fare, so this line deliberately raises the same kind of exception `float()` would raise on genuinely bad text.
+- `valid_records.append((name, fare))` — only reached if both the conversion and the business-rule check succeeded.
+- `except ValueError: invalid_records.append(row)` — catches *either* a failed conversion (bad text) or the deliberately raised rule violation (bad amount), and stores the original row, unmodified, in `invalid_records`. The loop then moves on to the next row.
+- `total_rows = len(valid_records) + len(invalid_records)` — computed after the loop finishes, using only counts, not values that need to be "valid" to count correctly.
+- The final three `print()` lines report the summary and both collections.
+
+### Step 5: Sample Input
+
+`bookings.csv`:
 
 ```
-Processed 4 rows: 3 valid, 1 skipped.
-Average attendance (valid rows only): 47.7 days
-Skipped rows: [['Rohan', '']]
+Name,Fare
+Priya Nair,745.50
+Rohan Verma,
+Arjun Mehta,-50
+Meena Iyer,1250.00
 ```
 
-**4. Notice what almost went wrong here.** The average is computed over `valid_records` — 3 rows — not `total_rows`, which is 4. If you'd divided by `total_rows` instead, Rohan's skipped row would have silently dragged the average down, even though it contributed no real number to the sum. Separating valid from invalid data isn't just about not crashing; it's about making sure your *math* only ever runs on data you actually trust.
+Rohan's row has a blank fare (fails the `float()` conversion itself), and Arjun's row has a fare of `-50` (converts to a number just fine, but fails the business rule that a fare must be greater than 0).
 
-*Common mistake: catching the exception but forgetting to store the bad row anywhere. The program stops crashing, which feels like success — but if you don't append it to `invalid_records`, that row's data just disappears with no record it ever existed. Always log or store what you skip; silence is not the same as success.*
+### Step 6: Expected Output
+
+```
+Processed 4 rows: 2 valid, 2 invalid.
+Valid bookings: [('Priya Nair', 745.5), ('Meena Iyer', 1250.0)]
+Invalid bookings (skipped): [['Rohan Verma', ''], ['Arjun Mehta', '-50']]
+```
+
+### Step 7: Why the Output Is Produced
+
+Priya's and Meena's rows both convert successfully with `float()` and pass the `fare > 0` check, so both land in `valid_records`. Rohan's row fails at the very first step — `float("")` cannot convert an empty string to a number, so `ValueError` is raised immediately and caught. Arjun's row is different: `float("-50")` succeeds without any error, producing the number `-50.0` — but the very next line, the business-rule check, deliberately raises its own `ValueError` because a negative fare makes no real-world sense. Both failures — one from Python's own conversion, one from your own rule — funnel through the exact same `except ValueError:`, which is why both end up correctly stored in `invalid_records` even though they broke in two completely different ways. Because the `try`/`except` sits inside the loop, the failure on Rohan's row never stops the loop from reaching Arjun's, and the failure on Arjun's row never stops it from reaching Meena's — the program processes all four rows and reports an honest, complete picture of what succeeded and what didn't.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- **Real data is rarely clean** — a robust reader assumes some rows will fail, rather than assuming every row is valid.
-- **Wrapping only the risky conversion** in `try`/`except`, per row, lets the loop continue past a single bad entry instead of dying on it.
-- **Catch the specific exception you expect** (`ValueError`, here) rather than a bare `except:` — otherwise you also hide real bugs in your own code.
-- **Not every bad value fails to convert.** A rule Python can't check on its own (like a valid mark range) needs you to `raise` your own `ValueError` — it's caught by the same `except` as any error Python raises for you.
-- **Separating valid and invalid records** into two collections keeps good data usable while preserving exactly what failed and why.
-- **Logging invalid rows to their own file** — not just printing them — means the rejected data leaves a permanent, reviewable trail.
-- **Any summary math you compute** should run over the valid records only — mixing in skipped rows (or their count) silently corrupts the result.
+- A **robust file reader** processes every row it can, sets aside every row it can't, and reports both — it never crashes on the first bad row, and it never silently drops bad data either.
+- This unit introduces **no new syntax** — it combines `with open()` and `csv.reader` from Unit 5.1 with `try`/`except` and `raise` from Unit 5.2 into one disciplined pattern.
+- The key structural rule: place the `try`/`except` **inside** the loop, wrapped around one row at a time — not around the whole loop.
+- **Valid records and invalid records** belong in two separate collections (or files), never mixed — and any summary math must run only over the valid ones.
+- Not every bad value fails to *convert* — a business rule (like a fare that must be greater than 0, or marks that must stay within 0–100) needs you to `raise` your own exception, which is caught by the same `except` as any error Python raises on its own.
+- **Fail-soft ("skip and log")** suits batch processing of many independent rows; **fail-fast** still has its place for single, critical operations that must not proceed on bad data.
+- Always catch the **specific** exception you expect, and always log or store what you skip — a bare `except:` or a silently discarded row both hide real problems instead of solving them.
+- This "skip and log" pattern is common enough in real data pipelines that it's worth naming explicitly in an interview — it signals production-quality thinking, not just toy-script code.
 
-This closes the file-and-exception-handling module. Next: version control with Git and GitHub — the professional habit of saving and sharing the code you've written so far.
+Coming next: Unit 6.1 — Version Control Basics, the start of Module P6, where you'll learn Git and GitHub — the professional habit of saving and sharing the code you've written throughout this course.
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 5.3 · Version 1.0*
+## 7. Reference Links
+
+- [Python 3 Documentation — csv: CSV File Reading and Writing](https://docs.python.org/3/library/csv.html)
+- [Python 3 Documentation — Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html)
+- [Python 3 Documentation — logging: Logging Facility for Python](https://docs.python.org/3/library/logging.html)
+- [Real Python — Reading and Writing CSV Files in Python](https://realpython.com/python-csv/)
+- [Real Python — Python Exceptions: An Introduction](https://realpython.com/python-exceptions/)
+- [W3Schools — Python Try Except](https://www.w3schools.com/python/python_try_except.asp)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 5.3 · Version 2.0*

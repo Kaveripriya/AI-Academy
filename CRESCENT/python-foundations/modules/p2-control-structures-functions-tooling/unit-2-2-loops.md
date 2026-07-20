@@ -6,358 +6,374 @@
 
 By the end of this unit, you will be able to:
 
-✓ Write a `while` loop that repeats a block as long as a condition holds, and explain how to stop it from running forever.  
-✓ Iterate over a sequence with a `for` loop, naming the loop variable that takes each value in turn.  
-✓ Generate numeric sequences with `range()` using its `start`, `stop`, and `step` arguments.  
-✓ Use `enumerate()` to get an index alongside each value, and `zip()` to walk two sequences in step.  
-✓ Control a loop from inside its body with `break` (leave early) and `continue` (skip to the next iteration).  
-✓ Nest one loop inside another and describe what the loop `else` clause does.
+- **Explain** how a `while` loop repeats a block based on a condition, and how a `for` loop repeats a block once for each item in a sequence.
+- **Implement** `range()` to generate numeric sequences using `start`, `stop`, and `step`, and use it to drive a `for` loop a fixed number of times.
+- **Apply** `enumerate()` to track a position while looping and `zip()` to walk two sequences together in step.
+- **Differentiate** between `break` and `continue`, and predict exactly how each one changes a loop's execution.
+- **Debug** the classic infinite-loop mistake and the off-by-one errors that come from misreading `range()`.
+- **Create** nested loops to solve grid-shaped problems such as tables, seat charts, and reports.
 
 ---
 
 ## 2. Overview
 
-Conditionals let a program choose a path once. But most real work is repetitive: print every character of a name, count down from ten, keep asking for input until the user finally types something valid. A **loop** runs a block of code over and over — either a fixed number of times or until a condition changes — so you never have to write the same statement out by hand.
+Every program you've written so far in this course runs each line exactly once, top to bottom. Real software rarely works that way. A banking app checks every transaction in a statement. A food delivery app polls an order's status again and again until it's delivered. An e-commerce site prints every item in an invoice, however many there are. Writing the same `print()` statement fifty times is not a solution — it doesn't scale, and it breaks the moment the number of items changes. What you need is a way to tell Python: "repeat this block, either while some condition holds, or once for every item in a sequence."
 
-Python gives you two loop keywords: `while`, which repeats *as long as* a condition is `True`, and `for`, which repeats *once for each item* in a sequence. This unit covers both, the tools that make looping practical (`range()`, `enumerate()`, `zip()`), and `break`/`continue` — two keywords that change a loop's flow from inside its own body.
+That mechanism is called a **loop**, and it is one of the four pillars of control flow, alongside the conditionals you learned in Unit 2.1. Python gives you exactly two loop keywords — `while`, which repeats *as long as* a condition stays `True`, and `for`, which repeats *once per item* in a sequence. Around these two keywords sit a small toolkit that makes looping practical in real code: `range()` to generate numbers to loop over, `enumerate()` to track position, `zip()` to walk two sequences together, and `break`/`continue` to redirect a loop's flow from inside its own body. Indian IT companies test loop fundamentals in nearly every entry-level coding round — this unit is the foundation for almost everything you will build from here on.
 
 ---
 
 ## 3. Description
 
-### 3.1 The `while` Loop
+### 3.1 Definition
 
-A `while` loop has the same shape as an `if`: a header line ending in a colon, then an indented block. The difference is what happens after the block runs — Python goes *back* to the top and tests the condition again, repeating the block as long as the condition is `True` and stopping the moment it becomes `False`.
+A **loop** is a control structure that repeats a block of code — the **loop body** — multiple times, either until a condition becomes `False` or until a sequence of items is exhausted. Each single repetition of the loop body is called an **iteration**. Python provides two loop statements: the `while` loop, which is condition-driven, and the `for` loop, which is sequence-driven.
 
 ```python
-count = 5
-
-while count > 0:
-    print(count)
-    count = count - 1
-
-print("Lift off!")
+for letter in "hi":
+    print(letter)
 ```
 
-Read it literally: "while `count > 0` is `True`, run the block." It prints `5`, `4`, `3`, `2`, `1`, and when `count` reaches `0` the condition is `False`, so the loop ends and `Lift off!` prints. The crucial line is `count = count - 1`: something inside the loop must eventually make the condition `False`. That's the loop's *progress* toward stopping.
+Read this as "for each `letter` in the text `"hi"`, run the block below." It runs the block twice — once with `letter` set to `"h"`, once with `letter` set to `"i"` — printing `h` and then `i`.
 
-The diagram below shows this cycle for both loop types — test the condition, run the body, loop back, and exit — including how `break` and `continue` redirect that flow and how one loop can nest inside another.
+### 3.2 Why This Concept Exists
+
+Without loops, repeating an action a hundred times would mean writing that action out a hundred times by hand — and the moment the count changes from a hundred to a thousand, the whole program has to be rewritten. Real software constantly needs to:
+
+- **Repeat** an action a known number of times (print every row of a report, charge every item in a cart).
+- **Repeat** an action until something changes (keep asking for a valid PIN until it's entered correctly).
+- **Walk through** every item in a collection of data, one at a time, without knowing in advance how many items there are.
+
+A loop solves all three with one mechanism: write the repeating action once, and let Python run it as many times as needed. This is why loops, right after conditionals, are the next concept every programming course teaches — nearly all real logic is "do this for every X" or "keep doing this until Y."
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Loop** | A control structure that repeats a block of code multiple times. |
+| **Loop body** | The indented block of statements that gets repeated. |
+| **Iteration** | One single run through the loop body. |
+| **`while` loop** | A loop that repeats as long as a given condition stays `True`. |
+| **`for` loop** | A loop that repeats once for each item in a sequence. |
+| **Loop variable** | The name that takes on each item's value in turn during a `for` loop. |
+| **Iterable / sequence** | Something a `for` loop can walk through one item at a time — a string, a `range()`, or the result of `enumerate()`/`zip()`. |
+| **`range()`** | A built-in function that produces a sequence of integers, controlled by `start`, `stop`, and `step`. |
+| **`enumerate()`** | A built-in function that pairs each item in a sequence with an index, starting at `0` by default. |
+| **`zip()`** | A built-in function that walks two (or more) sequences together, producing one item from each per pass. |
+| **`break`** | A keyword that immediately ends the loop entirely, skipping any remaining iterations. |
+| **`continue`** | A keyword that skips the rest of the current iteration and moves straight to the next one. |
+| **Infinite loop** | A loop whose condition never becomes `False`, so it never stops on its own. |
+| **Nested loop** | A loop placed inside the body of another loop. |
+| **Off-by-one error** | A bug where a loop runs one time too many or one time too few, often caused by misreading `range()`'s exclusive stop value. |
+
+### 3.4 Syntax
+
+**`while` loop:**
+
+```python
+while condition:
+    # loop body
+```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `while` | The keyword that starts a condition-driven loop. | Tells Python to keep re-checking the condition. |
+| `condition` | Any expression that evaluates to `True` or `False`. | Re-checked before every single iteration, including the first. |
+| Indented block | The loop body. | Runs once per iteration, as long as `condition` is `True`. |
+
+**`for` loop:**
+
+```python
+for item in sequence:
+    # loop body
+```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `for` ... `in` | Keywords that start a sequence-driven loop. | Tells Python to walk through `sequence` one item at a time. |
+| `item` | The **loop variable** — your chosen name. | Holds the current item's value during each iteration. |
+| `sequence` | Anything Python can iterate over — a string, `range(...)`, `enumerate(...)`, or `zip(...)`. | Defines what values `item` will take, and how many iterations run. |
+
+**`range()`, `enumerate()`, `zip()`:**
+
+| Call | Meaning | Example | Produces |
+|---|---|---|---|
+| `range(stop)` | Integers from `0` up to (not including) `stop`. | `range(5)` | `0, 1, 2, 3, 4` |
+| `range(start, stop)` | Integers from `start` up to (not including) `stop`. | `range(2, 6)` | `2, 3, 4, 5` |
+| `range(start, stop, step)` | Integers from `start` to `stop`, counting by `step`. | `range(0, 10, 2)` | `0, 2, 4, 6, 8` |
+| `enumerate(sequence)` | Pairs each item with an index, starting at `0`. | `enumerate("hi")` | `(0, 'h'), (1, 'i')` |
+| `enumerate(sequence, start)` | Same, but the index begins at `start`. | `enumerate("hi", 1)` | `(1, 'h'), (2, 'i')` |
+| `zip(seq1, seq2)` | Pairs items from two sequences, position by position. | `zip("ab", "12")` | `('a','1'), ('b','2')` |
+
+**`break` and `continue`:**
+
+| Keyword | Effect | Where it belongs |
+|---|---|---|
+| `break` | Ends the loop immediately — no further iterations run. | Inside a loop body, usually behind an `if`. |
+| `continue` | Skips the rest of the current iteration and jumps to the next one. | Inside a loop body, usually behind an `if`. |
+
+### 3.5 Rules
+
+- A `while` loop's condition is checked **before** every iteration, including the very first — if it's `False` to start with, the body never runs even once.
+- A `for` loop's iteration count is decided entirely by the sequence it walks — you never write a stop condition yourself.
+- `range()`'s `stop` value is always **exclusive** — `range(5)` never includes `5`.
+- `zip()` stops the moment the **shorter** of its sequences runs out — no error, no warning, the extra items in the longer sequence are simply ignored.
+- `break` and `continue` are only valid **inside** a loop body; using them outside a loop raises a `SyntaxError`.
+- In a nested loop, `break` and `continue` only affect the **innermost** loop they are written in — they never reach out to an outer loop.
+
+### 3.6 Best Practices
+
+- Use a `for` loop whenever you already know what you're iterating over (a fixed range, a string, a sequence). Use a `while` loop only when you're repeating until some condition changes and you can't know the count in advance.
+- Always double-check that a `while` loop has something in its body that moves its condition toward `False` — read that line back to yourself before running the code.
+- Prefer `range()` over manually managing a counter variable with a `while` loop when you just need to repeat something a fixed number of times.
+- Name loop variables for what they represent — `for student in ...` reads far better than `for x in ...`.
+- Keep nested loops to two levels wherever possible; if you need a third level, consider whether the logic can be simplified first.
+- Use `break` and `continue` sparingly and always pair them with a clear `if` condition — a loop with `break`/`continue` scattered everywhere becomes hard to trace.
+
+### 3.7 Common Mistakes
+
+- **Writing an infinite loop** — forgetting to update the variable a `while` condition depends on, so the condition is always `True` and the loop never ends.
+- **Off-by-one errors with `range()`** — expecting `range(5)` to include `5`, or expecting `range(1, 5)` to include five numbers instead of four.
+- **Assuming `break` exits every enclosing loop** — in a nested loop, `break` only exits the loop it is directly written inside; the outer loop keeps running unless it is told to stop separately.
+- **Using `continue` and expecting it to end the loop** — `continue` only skips to the next iteration; it does not stop the loop the way `break` does.
+- **Forgetting that `zip()` silently truncates** — pairing sequences of different lengths and being surprised that some items from the longer one never appear.
+- **Modifying the loop variable inside a `for` loop** — reassigning the loop variable inside the body has no effect on which item comes next; the `for` loop still advances on its own.
+
+### 3.8 Important Notes (Interview Insights)
+
+- A common fresher interview question: *"What is the difference between `break` and `continue`?"* Answer precisely: `break` exits the loop entirely; `continue` skips only the current iteration and moves to the next one. Confusing the two is one of the fastest ways to lose marks in a coding round.
+- Be ready to explain **why `range(5)` produces five numbers, `0` to `4`, not `1` to `5`** — this exclusive-stop behavior is one of the most frequently tested "gotcha" questions for beginners.
+- Interviewers often ask you to trace through a nested loop by hand and state exactly how many total iterations run — the answer is always (outer iterations) × (inner iterations). Practicing this trace on paper builds real confidence.
+- Know that `while True:` combined with a `break` is a legitimate, common pattern — not a bug — used whenever a loop should run until some event happens rather than for a fixed number of times (for example, retrying a login until it succeeds).
+
+### 3.9 Comparison Table: `for` Loop vs `while` Loop
+
+| Aspect | `for` Loop | `while` Loop |
+|---|---|---|
+| Driven by | A sequence (string, `range()`, etc.) | A condition (`True`/`False`) |
+| Iteration count | Known in advance — equals the length of the sequence | Not known in advance — depends on when the condition turns `False` |
+| Risk of infinite loop | None — it always ends when the sequence ends | Real risk if the condition never becomes `False` |
+| Typical use case | "Do this for every item / N times" | "Keep doing this until some event happens" |
+| Needs a manual counter? | No — the loop variable is managed automatically | Often yes, unless the condition depends on something external (like user input) |
+
+### 3.10 Diagram: Loop Control Flow
 
 ```mermaid
----
-title: Loop Control Flow — test, body, exit
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#a5d8ff"
-    primaryBorderColor: "#4a9eed"
-    lineColor: "#555"
-  flowchart:
-    htmlLabels: true
-    curve: basis
----
-flowchart TB
-    START(["<b>Enter loop</b>"]):::start
-    TEST{"<b>Condition True?</b><br><span style='font-size:11px;color:#6d28d9'>while / for test</span>"}:::auto
-    BODY["<b>Run body</b><br><span style='font-size:11px;color:#6d28d9'>if inside may jump</span>"]:::act
-    EXIT(["<b>After loop</b>"]):::done
-
-    START --> TEST
-    TEST -->|True| BODY
-    BODY -->|loop back| TEST
-    TEST -->|False| EXIT
-    BODY -.->|break| EXIT
-    BODY -.->|continue| TEST
-
-    NEST["<b>Nested loop</b><br><span style='font-size:11px;color:#6d28d9'>inner runs fully per outer pass</span>"]:::ghost
-    NEST -.-> BODY
-
-    classDef start fill:#a5d8ff,stroke:#4a9eed
-    classDef auto fill:#d0bfff,stroke:#8b5cf6
-    classDef act fill:#a5d8ff,stroke:#4a9eed
-    classDef done fill:#b2f2bb,stroke:#22c55e
-    classDef ghost fill:none,stroke:none,color:#6d28d9
+flowchart TD
+    A["Enter loop"] --> B{"Condition true?<br/>(while test / for has next item)"}
+    B -->|Yes| C["Run loop body"]
+    C --> D{"break?"}
+    D -->|Yes| F["Exit loop"]
+    D -->|No| E{"continue?"}
+    E -->|Yes| B
+    E -->|No| B
+    B -->|No more / False| F
 ```
 
-**Infinite loops and how to avoid them.** If the condition never becomes `False`, the loop never stops — an **infinite loop**, the classic `while` bug:
+Read this top to bottom: Python checks the condition (or whether the sequence has a next item), runs the body if it's `True`, then checks whether that body hit a `break` (leave immediately) or a `continue` (skip back to the condition check without finishing the rest of the body). Once the condition is `False` or the sequence runs out, the loop exits.
+
+### 3.11 Code Examples
+
+**Basic example** — a `while` loop counting up:
 
 ```python
-count = 5
+count = 1
 
-while count > 0:
+while count <= 5:
     print(count)
-    # forgot to change count — count stays 5 forever
+    count = count + 1
 ```
 
-Because `count` is never decreased, `count > 0` is always `True` and the program prints `5` endlessly until you force it to quit. The discipline is simple: **every `while` loop needs something in its body that moves the condition toward `False`.** Before running one, ask: "What changes each pass, and how does that eventually make the condition false?"
+*Line-by-line explanation:*
+- `count = 1` creates the variable that the loop's condition depends on.
+- `while count <= 5:` checks the condition before every iteration; as long as it's `True`, the body runs.
+- `print(count)` displays the current value.
+- `count = count + 1` is the crucial line — it moves `count` closer to making the condition `False`. Without it, this loop would never stop.
+- Output:
+  ```
+  1
+  2
+  3
+  4
+  5
+  ```
+  Once `count` becomes `6`, `6 <= 5` is `False`, and the loop ends.
 
-An infinite loop is not always a mistake — `while True:` is a common pattern *when paired with a `break`* that leaves the loop on some event, not on a timer. "Keep asking the user for input until they type something valid" is naturally a `while True:` with a `break` the moment the input passes a check, not a bug to fix. The rule is only that there must be *some* way out.
-
-### 3.2 The `for` Loop and the Loop Variable
-
-A `for` loop repeats its block **once for each item in a sequence**. On each pass the **loop variable** is set to the next item, and the block runs with that value. You do not manage a counter or a stop condition yourself — the `for` loop walks the sequence to its end for you. A string is a sequence of characters, so you can loop over one directly:
+**Beginner example** — a `for` loop with `range()`:
 
 ```python
-for letter in "cat":
-    print(letter)
+for i in range(1, 6):
+    print("Row", i)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `range(1, 6)` produces the integers `1, 2, 3, 4, 5` — starting at `1`, stopping before `6`.
+- `for i in range(1, 6):` binds `i` to each of those integers, one per iteration, five iterations in total.
+- `print("Row", i)` runs once per iteration with the current value of `i`.
+- Output:
+  ```
+  Row 1
+  Row 2
+  Row 3
+  Row 4
+  Row 5
+  ```
+  Notice there's no counter to manage by hand — `range()` and the `for` loop take care of that entirely.
 
-```
-c
-a
-t
-```
-
-The name `letter` is your choice — `for ch in "cat":` would work identically. Pick a name that describes one item. Use a `for` loop when you know the collection you're walking through; use a `while` loop when you're repeating until a condition changes and don't know the count in advance.
-
-### 3.3 `range()` — Generating Numeric Sequences
-
-Often you want to repeat something a fixed number of times, or count through numbers. `range()` produces a sequence of integers for a `for` loop to walk over. It has three forms:
-
-| Form | Meaning | Example | Produces |
-|---|---|---|---|
-| `range(stop)` | Start at 0, stop *before* this number | `range(5)` | `0, 1, 2, 3, 4` |
-| `range(start, stop)` | Start here, stop *before* the second number | `range(2, 6)` | `2, 3, 4, 5` |
-| `range(start, stop, step)` | Start here, stop before the second, count by `step` each time | `range(0, 10, 2)` | `0, 2, 4, 6, 8` |
-
-Two things trip people up. The `stop` value is **exclusive** — `range(5)` gives `0` through `4`, not `1` through `5`. And `step` can be negative to count *down*:
+**Practical example** — `enumerate()` and `zip()` together:
 
 ```python
-for i in range(5, 0, -1):
-    print(i)
+roll_numbers = (101, 102, 103)
+attendance = ("Present", "Absent", "Present")
+
+for index, roll in enumerate(roll_numbers, 1):
+    print("Position", index, "-> Roll number", roll)
+
+for roll, status in zip(roll_numbers, attendance):
+    print(roll, status)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `roll_numbers` and `attendance` are two short, fixed sequences of values written directly in parentheses — for now, just think of them as ready-made lists of values to loop over (you'll learn their proper name, tuples, in a later module).
+- `enumerate(roll_numbers, 1)` pairs each roll number with a position counter that starts at `1` instead of the default `0`.
+- The first loop prints each position alongside its roll number.
+- `zip(roll_numbers, attendance)` walks both sequences together, pairing `101` with `"Present"`, `102` with `"Absent"`, and `103` with `"Present"` — one pair per iteration.
+- The second loop prints each roll number next to its attendance status.
+- Output:
+  ```
+  Position 1 -> Roll number 101
+  Position 2 -> Roll number 102
+  Position 3 -> Roll number 103
+  101 Present
+  102 Absent
+  103 Present
+  ```
 
-```
-5
-4
-3
-2
-1
-```
-
-That's an alternative, counter-free way to write the countdown from §3.1. `range()` is the standard way to say "do this N times": `for i in range(3):` runs its block three times, whether or not you use `i` inside it.
-
-### 3.4 `enumerate()` and `zip()`
-
-When you loop over a sequence you often want to know *where* you are as well as *what* the value is. `enumerate()` gives you both — on each pass it hands back a counter (starting at `0`) and the item itself:
+**Industry-oriented example** — searching for an available train seat with nested loops and `break`:
 
 ```python
-for index, letter in enumerate("cat"):
-    print(index, letter)
-```
+seat_found = False
 
-Output:
-
-```
-0 c
-1 a
-2 t
-```
-
-Here `index, letter` unpacks the two values `enumerate` produces each pass into two loop variables at once. To start the count at `1` instead of `0`, pass a start value: `enumerate("cat", 1)` yields `1 c`, `2 a`, `3 t`.
-
-`zip()` solves a different problem: walking **two sequences together**, one item from each per pass:
-
-```python
-for letter, digit in zip("abc", "123"):
-    print(letter, digit)
-```
-
-Output:
-
-```
-a 1
-b 2
-c 3
-```
-
-One behavior worth knowing before it surprises you: `zip()` stops at the end of the **shorter** sequence — pairing `"abcd"` with `"12"` quietly gives you only two pairs, no error, no warning.
-
-### 3.5 `break`, `continue`, Nested Loops, and the Loop `else` Clause
-
-Two keywords change a loop's flow from within its own body:
-
-- **`break`** immediately **leaves the loop entirely** — no more iterations; execution jumps to the first statement after the loop.
-- **`continue`** **skips the rest of the current iteration** and goes straight to the next one.
-
-```python
-for letter in "python":
-    if letter == "h":
-        print("Found h — stopping.")
+for coach in range(1, 4):
+    for seat in range(1, 6):
+        if coach == 2 and seat == 3:
+            print(f"Seat {seat} in Coach {coach} is available. Booking now.")
+            seat_found = True
+            break
+    if seat_found:
         break
-    print(letter)
+
+if not seat_found:
+    print("No seats available on this route.")
 ```
 
-Output:
-
-```
-p
-y
-t
-Found h — stopping.
-```
-
-This prints `p`, `y`, `t`, then hits `h`, prints the message, and `break` ends the loop — the `o` and `n` are never reached. `continue` skips forward without leaving:
-
-```python
-for i in range(6):
-    if i % 2 == 0:
-        continue
-    print(i)
-```
-
-Output:
-
-```
-1
-3
-5
-```
-
-In short: `break` says "I am done with this loop"; `continue` says "I am done with *this one pass*, move on."
-
-**Nested loops.** A loop's body can contain another loop — a **nested loop**. For every single pass of the outer loop, the inner loop runs all the way through, which is how you produce a grid or table:
-
-```python
-for row in range(1, 4):
-    for col in range(1, 4):
-        print(row * col, end=" ")
-    print()
-```
-
-Output:
-
-```
-1 2 3
-2 4 6
-3 6 9
-```
-
-If the outer loop runs `n` times and the inner runs `m` times, the inner body runs `n × m` times in total. Keep nesting shallow — two levels are common, but each added level multiplies both the work and the difficulty of reading it.
-
-**The loop `else` clause.** Python allows an optional `else` attached to a loop. It runs **only if the loop finished normally** — that is, it never hit a `break`:
-
-```python
-for letter in "cat":
-    if letter == "z":
-        print("Found z.")
-        break
-else:
-    print("No z in the word.")
-```
-
-Output:
-
-```
-No z in the word.
-```
-
-Because `"cat"` contains no `"z"`, the `break` never fires, the loop runs to its end, and the `else` prints. Had the word contained a `"z"`, the `break` would have run and the `else` would have been skipped. It's a niche feature — recognize it when you see it, and reach for it only when it genuinely reads more clearly than a flag variable.
+*Line-by-line explanation:*
+- `seat_found = False` is a flag that tracks whether the search has succeeded yet.
+- The outer `for coach in range(1, 4):` walks through coaches `1`, `2`, `3`; for every single coach, the inner loop runs completely (or until it breaks) — this is a **nested loop**.
+- The inner `for seat in range(1, 6):` walks through seats `1` to `5` inside the current coach.
+- `if coach == 2 and seat == 3:` simulates finding a free seat — in a real system this condition would check a database instead.
+- `break` inside the inner loop stops scanning seats **only within the current coach** — it does not touch the outer loop.
+- `if seat_found: break` right after the inner loop is what actually stops the outer loop too — this is exactly why the common mistake in §3.7 matters: one `break` alone would not have been enough to leave both loops.
+- If no seat is ever found, `seat_found` stays `False`, and the final `if` prints a "no seats" message.
+- Output:
+  ```
+  Seat 3 in Coach 2 is available. Booking now.
+  ```
 
 ---
 
 ## 4. Real-World Application
 
-A form that keeps re-prompting until you enter a valid email address is `while True:` paired with a `break` — read input, check it, loop again if it fails, break the moment it passes. A search feature that stops the instant it finds a match, instead of scanning every remaining record, is `break` doing exactly that job. A running total or a page-view counter that climbs by one each time is a `for i in range(...)` loop accumulating a value on every pass. And a multiplication table, a seating chart, or any row-by-column report is a nested loop — the outer loop picks the row, the inner loop fills it in completely before the outer loop moves on.
+- **Banking & FinTech:** An ATM PIN entry screen uses a `while` loop with a maximum of three attempts — it keeps asking for a PIN until it's correct or the attempt count runs out, then `break`s the moment the correct PIN is entered.
+- **UPI / Payment Systems:** A payment status checker uses `while True:` paired with `break` — it keeps polling "is this transaction complete?" and stops the instant the payment succeeds or fails.
+- **E-commerce:** Calculating the total bill for a cart walks through every item with a `for` loop, adding each item's price to a running total — exactly the "repeat for every item" pattern `for` loops exist for.
+- **Food Delivery:** Assigning delivery partners to orders often uses nested loops — the outer loop walks through orders, the inner loop walks through available partners, and a `break` fires the moment a suitable match is found.
+- **Healthcare:** A hospital's patient monitoring dashboard uses a loop to keep checking a patient's vitals reading, skipping (`continue`) a check if a sensor briefly reports no data, without ending the entire monitoring loop.
+- **Railway Booking (IRCTC-style systems):** Searching for an available seat across coaches, exactly as shown in the industry example above, is a textbook use of nested loops and `break`.
+- **Education / Student Life:** A teacher's attendance system loops through roll numbers with `enumerate()` to print position and status together, using `continue` to skip absent students and `break` to stop early if class is dismissed.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a `while` countdown from user input, trace exactly why it terminates, then deliberately break it with the classic infinite-loop mistake before fixing it.
+### Problem Statement
 
-**1. Read a number and count down to zero.**
+A class teacher is taking attendance in roll-number order for six students. The attendance for each roll number, in order, is already known: `("Present", "Present", "Absent", "Present", "Left", "Present")`. Write a program that goes through the students starting from roll number `1`, prints `"Roll <n>: Present"` for every present student, silently skips absent students, and stops attendance completely the moment it reaches a student marked `"Left"` (simulating the teacher being called away before finishing).
 
-```python
-count = int(input("Count down from: "))
+### Step 1: Understand the Problem
 
-while count > 0:
-    print(count)
-    count = count - 1
-print("Done.")
-```
+You need to walk through a fixed sequence of attendance values while also tracking each student's roll number, which starts at `1`, not `0`. Present students should be printed. Absent students should be skipped without printing anything for them. The moment a `"Left"` status is seen, attendance must stop entirely — any roll numbers after it should never be checked.
 
-Say the user types `3`. Tracing it: `input()` reads text, `int(...)` converts it to the number `3`. Python tests `3 > 0` → `True` → prints `3`, then `count` becomes `2`. It loops back: `2 > 0` → `True` → prints `2`, `count` becomes `1`. Then `1 > 0` → `True` → prints `1`, `count` becomes `0`. Now `0 > 0` is `False`, so the loop ends and `Done.` prints.
+### Step 2: Plan the Solution
 
-Output:
+Use `enumerate()` on the attendance sequence with `start=1` so the roll number lines up naturally with each status. Inside the loop, check `"Left"` first and `break` if it's found. Then check `"Absent"` and `continue` to skip it. Otherwise, the student is present, so print the roll number.
 
-```
-3
-2
-1
-Done.
-```
-
-**2. Introduce the classic mistake — drop the decrement.**
+### Step 3: Write the Python Code
 
 ```python
-count = 3
+attendance = ("Present", "Present", "Absent", "Present", "Left", "Present")
 
-while count > 0:
-    print(count)
-    # count = count - 1   <-- missing on purpose
+for roll, status in enumerate(attendance, 1):
+    if status == "Left":
+        print(f"Roll {roll}: Attendance stopped - teacher called away.")
+        break
+    if status == "Absent":
+        continue
+    print(f"Roll {roll}: Present")
 ```
 
-`count` never changes, so `count > 0` is always `True`. This would print `3` forever and never reach a `Done.` line — an infinite loop, exactly as described in §3.1. Don't actually run this version; reason through why it never stops instead.
+### Step 4: Explain Each Line
 
-**3. Fix it by restoring the line that makes progress.**
+- `attendance = (...)` stores the six known statuses in order, exactly as given in the problem.
+- `for roll, status in enumerate(attendance, 1):` walks through `attendance` one status at a time, pairing each with a roll number starting at `1` rather than `0`.
+- `if status == "Left": ... break` checks for the stop condition first; the moment it's `True`, a message prints and `break` ends the loop immediately — no further roll numbers are checked.
+- `if status == "Absent": continue` catches the absent case next; `continue` skips straight back to the top of the loop without running the final `print()` for that student.
+- `print(f"Roll {roll}: Present")` only runs for students who are neither `"Left"` nor `"Absent"` — that is, present students — because both earlier checks would have already skipped or stopped the loop otherwise.
 
-```python
-count = 3
+### Step 5: Sample Input
 
-while count > 0:
-    print(count)
-    count = count - 1
-print("Done.")
-```
+None. The attendance sequence is fixed directly in the code for this example; no user input is involved.
 
-Output:
-
-```
-3
-2
-1
-Done.
-```
-
-**4. Write the same countdown with `range()` instead — no counter to manage.**
-
-```python
-for i in range(3, 0, -1):
-    print(i)
-print("Done.")
-```
-
-Output:
+### Step 6: Expected Output
 
 ```
-3
-2
-1
-Done.
+Roll 1: Present
+Roll 2: Present
+Roll 4: Present
+Roll 5: Attendance stopped - teacher called away.
 ```
 
-Same result, but there's no variable to remember to decrement — `range()` owns the counting, which is exactly why a `for` loop is the safer choice whenever you already know how many times you need to repeat.
+### Step 7: Why the Output Is Produced
 
-*Common mistake: writing a `while` loop's stopping condition correctly, then forgetting that the condition is only re-checked, not re-evaluated intelligently — it doesn't "know" you meant to stop. If nothing inside the loop changes the value the condition depends on, Python will keep asking the exact same question forever.*
+Roll `1` and roll `2` are `"Present"`, so both print normally. Roll `3` is `"Absent"`, so `continue` skips it silently — no line prints for roll `3`. Roll `4` is `"Present"` again, so it prints. Roll `5` is `"Left"`, which triggers the `break` — its stop message prints, and the loop ends immediately, which is exactly why roll `6` (which is actually `"Present"` in the data) is never reached or printed. The output shows precisely four lines, in order, matching this trace.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- A **`while`** loop repeats as long as its condition is `True`; every one must contain something that eventually makes the condition `False` (or a deliberate `break`), or it runs forever.
-- A **`for`** loop runs once per item in a sequence, binding each item to the loop variable in turn — there's no condition to get wrong, because it ends when the sequence runs out.
-- **`range()`** produces integers using `start`, `stop`, and `step`, where `stop` is exclusive and `step` may be negative to count down.
-- **`enumerate()`** pairs each item with an index; **`zip()`** walks two sequences together, stopping at the shorter one.
-- **`break`** leaves a loop immediately; **`continue`** skips to the next iteration; a loop **`else`** runs only when the loop finishes without hitting a `break`.
-- **Nested loops** run the inner loop fully for each pass of the outer loop — keep the nesting shallow.
+- A **`while`** loop repeats as long as its condition is `True`; it must contain something that eventually makes the condition `False`, or it becomes an **infinite loop**.
+- A **`for`** loop repeats once per item in a sequence, with no condition to manage — it ends automatically when the sequence is exhausted.
+- **`range(start, stop, step)`** generates integers with an **exclusive** stop value — `range(5)` never includes `5`.
+- **`enumerate()`** pairs each item with an index (default starting at `0`); **`zip()`** walks two sequences together and stops at the shorter one.
+- **`break`** exits a loop immediately; **`continue`** skips only the current iteration and moves to the next one.
+- In a **nested loop**, `break` and `continue` affect only the innermost loop they are written inside — an outer loop needs its own separate exit logic.
+- Use a `for` loop when you know what you're iterating over; use a `while` loop when you're repeating until a condition changes.
+- The two most common loop bugs are the **infinite loop** (forgetting to update a `while` condition) and the **off-by-one error** (misreading `range()`'s exclusive stop).
 
-Next up: functions — how to package a block of logic under a name, so you can reuse it by calling it instead of retyping or re-copying it.
+Coming next: Unit 2.3 — Functions, where you'll learn to package a block of logic — including loops — under a name, so you can reuse it by calling it instead of retyping it.
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 2.2 · Version 1.0*
+## 7. Reference Links
+
+- [The Python Tutorial — More Control Flow Tools (for, range, break, continue)](https://docs.python.org/3/tutorial/controlflow.html)
+- [Python 3 Language Reference — The `while` Statement](https://docs.python.org/3/reference/compound_stmts.html#the-while-statement)
+- [Python 3 Documentation — Built-in Functions: `enumerate()` and `zip()`](https://docs.python.org/3/library/functions.html#enumerate)
+- [Real Python — Python "for" Loops](https://realpython.com/python-for-loop/)
+- [Real Python — Python "while" Loops](https://realpython.com/python-while-loop/)
+- [W3Schools — Python For Loops](https://www.w3schools.com/python/python_for_loops.asp)
+- [W3Schools — Python While Loops](https://www.w3schools.com/python/python_while_loops.asp)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 2.2 · Version 2.0*

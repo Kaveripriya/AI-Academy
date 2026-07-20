@@ -6,148 +6,265 @@
 
 By the end of this unit, you will be able to:
 
-✓ Set up a personal portfolio repository that stays with you for the rest of the programme.  
-✓ Structure that repo's folders so a stranger can predict where anything lives without opening every file.  
-✓ Write a README that actually holds a reader's attention — title, quick start, and a look at what it produces.  
-✓ Explain what the end-of-Part-A diagnostic checks, and why it exists at all.  
-✓ Submit a diagnostic task that shows your Python and Git skills working together, and describe what faculty sign-off unlocks.
+- **Explain** what a portfolio repository is and why it is different from the disposable practice repos you created in Unit 6.1.
+- **Describe** what the end-of-Part-A diagnostic checks and why it exists as a gate before Part B.
+- **Create** a permanent, public GitHub repository to hold your work for the rest of the programme.
+- **Implement** a clear folder structure and a README that a stranger can understand in under a minute.
+- **Differentiate** between a messy, disorganized repository and a well-organized one, using specific, checkable criteria.
+- **Apply** the commit discipline from Unit 6.1 to build a commit history that itself acts as evidence of consistent work.
 
 ---
 
 ## 2. Overview
 
-Every unit up to this point taught you one skill at a time. This unit doesn't teach a new one — it asks you to prove the ones you already have, in a form someone outside this course can actually see.
+Every unit before this one taught you a new Python or Git skill. This unit is different — it does not add a new skill. It asks you to organize and present the skills you already have, in a place someone outside this course can actually see them.
 
-That form is a **portfolio repository**: one GitHub repository, created once, that you keep adding to for the rest of the programme. Think of it like a civil engineer's as-built drawings — a single, always-current record that shows exactly what's been built so far, updated after every phase of work rather than redrawn from scratch each time.
+In the Indian IT job market, this matters more than most freshers expect. Recruiters and interviewers at product companies, service companies, and startups alike routinely ask for a GitHub profile link alongside a resume, and many open it before the interview even starts. A resume tells an interviewer what you claim to know; a **portfolio repository** shows them, in your own commits, whether that claim holds up. Two candidates with identical resumes can leave very different impressions purely because one has an empty or disorganized GitHub profile and the other has a clean, well-documented one.
 
-Attached to it is the **Part A diagnostic** — a small task that combines a Python skill with a Git skill, submitted through your portfolio repo. Passing it isn't a formality. It's the checkpoint that confirms you're ready for **Part B — AI Fundamentals**, where every module assumes you can already read/write Python comfortably and commit your work without being walked through it.
+This unit also closes Part A of the programme with the **Part A diagnostic** — a small, deliberately simple task that combines one Python skill and one Git skill, submitted through your portfolio repository. It is not designed to be hard. Its only job is to confirm, before you move into Part B, that your Python and Git foundations are solid enough to build on without re-teaching the basics.
+
+By the end of this unit, you will have a live, public portfolio repository and a clear picture of what the diagnostic checkpoint expects from you.
 
 ---
 
 ## 3. Description
 
-### 3.1 The Portfolio Repository — and What Actually Makes a README Good
+### 3.1 Definition
 
-Unlike the small, disposable assignment repos from Unit 6.1, this repository is permanent. You create it once, today, and every later Part of the course adds to it — new scripts, new mini-projects, eventually a capstone.
+A **portfolio repository** is a single, permanent GitHub repository that you create once and keep adding to for as long as you are learning and building software. Unlike a one-off assignment repo, it is not deleted or abandoned after a unit ends — it grows with you, unit after unit, module after module, eventually holding a running record of everything you have built.
 
-Here's the part worth taking seriously: **almost nobody who looks at your portfolio — a recruiter, an instructor, a future teammate — reads your code first.** They open the README. If it's confusing, generic, or empty, most of them stop right there. The README isn't decoration; it's the only thing standing between "I built this" and someone actually believing it.
+A **diagnostic** (also called a **checkpoint assessment**) is a small, focused task used to confirm that a learner has reached a required level of skill before being allowed to move to the next stage. It is not meant to teach anything new or to be difficult — every skill it requires has already been practised earlier. Its only purpose is to verify readiness. The **Part A diagnostic** in this unit is exactly that: one short task combining a Python skill (reading and summarizing data from a file) and a Git skill (committing and pushing that result), reviewed and signed off by your instructor before you begin Part B.
 
-A README that does its job has four things, in this order:
+### 3.2 Why This Concept Exists
 
-- **Title and one-line description** — state plainly whose portfolio this is and what it collects. A reader should know what they're looking at from the first sentence, not by inferring it from folder names.
-- **Quick start** — for each project worth highlighting, the exact command to run it, the one input it expects, and what it produces. This is what turns a passive reader into someone who actually tries the project.
-- **Demo or example output** — show what the project actually produces (a sample summary line, a screenshot) so a reader can evaluate it without setting anything up themselves. For a portfolio, the README is often the *entire* interaction a visitor has with your work.
-- **A short index of what's inside** — a portfolio holds several projects, not one. A brief list (name, one-line description, folder link) lets a reader choose what to look at instead of guessing.
+Two separate problems make this unit necessary, and both come down to the same idea: skill that nobody can see is skill nobody can act on.
 
-Compare these two openings to the exact same README:
+- **Employers cannot interview everyone in depth.** A recruiter screening dozens of fresher applications does not have time to test every candidate's coding ability from scratch. A public, well-organized portfolio does that verification for them — it is evidence they can check in minutes, before ever speaking to you.
+- **A programme cannot safely assume readiness without checking it.** Part B of this programme — AI Fundamentals — builds directly on Python and Git skills, assuming you can already read and write Python comfortably and commit your work without being walked through the steps. Without a checkpoint, some learners would move forward with gaps that only surface later, when they are much harder to fix. The diagnostic exists to catch that early, while it is still cheap to address.
 
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Portfolio repository** | A single, permanent GitHub repository you create once and keep updating for the rest of the programme, showcasing your work. |
+| **README** | The `README.md` file shown automatically on a repository's main page — usually the first (and sometimes only) thing a visitor reads. |
+| **Project structure** | The way folders and files inside a repository are organized, so their purpose is clear without opening every file. |
+| **Diagnostic / checkpoint assessment** | A small, focused task used to confirm a learner has reached a required skill level before advancing further. |
+| **Commit history** | The full sequence of commits in a repository, visible to anyone — it acts as a timestamped record of what you did and when. |
+| **Sign-off** | An instructor's confirmation, given after reviewing your diagnostic submission, that you are ready to proceed to the next stage. |
+| **Public repository** | A repository anyone with the link can view — required for recruiters and instructors to review your work. |
+
+### 3.4 Syntax/Structure
+
+A good portfolio repository does not need to be complex — it needs to be predictable. A reader should be able to guess where something lives from the folder name alone.
+
+| Path | Purpose |
+|---|---|
+| `README.md` | Top-level overview: who you are, what the repository contains, and where to look for specific work. |
+| `python-foundations/` | One folder per module or unit's practice work, e.g. `p1-introduction/`, `p3-control-flow/`. |
+| `<project-name>/` | One folder per stand-alone project, named for what it does — e.g. `csv_summary_tool/`, not `week5` or `misc`. |
+| `<project-name>/README.md` | A short, project-level README explaining what that specific project does and how to run it. |
+| `diagnostics/` | A folder to hold diagnostic or checkpoint submissions as the programme progresses. |
+
+Keep the layout flat rather than deeply nested. A handful of clearly named top-level folders is easier for a visitor to scan than several layers of subfolders they must click through just to find something.
+
+### 3.5 Rules
+
+The Part A diagnostic itself is intentionally narrow in what it demands — but what it demands, it demands exactly:
+
+- The submission must be **working code**, committed to your portfolio repository, that runs without errors on the sample input provided.
+- It must demonstrate **one Python skill** from Part A (such as reading a file and computing a summary) and **one Git skill** from Unit 6.1 (such as committing and pushing that result) — together, not in isolation.
+- The commit must be **pushed to a public repository** your instructor can open and review directly on GitHub — a local-only commit or a private repo cannot be reviewed.
+- **Sign-off** happens only after your instructor reviews the actual commit — not a description of it, not a screenshot, the real code in the real repository.
+
+### 3.6 Best Practices
+
+- Write a clear, specific top-level **README** — who you are, what this repository collects, and a short index of what is inside. Avoid vague, generic openings that could describe anyone's repository.
+- Organize projects **logically**, one folder per project, named for its contents rather than a date or a vague label like `misc` or `week4`.
+- Keep your **commit history** meaningful, exactly as you practised in Unit 6.1 — commit messages that say what changed and why, not `update` or `final final v2`.
+- Update the portfolio **regularly** as you complete new work, rather than doing one large dump at the end — a steady commit history is itself evidence of consistent effort.
+- Keep the repository **public** from the very start. A private repository cannot be reviewed by an instructor or shown to a recruiter later.
+
+### 3.7 Common Mistakes
+
+- **An empty or near-empty repository** — created once and never updated, which tells a reader nothing about your actual ability.
+- **No README, or a one-line placeholder README** — leaves a visitor guessing what the repository even contains, so most simply move on.
+- **Dumping unrelated files with no explanation** — screenshots, half-finished scripts, and random notes mixed together with no folder structure or context.
+- **Vague folder and file names** — `test1.py`, `final.py`, `stuff/` — that force a reader to open every file just to understand what is there.
+- **Keeping the repository private "until it's finished"** — a portfolio is never really finished; it is meant to be watched growing, not hidden until perfect.
+
+### 3.8 Important Notes (Interview Insights)
+
+- Recruiters and interviewers at Indian IT companies — from large service firms to product startups — routinely check a candidate's GitHub profile before or during screening, especially for freshers with limited work history. A clean, well-documented portfolio is one of the few concrete differentiators a fresher can control.
+- Be ready to explain, in an interview, *what* is in your portfolio and *why* — an interviewer may click into a project and ask you to walk through it live. A repository you cannot explain is worse than no repository at all.
+- Commit history is often checked as evidence of genuine, sustained effort rather than a single last-minute upload — a portfolio built up gradually, over many small commits, reads as more credible than one created in a single sitting the night before an interview.
+
+### 3.9 Comparison Table: Messy vs Well-Organized Portfolio Repository
+
+| Aspect | Messy Repository | Well-Organized Repository |
+|---|---|---|
+| README | Missing, or one vague line | Clear title, description, and index of contents |
+| Folder names | `misc/`, `week3/`, `stuff/` | `csv_summary_tool/`, `student_records/` |
+| Commit history | Few commits, vague messages like `update` | Frequent commits with clear, specific messages |
+| File organization | Unrelated files mixed together | One folder per project, related files kept together |
+| Visibility | Private, or forgotten after creation | Public and actively maintained |
+| Reader's experience | Has to open every file to understand anything | Can predict where something lives from folder/README alone |
+
+### 3.10 Diagram: Portfolio Repository Structure
+
+```mermaid
+flowchart TD
+    R["your-name-ai-native-portfolio/"] --> RM["README.md<br/>who you are + index of contents"]
+    R --> P1["python-foundations/<br/>unit practice work"]
+    R --> P2["csv_summary_tool/<br/>project + its own README.md"]
+    R --> P3["student_records/<br/>project + its own README.md"]
+    R --> D["diagnostics/<br/>checkpoint submissions"]
 ```
-# My Portfolio
-This is my portfolio for the AI course. I am learning Python.
+
+### 3.11 Diagram: Part A to Part B Flow
+
+```mermaid
+flowchart LR
+    A["Part A: Python Foundations<br/>Units 1.1 - 6.1"] --> B["Build portfolio repository<br/>Unit 6.2"]
+    B --> C["Submit Part A diagnostic<br/>Python + Git skill together"]
+    C --> D{"Instructor<br/>reviews commit"}
+    D -->|Sign-off given| E["Part B:<br/>AI Fundamentals"]
+    D -->|Gaps found| A
 ```
 
-```
-# Priya's AI-Native Engineering Portfolio
-Python projects and exercises from Parts 1–5 of the programme.
+### 3.12 Examples
 
-## Quick Start
-Run the CSV summary tool: `python summary.py transactions.csv`
-Prints row count, skipped/malformed rows, and basic stats.
+**Sample README.md snippet** for a portfolio repository's top level:
 
-## Example Output
-Rows processed: 240, malformed rows skipped: 3
-Average transaction: 842.50
+```markdown
+# Priya Nair's AI-Native Engineering Portfolio
+
+Python projects and exercises from the Python Foundations programme (Parts 1-6).
 
 ## What's Inside
 - `csv_summary_tool/` — reads and summarizes transaction CSVs
 - `student_records/` — class-based student record manager
+- `diagnostics/` — checkpoint submissions reviewed by faculty
+
+## Quick Start
+Run the CSV summary tool:
+`python csv_summary_tool/summary.py transactions.csv`
+Prints row count, skipped/malformed rows, and basic statistics.
 ```
 
-The first version is technically a README — it has words in the right file. It tells a reader nothing they couldn't guess from the repository's name. The second version, with the exact same amount of effort, tells a reader what to run, what they'll get back, and where to find more — before they've opened a single line of actual code. That's the difference between a portfolio that gets a second look and one that doesn't.
+*Explanation:* The title and first line immediately tell a reader whose repository this is and what it contains — no guessing required. The "What's Inside" section acts as an index, so a visitor can jump straight to the project that interests them instead of opening every folder. The "Quick Start" section gives an exact command to run, which turns a passive reader into someone who can actually try the work themselves.
 
----
+**Sample folder structure**, shown as a directory listing:
 
-### 3.2 Repo and Folder Structure
+```
+priya-ai-native-portfolio/
+├── README.md
+├── python-foundations/
+│   ├── unit-1-2-practice.py
+│   └── unit-3-1-practice.py
+├── csv_summary_tool/
+│   ├── README.md
+│   └── summary.py
+├── student_records/
+│   ├── README.md
+│   └── student_records.py
+└── diagnostics/
+    └── part-a-diagnostic.py
+```
 
-A README earns a reader's trust in the first few seconds; the folder structure has to hold that trust once they start clicking around. Give the repo one folder per project, named for what's actually inside it — `csv_summary_tool`, not `week3` or `misc`. A reader should be able to predict where something lives from the folder name alone, the same way a clear commit message (from the last unit) tells them what changed without opening the diff.
-
-Keep the layout flat. A handful of clearly named top-level folders beats several nested subfolders a visitor has to click through just to get oriented — and keep each project's files together rather than interleaved with unrelated work.
-
----
-
-### 3.3 The End-of-Part-A Diagnostic
-
-- **What it actually checks.** It's a small, self-contained task requiring one Python skill from Part A (reading and summarizing a file) *and* one Git skill (committing and pushing that result) — proof both foundations hold up together, not just individually in isolation.
-- **How you submit it.** Commit the working script to your portfolio repository and push it, the same loop you practised in Unit 6.1.
-- **What happens after.** Your instructor reviews the commit directly on GitHub. Sign-off on this specific, small task is what confirms your Part A foundation is solid enough for Part B — AI Fundamentals — to build on without re-teaching Python basics.
-
-*Note: the diagnostic is small on purpose. It isn't testing anything new — every skill it needs has already been practised earlier in Part A. Its only job is confirming readiness.*
+*Explanation:* Each project sits in its own clearly named folder, so a reader can predict its contents without opening it. Larger projects (`csv_summary_tool/`, `student_records/`) carry their own short README, giving detail specific to that project without cluttering the top-level one. The `diagnostics/` folder keeps checkpoint submissions separate from regular practice work, so an instructor reviewing sign-off knows exactly where to look.
 
 ---
 
 ## 4. Real-World Application
 
-A recruiter scanning a GitHub profile before an interview, or an internship platform like Internshala or LinkedIn asking for a GitHub link alongside a resume, is exactly the audience §3.1's specific-over-generic principle is written for — the README is almost always the first thing opened, and it's the difference between a profile that gets a follow-up question and one that doesn't. A portfolio repo isn't a nice-to-have anymore; it's table-stakes evidence next to a resume.
-
-The same logic applies closer to home: when faculty check a project submission directly on GitHub instead of a zip file, commit history shows who actually did the work — §3.3's diagnostic is built on exactly that principle. A messy, unsorted repo creates the same problem at a bigger scale — a reader with no naming convention to rely on gives up faster than one who can predict the layout from a handful of well-named folders, which is exactly §3.2's point. And it doesn't stop after today — every later Part of this programme assumes you can commit and push without being walked through it, and this portfolio repo is where that ongoing work will actually live.
+- **Recruitment screening:** At Indian IT services firms, product companies, and startups alike, recruiters and technical interviewers commonly ask for a GitHub link on a fresher's resume, and many open it before the interview begins. A portfolio with clear READMEs and organized projects can generate follow-up questions and genuine interest; an empty or disorganized one rarely does.
+- **Banking, e-commerce, and startup hiring:** Banking and e-commerce companies hiring for engineering roles increasingly look for evidence of hands-on coding ability, not just marks or certificates — a well-kept portfolio, alongside personal or open-source contributions, is viewed as a real signal of initiative and consistency. Startups, with leaner hiring processes, often weigh this even more heavily, since they may not have the bandwidth for lengthy technical interviews.
+- **Faculty and internal review:** Just as your instructor will review your Part A diagnostic directly on GitHub rather than through a zip file or screenshot, many technical teams review a new hire's or intern's early work the same way — through commits, not descriptions of commits.
+- **A living record across the whole programme:** This portfolio repository does not end with Part A. Every later part of the AI Native Engineering programme — AI Fundamentals in Part B, and everything after it — will keep adding to this same repository, so it becomes a continuously growing record of your entire journey, not a one-time exercise.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Turn a weak, generic README into one that actually says something specific about you, then complete and submit the diagnostic.
+### Problem Statement
 
-**1. Create the repository.** On GitHub, click **New repository**. Name it something like `yourname-ai-native-portfolio`. Set visibility to **Public** — a private repo can't be reviewed by an instructor or shown to a recruiter later. Click **Create repository**.
+Set up your personal portfolio repository and organize your Python Foundations work so it is ready for review before the Part A diagnostic.
 
-**2. Write a first draft, honestly.** Most first attempts look like this — and that's a normal starting point, not a failure:
+### Step 1: Understand the Problem
+
+You need one permanent, public GitHub repository containing an overview README and your strongest work from Units 1.1 through 6.1, organized so an instructor (or later, a recruiter) can understand it without opening every file. You then need to add one small diagnostic script that proves your Python and Git skills work together, and get it reviewed.
+
+### Step 2: Plan the Solution
+
+Create the repository once, write a specific and honest README, move your best practice work into clearly named project folders one at a time (committing as you go), then add and push the diagnostic script in its own folder, and finally notify your instructor for sign-off.
+
+### Step 3: Walk Through the Concrete Steps
+
+1. On GitHub, click **New repository**. Name it something like `yourname-ai-native-portfolio`.
+2. Set visibility to **Public**, exactly as you practised in Unit 6.1 — a private repository cannot be reviewed by an instructor or shown to a recruiter later.
+3. Click **Create repository**, then create a `README.md` file directly on GitHub (or clone the repo locally and add it there, using the clone/commit/push workflow from Unit 6.1).
+4. Write a first draft of the README with a title, a one-line description, and a short "What's Inside" list.
+5. Create one folder per project you want to showcase, named for its contents — `csv_summary_tool/`, not `week5` — and move your strongest Part A work into each, committing after each move rather than in one giant commit.
+6. Create a `diagnostics/` folder and add a short script, `part-a-diagnostic.py`, that reads a CSV of sample data and prints a summary (for example, row count and basic statistics), skipping or flagging malformed rows instead of crashing.
+7. Commit this with a clear message (e.g. `Add Part A diagnostic - reads marks.csv and prints summary stats`) and push it to GitHub.
+8. Share the repository link with your instructor as instructed, so they can review the commit directly and sign off.
+
+### Step 4: Explain Each Step
+
+- Steps 1-3 create the permanent repository and its first, visible entry point — the README — using the exact GitHub workflow from Unit 6.1.
+- Step 4 applies the README structure from §3.12: a clear title, a one-line description, and an index of contents, so a visitor understands the repository within seconds.
+- Step 5 applies the folder-structure guidance from §3.4 and §3.6 — one project per folder, named for its contents, moved and committed incrementally so the commit history itself shows steady progress.
+- Steps 6-7 produce the actual diagnostic submission described in §3.5 — a small script combining a Python skill (reading and summarizing data) with a Git skill (commit and push).
+- Step 8 completes the process described in §3.1 and §3.3 — the diagnostic is only considered passed once an instructor reviews the real commit on GitHub and gives sign-off.
+
+### Step 5: Sample Input
+
+A CSV file of sample marks, `marks.csv`, with columns such as `student_name` and `mark`, including at least one deliberately malformed row (for example, a missing or non-numeric mark) to confirm the diagnostic script handles bad data gracefully instead of crashing.
+
+### Step 6: Expected Output
+
+- A public GitHub repository named similarly to `yourname-ai-native-portfolio`, containing a clear top-level README, one folder per showcased project, and a `diagnostics/` folder.
+- Console output from running `part-a-diagnostic.py` against `marks.csv`, for example:
 
 ```
-# My Portfolio
-This is my portfolio for the AI course. I am learning Python.
+Rows processed: 42
+Malformed rows skipped: 1
+Average mark: 74.2
+Highest mark: 98
+Lowest mark: 31
 ```
 
-**3. Rewrite it to be specific**, using the four-part structure from §3.1:
+- A pushed commit visible on GitHub, and confirmation from your instructor that sign-off has been given.
 
-```
-# Priya's AI-Native Engineering Portfolio
-Python projects and exercises from Parts 1–5 of the programme.
+### Step 7: Why This Result Matters
 
-## Quick Start
-Run the marks summary tool: `python summary.py marks.csv`
-Prints the average, highest, and lowest mark, skipping malformed rows.
-
-## Example Output
-Rows processed: 42, malformed rows skipped: 1
-Average: 74.2, Highest: 98, Lowest: 31
-
-## What's Inside
-- `marks_summary/` — reads and summarizes a CSV of student marks
-```
-
-Commit this with the message `Add portfolio README`.
-
-**4. Create one folder per project**, named for its contents rather than a generic label — `marks_summary/`, not `week8` or `misc` — per §3.2. Move your strongest Parts 1–5 work into folders like this one at a time, committing as you go rather than dumping everything in one pass.
-
-**5. Add the diagnostic script.** Inside a project folder, create `diagnostic.py` — a short script that reads a CSV of sample marks and prints a summary (average, highest, lowest), skipping or flagging any malformed row instead of crashing on it. This is deliberately a Part-A-level task: it exists to prove your Python and Git skills work together, not to be difficult.
-
-**6. Commit and push it.** Use a message that says what the script does, not just that it exists: `Add Part A diagnostic — reads marks.csv and prints summary stats`.
-
-**7. Notify your instructor.** Share the repository link as instructed, so they can review the commit and sign off.
-
-*Common mistake: setting the repository to Private "until it's more finished." Nobody's portfolio is ever finished — it's meant to be watched growing. Keep it Public from day one, unless your instructor tells you otherwise.*
+This result is the tangible proof that everything taught across Part A — variables, control flow, data structures, functions, classes, file handling, and now Git and GitHub — has come together into something a stranger can actually see and verify. It is also the literal gate into Part B: instructor sign-off on this diagnostic is what confirms your foundation is solid enough for AI Fundamentals to build on directly, without re-teaching Python or Git basics.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- **Your portfolio repository** is created once and grows for the entire programme — unlike the disposable per-assignment repos from Unit 6.1.
-- **The README is read before the code, almost always** — title and description, a quick-start command, sample output, and an index of what's inside get a README taken seriously; a generic one gets skipped.
-- **Folder structure carries the same weight** — one clearly named folder per project lets a stranger predict where anything lives without opening every file.
-- **The Part A diagnostic** combines a Python skill and a Git skill in one small, deliberately easy task — its only purpose is confirming both foundations are solid.
-- **Faculty sign-off** on that diagnostic is the actual gate into Part B — AI Fundamentals.
+- A **portfolio repository** is created once and grows for the entire programme, unlike the disposable per-assignment repos from Unit 6.1.
+- A **README** is usually the first — and sometimes only — thing a reader opens; a specific, well-structured one is far more effective than a generic placeholder.
+- **Folder structure** should let a reader predict where something lives from the folder name alone, without opening every file.
+- The **Part A diagnostic** combines one Python skill and one Git skill in a small, deliberately easy task — it exists only to confirm readiness, not to teach anything new.
+- Sign-off requires your instructor to review the **actual commit on GitHub**, not a description, screenshot, or zip file.
+- **Commit history** itself is evidence — frequent, clearly messaged commits show consistent effort; recruiters and interviewers do notice this.
+- Keep the repository **public** from day one; a private repository cannot be reviewed by anyone outside your own account.
+- A clean, well-documented GitHub portfolio is a genuine differentiator for freshers in the Indian IT job market, where recruiters and interviewers routinely check GitHub profiles before or during screening.
 
-This closes Part A. Everything from here — variables and types, control flow, data structures, classes, files, and now version control — is the foundation Part B assumes is already comfortable, not something it re-teaches. Keep this portfolio repository open: the next thing you commit to it will be your first piece of actual AI work.
+Coming next: Congratulations on completing Python Foundations (Part A) — next comes the Part A diagnostic, followed by Part B of the AI Native Engineering programme.
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 6.2 · Version 1.0*
+## 7. Reference Links
+
+- [GitHub Docs — About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
+- [GitHub Docs — Managing Your Profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)
+- [Real Python — Build a Python Portfolio Project](https://realpython.com/intermediate-python-project-ideas/)
+- [GitHub Docs — About GitHub Classroom](https://docs.github.com/en/education/manage-coursework-with-github-classroom/get-started-with-github-classroom/about-github-classroom)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 6.2 · Version 2.0*

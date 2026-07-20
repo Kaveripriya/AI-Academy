@@ -6,296 +6,349 @@
 
 By the end of this unit, you will be able to:
 
-✓ Create a tuple by packing values or with `tuple()`, and access its elements by index or slice.  
-✓ Explain immutability — what it forbids, and why a tuple exposes only two methods.  
-✓ Unpack a tuple into variables, including the `a, b = b, a` swap and star-unpacking.  
-✓ Use nested tuples, the `count()`/`index()` methods, and lexicographic comparison.  
-✓ Decide when a tuple is the right choice over a list, and how to "change" one.
+- **Create** a tuple by packing values with commas, using parentheses `()`, or building one from any iterable with `tuple()`.
+- **Explain** immutability — what it forbids, why a tuple exposes only two methods, and why that matters for shared data.
+- **Apply** unpacking to spread a tuple's values into variables, including the `a, b = b, a` swap and star-unpacking.
+- **Differentiate** between a list and a tuple, and decide correctly which one a given piece of data calls for.
+- **Implement** nested tuples and basic tuple operations — concatenation, repetition, membership, `count()`, and `index()`.
+- **Debug** the two most common tuple mistakes — a missing trailing comma on a single-element tuple, and attempting to mutate a tuple in place.
 
 ---
 
 ## 2. Overview
 
-You just spent the last unit on lists — ordered, indexable, and freely editable. A **tuple** is the same idea with one deliberate restriction: once built, it **cannot be changed**. Where a list says "here is a collection I might edit," a tuple says "here is a fixed group of values that belong together and will not move."
+In Unit 3.1, you worked with lists — ordered collections you can freely grow, shrink, and edit. A **tuple** is Python's other ordered collection, and it looks almost identical on the surface: you can index into it, slice it, loop over it, and check membership with `in`. The one deliberate difference is that a tuple, once created, **cannot be changed**. Where a list says "here is a collection I might edit," a tuple says "here is a fixed group of values that belong together and will stay exactly as they are."
 
-A pair of coordinates, an RGB color, or a database row are groups where changing one value in place would usually be a bug, not a feature — a tuple lets you say "these values travel as a unit and stay put." Deciding "list or tuple?" is one of the first choices you make once you're picking a data structure for a real task.
+This distinction matters far more in real software than it first appears. A GPS coordinate, an RGB colour, a bank account number paired with its IFSC code, a database row fetched from a query — these are all groups of values where accidentally changing one field in place would be a bug, not a feature. Indian IT teams working on banking systems, UPI payment gateways, e-commerce platforms, and railway booking engines rely on tuples constantly, often without even naming them explicitly — every time a function returns more than one value, it is quietly returning a tuple.
 
-This unit covers creating and reading tuples (including the `tuple()` constructor), immutability and what it actually buys you, unpacking, nesting, and the operations, methods, and comparison rules tuples support.
+This unit covers how to create and access tuples, how tuple assignment and unpacking work (including the classic variable-swap trick), how tuples can be nested inside one another, what immutability actually means in practice, and the small set of basic operations every tuple supports. By the end, "should this be a list or a tuple?" will be a question you can answer instantly.
 
 ---
 
 ## 3. Description
 
-### 3.1 What a Tuple Is
+### 3.1 Definition
 
-A tuple is an ordered sequence of values, written with parentheses and comma-separated values — though the parentheses are actually optional; the comma is what makes it a tuple:
-
-```python
-point = 3, 5        # packing — no parentheses needed
-rgb = (255, 128, 0)
-person = ("Ada", 36, True)   # mixed types are fine, exactly like a list
-```
-
-A single-element tuple needs a trailing comma: `(42,)` is a tuple; `(42)` is just the number `42` sitting in redundant parentheses — a common, quiet bug. You can also build a tuple from any existing iterable with `tuple()`:
-
-```python
-tuple([1, 2, 3])     # (1, 2, 3)   — freeze a list
-tuple("abc")         # ('a', 'b', 'c')
-```
-
-`tuple()` takes **one** argument — an iterable. `tuple(1, 2, 3)` raises a `TypeError`; when the values are loose, use the comma form `(1, 2, 3)` instead.
-
-### 3.2 Indexing, Slicing, and Immutability
-
-Because a tuple is a sequence, everything you know about reading a list applies unchanged — indexing starts at `0`, negative indices count from the end, and slicing (including a step, like `nums[::-1]` to reverse) returns a brand-new tuple:
-
-```python
-person = ("Ada", 36, True)
-print(person[0], person[-1])
-```
-
-Output:
-
-```
-Ada True
-```
-
-The one thing you cannot do is *write*:
-
-```python
-person[1] = 40
-```
-
-Output:
-
-```
-TypeError: 'tuple' object does not support item assignment
-```
-
-A tuple has none of the mutating methods a list has — `append`, `insert`, `remove`, `pop`, `sort` — calling one raises an `AttributeError`, because the method simply doesn't exist on a tuple. In fact, a tuple exposes exactly **two** methods, both read-only (`count()` and `index()`, covered in §3.5) — versus the roughly dozen a list carries. That short menu *is* the immutability guarantee, expressed as an API.
-
-One subtlety worth naming once: immutability applies to the tuple's *structure* — which objects it holds and in what order — not necessarily to those objects' own contents. A tuple holding a list can still have that inner list edited; the tuple simply can't swap it out for a different object. For the everyday case of numbers, strings, and other tuples, treat a tuple as fully fixed. To get a "changed" tuple, you build a new one instead of editing the old:
+A **tuple** is an ordered, immutable sequence of values, written as comma-separated values, usually inside parentheses:
 
 ```python
 point = (3, 5)
-point = point + (7,)   # rebinds point to a NEW tuple; the original is untouched
+rgb = (255, 128, 0)
+person = ("Ada", 36, True)
 ```
 
-### 3.3 Unpacking and the Swap
+"Ordered" means every value has a fixed position (an **index**), exactly like a list. "Immutable" means that once the tuple is built, you cannot add, remove, or replace any of its elements — the collection is locked for its entire lifetime. A tuple can hold values of different types in the same tuple, just like a list can.
 
-**Unpacking** spreads a tuple's values across several variables in one line — the count on each side must match, or Python raises a `ValueError`:
+### 3.2 Why This Concept Exists
+
+A list is deliberately flexible — that flexibility is exactly why it exists. But flexibility has a cost: any piece of code that receives a list can accidentally (or deliberately) change it, and every other piece of code holding a reference to that same list will see the change too. For data that is genuinely meant to travel together and never change — a coordinate pair, a date `(day, month, year)`, a fixed configuration record — that flexibility is a liability, not a feature.
+
+The tuple exists to solve exactly this problem. By refusing to support any operation that changes its contents, a tuple gives you a guarantee: once you receive one, you can trust that it will look the same later, no matter who else is holding a reference to it. This guarantee is also *why* a function that needs to return multiple values almost always returns them as a tuple — the caller can trust the returned group will not be silently altered by anything in between.
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Tuple** | An ordered, immutable sequence of values, typically written with parentheses. |
+| **Immutability** | The property that an object's contents cannot be changed after creation. |
+| **Packing** | Writing several values together, separated by commas, to build a tuple. |
+| **Unpacking** | Spreading a tuple's values into separate variables in one assignment statement. |
+| **Nested tuple** | A tuple that contains another tuple as one of its elements. |
+| **`tuple()`** | The built-in function that builds a tuple from any iterable (a list, a string, etc.). |
+| **Sequence** | Any ordered collection whose elements can be accessed by index — lists, tuples, and strings are all sequences. |
+| **Index** | The position of an element in a sequence, starting at `0`. |
+| **Slice** | A sub-sequence extracted using `start:stop:step` notation, e.g. `nums[1:3]`. |
+| **Hashable** | An object whose value never changes and can therefore be used as a dictionary key or placed inside a set. |
+| **Lexicographic comparison** | Comparing two sequences element by element, left to right, the same way words are compared in a dictionary. |
+
+### 3.4 Syntax
+
+**Creating a tuple:**
+
+```python
+name = (value1, value2, value3)
+```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `(` and `)` | The parentheses that visually mark a tuple. | Optional in most cases — the comma is what actually creates the tuple, not the parentheses — but parentheses are recommended for readability and are required in some contexts (e.g. as a function argument, or an empty tuple `()`). |
+| `value1, value2, ...` | The comma-separated values being packed together. | Each comma separates one element from the next; this is the mechanism that actually builds the tuple. |
+| `,` (trailing, single element) | A comma after the one value, e.g. `(42,)`. | Without it, `(42)` is just the number `42` in redundant parentheses, not a tuple at all — this is a genuine language quirk you must memorise. |
+
+**Unpacking a tuple:**
+
+```python
+a, b, c = (10, 20, 30)
+```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `a, b, c` | Variable names on the left, one per value. | Python binds each name to the value in the same position on the right. |
+| `=` | The assignment operator. | Same operator you already know — it works on multiple names at once when the right side is a tuple (or any iterable) of matching length. |
+| `(10, 20, 30)` | The tuple being unpacked. | The number of names on the left must match the number of values on the right, or Python raises a `ValueError`. |
+
+### 3.5 Rules
+
+- A tuple is created by the **comma**, not the parentheses — `1, 2, 3` and `(1, 2, 3)` produce the identical tuple.
+- A single-element tuple **must** have a trailing comma: `(42,)` is a tuple of one item; `(42)` is simply the integer `42`.
+- Once created, a tuple's elements **cannot** be reassigned, added, or removed — `my_tuple[0] = 5` raises a `TypeError`.
+- `tuple()` accepts exactly **one** argument, which must be an iterable — `tuple([1, 2, 3])` works, but `tuple(1, 2, 3)` raises a `TypeError`.
+- Unpacking requires the number of variables on the left to **match** the number of elements on the right, unless you use a star-expression (`*rest`) to collect the extra values into a list.
+- Indexing and slicing on a tuple follow the same rules as a list — index `0` is the first element, negative indices count from the end, and a slice always returns a new tuple.
+
+### 3.6 Best Practices
+
+- Prefer a **tuple** over a list when the data is a fixed, related group of values that should never change — a coordinate, a colour, a date, a database row, or the multiple return values of a function.
+- Prefer a **list** when the collection's size or contents will change over the program's life — items being added, removed, or reordered.
+- Use tuples for function return values whenever a function needs to hand back more than one piece of information — this is the most common real-world use of tuples in Python code.
+- Add a trailing comma to every single-element tuple you write — make it a habit, not something you remember only after hitting a bug.
+- Use meaningful variable names when unpacking (`name, age, branch = student`) rather than generic ones (`a, b, c = student`), so the code reads clearly.
+
+### 3.7 Common Mistakes
+
+- **Forgetting the trailing comma** on a single-element tuple — writing `single = (5)` creates an `int`, not a tuple; `type(single)` will quietly show `<class 'int'>` instead of `<class 'tuple'>`, a bug that is easy to miss.
+- **Trying to mutate a tuple** — code like `my_tuple[0] = "new value"` or `my_tuple.append(x)` raises a `TypeError` (item assignment) or `AttributeError` (no such method), because a tuple simply does not support either operation.
+- **Mismatched unpacking count** — writing `a, b = (1, 2, 3)` raises `ValueError: too many values to unpack`, because there are three values but only two variables.
+- **Calling `tuple()` with loose arguments** — `tuple(1, 2, 3)` raises a `TypeError`, because `tuple()` takes exactly one iterable, not several separate values.
+- **Assuming immutability applies to everything inside** — a tuple that contains a list (e.g. `record = ("Ada", [90, 85])`) cannot swap out that inner list for a different object, but the inner list itself can still be edited in place — a subtlety worth remembering.
+
+### 3.8 Important Notes (Interview Insights)
+
+- A very common fresher interview question is: *"What is the difference between a list and a tuple?"* Be ready to answer crisply: lists are mutable and use `[]`, tuples are immutable and use `()`; tuples are generally used for fixed, related data, while lists are used for collections that change.
+- An equally common follow-up: *"Why are tuples hashable but lists are not?"* Answer: a value is **hashable** only if it never changes over its lifetime, because Python computes a hash value once and relies on it staying accurate — since a tuple's contents can never change, Python can safely compute a hash for it, allowing a tuple to be used as a dictionary key or stored inside a set. A list can change at any time, so its hash could go stale, which is why Python does not allow lists to be hashed.
+- Interviewers sometimes ask you to prove immutability live: show that `tuple_var[0] = x` raises a `TypeError`, and explain that this happens because a tuple has no `__setitem__` behaviour defined for it — a clean, confident way to demonstrate real understanding rather than a memorised answer.
+
+### 3.9 Comparison Table: List vs Tuple
+
+| Aspect | List | Tuple |
+|---|---|---|
+| Mutability | Mutable — can be changed after creation | Immutable — cannot be changed after creation |
+| Syntax | Square brackets `[1, 2, 3]` | Parentheses (or just commas) `(1, 2, 3)` |
+| Methods available | Many — `append()`, `insert()`, `remove()`, `pop()`, `sort()`, and more | Only two — `count()` and `index()` |
+| Hashable | No — cannot be used as a dictionary key or set element | Yes — can be used as a dictionary key or set element |
+| Typical use case | A collection that grows, shrinks, or reorders over time | A fixed group of related values, or a function's multiple return values |
+| Performance | Slightly slower to iterate; more memory overhead for the same data | Slightly faster to iterate; lower memory overhead, since Python can optimise fixed-size storage |
+
+### 3.10 Diagram: Tuple Unpacking Flow
+
+```mermaid
+flowchart LR
+    A["Tuple on the right side<br/>('Priya', 21, 'CSE')"] --> B["Python checks:<br/>count matches variables?"]
+    B -->|Yes| C["Each value bound to the<br/>variable in the same position"]
+    B -->|No| D["ValueError:<br/>too many/few values to unpack"]
+    C --> E["name = 'Priya'<br/>age = 21<br/>branch = 'CSE'"]
+```
+
+### 3.11 Code Examples
+
+**Basic example** — creating a tuple and accessing its elements:
+
+```python
+point = (3, 5)
+print(point[0])
+print(point[1])
+```
+
+*Line-by-line explanation:*
+- `point = (3, 5)` packs two values into a tuple named `point`.
+- `point[0]` accesses the element at index `0` — the first value, `3`.
+- `point[1]` accesses the element at index `1` — the second value, `5`.
+- Output:
+  ```
+  3
+  5
+  ```
+
+**Beginner example** — unpacking a tuple, including the classic swap:
 
 ```python
 name, age, branch = ("Priya", 21, "Computer Science")
-```
+print(name, age, branch)
 
-This is also how Python swaps two variables with no temporary one — it builds the tuple `(b, a)` completely *before* assigning anything back:
-
-```python
 a, b = 5, 10
 a, b = b, a
 print(a, b)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `name, age, branch = ("Priya", 21, "Computer Science")` unpacks the three-element tuple into three variables in one line — `name` gets `"Priya"`, `age` gets `21`, and `branch` gets `"Computer Science"`.
+- `print(name, age, branch)` displays all three values.
+- `a, b = 5, 10` packs and assigns in one step — no parentheses needed.
+- `a, b = b, a` builds the tuple `(b, a)` completely first, *then* unpacks it back into `a` and `b` — this is how Python swaps two variables without a temporary third variable.
+- Output:
+  ```
+  Priya 21 Computer Science
+  10 5
+  ```
 
-```
-10 5
-```
-
-When you only care about the ends, star-unpacking collects the rest into a list — at most one `*` is allowed:
-
-```python
-first, *rest = (1, 2, 3, 4)
-print(first, rest)
-```
-
-Output:
-
-```
-1 [2, 3, 4]
-```
-
-Unpacking also reads cleanly inside a `for` loop when each element is itself a tuple, and it's why a function that needs to hand back more than one value almost always returns a tuple for the caller to unpack:
-
-```python
-pairs = [("Ada", 36), ("Alan", 41)]
-for name, age in pairs:
-    print(f"{name} is {age}")
-```
-
-Output:
-
-```
-Ada is 36
-Alan is 41
-```
-
-### 3.4 Nested Tuples
-
-A tuple can hold other tuples — the natural way to represent one thing made of paired values, like a location's latitude and longitude, or a table of records:
+**Practical example** — nested tuples, immutability, and basic operations:
 
 ```python
 delivery_point = ("Central Library", (12.9716, 77.5946))
+print(delivery_point[0])
 print(delivery_point[1][0])
-```
 
-Output:
+coordinates = (12.9716, 77.5946)
+try:
+    coordinates[0] = 13.0
+except TypeError as error:
+    print("Error:", error)
 
-```
-12.9716
-```
-
-`delivery_point[1]` gets the inner tuple; the second `[0]` reaches inside it — chained indexing, identical in feel to nested lists.
-
-### 3.5 Operations, Methods, and Comparison
-
-```python
-print((1, 2) + (3, 4))     # concatenation — builds a new tuple
-print(("a",) * 3)          # repetition
-print(21 in (21, "gold"))  # membership
-```
-
-Output:
-
-```
-(1, 2, 3, 4)
-('a', 'a', 'a')
-True
-```
-
-The two read-only methods:
-
-```python
 marks = (7, 3, 7, 7, 1)
-print(marks.count(7))    # how many times 7 appears
-print(marks.index(7))    # position of the first 7 (raises ValueError if absent)
+print(marks.count(7))
+print(marks.index(7))
+print((1, 2) + (3, 4))
 ```
 
-Output:
+*Line-by-line explanation:*
+- `delivery_point = ("Central Library", (12.9716, 77.5946))` creates a tuple whose second element is itself a tuple — a **nested tuple**, here representing a location name paired with its GPS coordinates.
+- `delivery_point[0]` reaches the outer tuple's first element, the location name.
+- `delivery_point[1][0]` first reaches the inner tuple with `[1]`, then its first element with `[0]` — chained indexing into a nested structure.
+- The `try`/`except` block attempts `coordinates[0] = 13.0`, which raises a `TypeError` because tuples do not support item assignment; the `except` catches it and prints the error message instead of crashing the program.
+- `marks.count(7)` counts how many times `7` appears in the tuple.
+- `marks.index(7)` returns the position of the *first* occurrence of `7`.
+- `(1, 2) + (3, 4)` concatenates two tuples into a brand-new tuple — the originals are untouched.
+- Output:
+  ```
+  Central Library
+  12.9716
+  Error: 'tuple' object does not support item assignment
+  3
+  0
+  (1, 2, 3, 4)
+  ```
 
-```
-3
-0
-```
-
-Tuples also compare **lexicographically** — element by element, left to right, the same rule dictionaries use for words:
+**Industry-oriented example** — a food delivery order record built from tuples:
 
 ```python
-print((1, 2) < (1, 3))     # first elements tie, 2 < 3 decides
-print(sorted([("Ada", 95), ("Alan", 72), ("Ada", 20)]))
+order = ("ORD10293", "Rohit Verma", (12.9352, 77.6146), 458.50)
+
+order_id, customer_name, location, amount = order
+latitude, longitude = location
+
+print("Order ID:", order_id)
+print("Customer:", customer_name)
+print("Delivery location:", latitude, longitude)
+print("Amount to collect:", amount)
 ```
 
-Output:
-
-```
-True
-[('Ada', 20), ('Ada', 95), ('Alan', 72)]
-```
-
-This is why `sorted()` on a list of tuples gives multi-key ordering for free — the first field breaks ties, then the second, and so on.
-
-**Deciding between a list and a tuple comes down to one question: will the collection's membership change?** If items will be added, removed, or reordered over its life — a to-do list, a growing log, a queue — use a **list**. If the group is a fixed-size, fixed-meaning record whose parts stay put — a coordinate, a color, a date, a row — use a **tuple**.
+*Line-by-line explanation:*
+- `order = ("ORD10293", "Rohit Verma", (12.9352, 77.6146), 458.50)` models one food delivery order as a single tuple — an order ID, a customer name, a nested `(latitude, longitude)` tuple, and the amount to collect. All four values naturally belong together and should never be edited individually mid-delivery.
+- `order_id, customer_name, location, amount = order` unpacks the outer tuple into four variables in one line.
+- `latitude, longitude = location` further unpacks the nested coordinate tuple into two separate variables.
+- The `print()` calls display each piece of the order clearly. This is exactly the shape of data a real food delivery backend (like Swiggy or Zomato) passes between its order service and its delivery-partner app — a fixed record, safely unpacked wherever it is needed.
+- Output:
+  ```
+  Order ID: ORD10293
+  Customer: Rohit Verma
+  Delivery location: 12.9352 77.6146
+  Amount to collect: 458.5
+  ```
 
 ---
 
 ## 4. Real-World Application
 
-A function like `divmod(17, 5)` returning `(3, 2)` is packing-then-unpacking in Python's own built-ins — both values travel together and unpack in one line, the same pattern a `def` uses whenever it returns more than one value for the caller to unpack. A ride-hailing app's driver-location updates work the same way: every ping is a `(latitude, longitude)` pair, because neither number means anything alone. And sorting a list of `(name, score)` records by `sorted()` gets multi-key ordering — by name, then score — for free, purely because tuples compare lexicographically.
+- **Banking & FinTech:** An account holder's account number and IFSC code are often paired as a fixed tuple — values that must travel together and must never be edited independently by a stray line of code.
+- **UPI / Payment Systems:** A payment gateway function commonly returns `(transaction_id, status, timestamp)` as a tuple — the caller unpacks it and trusts none of these values will change once received.
+- **E-commerce:** A product's fixed attributes — `(product_id, category)` — are natural tuple candidates, while the cart itself (which grows and shrinks) stays a list.
+- **Healthcare:** A lab result might be represented as `(patient_id, test_name, result_value)` — a fixed record pulled from a database, never mutated after being read.
+- **Education:** A student's fixed academic identity — `(roll_number, name, branch)` — is tuple-shaped, while their list of marks across the semester (which can be appended to) remains a list.
+- **Railway Booking (IRCTC-style systems):** Each seat allotment is naturally a `(coach, seat_number)` tuple; a booking confirmation function typically returns `(pnr, status)` for the caller to unpack.
+- **AI/ML:** A model's evaluation step commonly returns `(accuracy, precision, recall)` as one tuple, and GPS-style location data used in ride-hailing or logistics models is almost always stored as `(latitude, longitude)` tuples.
+- **Cloud Apps:** Configuration values that must never change at runtime — a fixed `(region, zone)` pair, for instance — are natural tuples, communicating "this will not change" simply through the choice of data structure.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a small table of records as a list of tuples, process it, and see exactly why a tuple is the safer choice for each fixed record than a list would be.
+### Problem Statement
 
-**1. Build the records and total them by unpacking in the loop header.**
+You are asked to model a single railway ticket booking confirmation, similar to an IRCTC-style system. Each booking record must hold the PNR number, the passenger's name, their seat allotment as a `(coach, seat_number)` pair, and the fare — and once printed, the confirmation must never be silently altered by the rest of the program.
 
-```python
-records = [("Ada", 95), ("Alan", 88), ("Grace", 95), ("Alan", 72)]
+### Step 1: Understand the Problem
 
-total = 0
-for name, score in records:
-    total += score
-average = total / len(records)
-print(average)
-```
+A booking has four pieces of information, and all four naturally belong together as one fixed unit once the booking is confirmed: a PNR (text), a passenger name (text), a seat allotment (itself a pair of coach and seat number), and a fare (a decimal amount). Since a confirmed booking should not be editable in place, this is a clear case for a tuple rather than a list.
 
-Output:
+### Step 2: Plan the Solution
 
-```
-87.5
-```
+Build the booking as a tuple with a nested tuple for the seat allotment. Unpack the booking into readable variables, then unpack the nested seat tuple further. Print the details. Finally, demonstrate what happens if the code mistakenly tries to change the fare in place, and show the correct way to "update" a booking — by building a new tuple.
 
-**2. Use `count()` and `index()` on just the scores.**
+### Step 3: Write the Python Code
 
 ```python
-scores_only = tuple(score for name, score in records)
-print(scores_only.count(95))
-print(scores_only.index(95))
+booking = ("PNR4821093", "Ananya Sharma", ("B2", 34), 1250.00)
+
+pnr, passenger_name, seat, fare = booking
+coach, seat_number = seat
+
+print("PNR:", pnr)
+print("Passenger:", passenger_name)
+print("Seat:", coach, seat_number)
+print("Fare:", fare)
+
+try:
+    booking[3] = 1500.00
+except TypeError as error:
+    print("Cannot modify booking:", error)
+
+booking = (pnr, passenger_name, seat, 1500.00)
+print("Updated fare:", booking[3])
 ```
 
-Output:
+### Step 4: Explain Each Line
+
+- `booking = ("PNR4821093", "Ananya Sharma", ("B2", 34), 1250.00)` creates one tuple holding all four booking details, with the seat allotment stored as a nested tuple `("B2", 34)`.
+- `pnr, passenger_name, seat, fare = booking` unpacks the outer tuple into four variables in one line.
+- `coach, seat_number = seat` unpacks the nested seat tuple into two further variables.
+- The four `print()` calls display each piece of the confirmation clearly, with the nested values already separated out.
+- The `try` block attempts `booking[3] = 1500.00` — changing the fare in place — which raises a `TypeError`, because tuples do not support item assignment; the `except` block catches it and prints a clear message instead of crashing.
+- `booking = (pnr, passenger_name, seat, 1500.00)` shows the *correct* way to change a booking's fare: build an entirely new tuple with the updated value and rebind the name `booking` to it — the old tuple is discarded, not edited.
+- `print("Updated fare:", booking[3])` confirms the new tuple now holds the updated fare.
+
+### Step 5: Sample Input
+
+None. All values are defined directly in the code for this example.
+
+### Step 6: Expected Output
 
 ```
-2
-0
+PNR: PNR4821093
+Passenger: Ananya Sharma
+Seat: B2 34
+Fare: 1250.0
+Cannot modify booking: 'tuple' object does not support item assignment
+Updated fare: 1500.0
 ```
 
-**3. Sort the records lexicographically — by name, then score.**
+### Step 7: Why the Output Is Produced
 
-```python
-ranked = sorted(records)
-print(ranked)
-```
-
-Output:
-
-```
-[('Ada', 95), ('Alan', 72), ('Alan', 88), ('Grace', 95)]
-```
-
-**4. Try to "correct" Ada's score in place, the way you might with a list.**
-
-```python
-records[0][1] = 100
-```
-
-Output:
-
-```
-TypeError: 'tuple' object does not support item assignment
-```
-
-**5. Do it correctly — the *list* is mutable, so swap in a new tuple.**
-
-```python
-records[0] = ("Ada", 100)
-print(records[0])
-```
-
-Output:
-
-```
-('Ada', 100)
-```
-
-This is the whole immutability story in one line: we didn't edit a tuple, we replaced one tuple with a different one inside a mutable list — the list holds the changing collection, and each tuple is a fixed record inside it.
-
-*Common mistake: reaching for `records[0][1] = 100` out of habit from working with plain lists. If a field needs to change, either that record should have been a list to begin with, or you build a fresh tuple with the corrected value and slot it back in — never patch a tuple in place.*
+The first four lines come directly from unpacking the original tuple and its nested seat tuple — Python binds each variable to the value in the matching position, exactly once. The attempt to write `booking[3] = 1500.00` fails immediately because a tuple has no mechanism to change an existing element — Python raises a `TypeError` before any value can be altered, and the `except` block prints that error instead of letting the program crash. The final line succeeds because the code never tried to edit the old tuple at all — it built a completely new tuple with the updated fare and rebound the name `booking` to point to it, which is the only correct way to "change" a tuple's contents.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- A **tuple** is an ordered, immutable sequence — it reads like a list (index, slice, loop, `in`) but cannot be changed after creation, and it has only two methods: `count()` and `index()`.
-- The **comma** makes a tuple, not the parentheses; a single-element tuple needs a trailing comma, and `tuple(iterable)` builds one from any iterable.
-- **Unpacking** spreads a tuple across variables, enables the `a, b = b, a` swap and star-unpacking (`first, *rest = ...`), and is how functions hand back more than one result.
-- **Immutability isn't just a restriction** — a tuple's short method list is the guarantee, expressed as an API, that it can be shared without risk of changing unexpectedly.
-- Tuples compare **lexicographically**, which makes `sorted()` on a list of tuples do multi-key ordering for free.
+- A **tuple** is an ordered, immutable sequence — it supports indexing, slicing, looping, and `in`, exactly like a list, but its contents can never be changed after creation.
+- The **comma** is what creates a tuple, not the parentheses; a single-element tuple needs a trailing comma — `(42,)` is a tuple, `(42)` is just the integer `42`.
+- **Unpacking** spreads a tuple's values into variables in one line, enables the no-temporary-variable swap `a, b = b, a`, and is the standard way Python functions return more than one value.
+- A tuple can be **nested** inside another tuple, and its inner elements are reached with chained indexing, e.g. `outer[1][0]`.
+- A tuple exposes only two methods — `count()` and `index()` — and that short list is itself the immutability guarantee, expressed as an API.
+- A tuple is **hashable** because its contents can never change; a list is not hashable for the opposite reason — this is a very common interview question.
+- To "change" a tuple, you never edit it in place — you build a brand-new tuple with the corrected values and rebind the name to it.
+- **Decide list vs tuple** by asking: will this collection's membership or values change over its life? If yes, use a list; if the group is fixed and related, use a tuple.
 
-Up next: sets — a collection built around a guarantee neither the list nor the tuple gives you: every value in it is unique.
+Coming next: Unit 3.3 — Sets, a collection built around a guarantee neither the list nor the tuple gives you: every value in it is unique.
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 3.2 · Version 1.0*
+## 7. Reference Links
+
+- [The Python Tutorial — Data Structures (Tuples and Sequences)](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)
+- [Python 3 Documentation — Built-in Types (Sequence Types)](https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range)
+- [Real Python — Python Tuples](https://realpython.com/python-tuple/)
+- [W3Schools — Python Tuples](https://www.w3schools.com/python/python_tuples.asp)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 3.2 · Version 2.0*

@@ -6,27 +6,70 @@
 
 By the end of this unit, you will be able to:
 
-✓ Use Python's arithmetic operators — `+`, `-`, `*`, `/`, `//`, `%`, and `**` — and explain how true division differs from floor division, including how each behaves with negative numbers.  
-✓ Predict how Python evaluates an expression by applying operator precedence, and control that order deliberately with parentheses.  
-✓ Compare two values with `==`, `!=`, `<`, `>`, `<=`, and `>=`, recognize that a comparison produces a `bool`, and read a chained comparison such as `1 < x < 10`.  
-✓ Combine conditions with `and`, `or`, and `not`, explain the precedence among them, and explain what short-circuit evaluation does and why it's useful.  
-✓ Identify which values Python treats as truthy and which as falsy, and explain how truthiness feeds the logical operators.
+- **Apply** Python's arithmetic operators — `+`, `-`, `*`, `/`, `//`, `%`, and `**` — to build correct expressions, including how true division differs from floor division.
+- **Explain** operator precedence, the fixed order in which Python evaluates an expression with more than one operator, and use parentheses to control that order deliberately.
+- **Implement** comparison operators (`==`, `!=`, `<`, `>`, `<=`, `>=`) to test relationships between values and recognize that every comparison produces a `bool`.
+- **Differentiate** between the assignment operator `=` and the equality operator `==`, the single most common beginner mistake in this area.
+- **Analyze** compound conditions built with the logical operators `and`, `or`, and `not`, and explain short-circuit evaluation.
+- **Identify** which Python values are truthy and which are falsy, and describe how truthiness feeds directly into logical operators.
 
 ---
 
 ## 2. Overview
 
-In unit 1.2 you learned to name values and check their types with `type()`. But a program that only stores values doesn't *do* anything with them — the moment you want to add a price to a tax, check whether a score passed a threshold, or decide "is the cart empty *and* is the user logged in," you need an **operator**: a symbol (or short keyword) that combines values into a new value. Put values, variables, and operators together into something Python can evaluate down to a single value, and you've written an **expression**.
+In Unit 1.2 you learned to name a value and check its type with `type()`. But a program that only stores values doesn't actually *do* anything with them. The moment you want to add a delivery charge to a cart total, check whether a UPI amount is within a daily limit, or decide whether a customer qualifies for a discount, you need an **operator** — a symbol or short keyword that combines one or more values into a new value. Put values, variables, and operators together into something Python can evaluate down to a single result, and you have written an **expression**.
 
-This unit covers the five expression tools you'll use in almost every program from here on: arithmetic, precedence (which operator runs first when a line has more than one), comparison, logical operators, and truthiness. Every comparison and logical expression produces a `bool`, and those booleans are exactly what will drive the decisions your programs make once you reach conditionals in Part 2.
+This unit covers four operator families and one supporting idea that you will use in almost every Python program you ever write: **arithmetic operators** (for calculations), **operator precedence** (which operator runs first), **comparison operators** (for asking true/false questions about values), **logical operators** (for combining those questions), and **truthiness** (how Python judges *any* value as true-ish or false-ish). In the Indian IT industry, these five ideas sit underneath everything from a food delivery app calculating your bill, to a banking system validating a transaction, to an e-commerce site deciding whether you qualify for free shipping. Every comparison and logical expression you write here produces a `bool` — and those booleans are exactly what will drive the decisions your programs make once you reach conditional statements in the next part of this course.
 
 ---
 
 ## 3. Description
 
-### 3.1 Arithmetic Operators
+### 3.1 Definition
 
-Arithmetic operators do the math you'd expect, on `int` and `float` values:
+An **operator** is a symbol (or a short keyword, like `and`) that tells Python to perform a specific operation — add two numbers, compare two values, or combine two conditions. An **expression** is any combination of values, variables, and operators that Python can evaluate down to a single result. `3 + 4` is an expression; so is `age >= 18`; so is `is_member and not is_banned`. Every expression, no matter how simple or complex, always reduces to exactly one value.
+
+```python
+total = 200 + 50
+```
+
+Here, `200 + 50` is the expression, `+` is the operator, `200` and `50` are the **operands** (the values the operator works on), and the whole expression is evaluated to `250` *before* it is assigned to `total`.
+
+### 3.2 Why This Concept Exists
+
+Without operators, a program could only store fixed values — it could never calculate a total, check a condition, or combine multiple facts into one decision. Real software constantly needs to:
+
+- **Calculate** — add a delivery fee to a cart subtotal, apply a discount percentage, compute the remainder when splitting a bill.
+- **Compare** — check whether an account balance is enough for a withdrawal, whether an age meets a minimum, whether an entered PIN matches the stored one.
+- **Combine conditions** — decide whether a user may proceed only when *several* facts are true at once, such as "logged in **and** balance sufficient **and** account not blocked."
+
+Arithmetic, comparison, and logical operators, together with the rules that govern how they combine (precedence and truthiness), give you exactly this toolkit. This is why "operators and expressions" is universally the topic that follows "variables and types" in every programming course — you cannot build a decision-making program without them.
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Operator** | A symbol or keyword that performs an operation on one or more values, e.g. `+`, `==`, `and`. |
+| **Operand** | A value that an operator works on — in `3 + 4`, both `3` and `4` are operands. |
+| **Expression** | Any combination of values, variables, and operators that Python evaluates down to a single result. |
+| **Arithmetic operator** | An operator that performs a mathematical calculation, e.g. `+`, `-`, `*`, `/`. |
+| **True division (`/`)** | Division that always produces a `float` result, even when the numbers divide evenly. |
+| **Floor division (`//`)** | Division that rounds the result *down* toward negative infinity, discarding the fractional part. |
+| **Modulo (`%`)** | The remainder left over after floor division. |
+| **Exponentiation (`**`)** | Raising a number to a power, e.g. `7 ** 2` means 7 squared. |
+| **Operator precedence** | The fixed ranking that decides which operator Python evaluates first in an expression with more than one operator. |
+| **Associativity** | The rule for order when two operators share the same precedence level — Python evaluates most of them left to right. |
+| **Comparison operator** | An operator that compares two values and produces a `bool`, e.g. `==`, `<`, `>=`. |
+| **Chained comparison** | Writing two comparisons together, like `1 < x < 10`, which Python evaluates as one combined condition. |
+| **Logical operator** | An operator — `and`, `or`, or `not` — that combines or inverts `bool` values. |
+| **Short-circuit evaluation** | Python's behaviour of stopping early on `and`/`or` the instant the final result is already decided, without checking the remaining side. |
+| **Truthiness** | Python's rule for treating *any* value — not just `True`/`False` — as true-ish or false-ish in a logical context. |
+| **Falsy** | A value that behaves as `False` in a logical context, such as `0`, `0.0`, or `""`. |
+| **Truthy** | A value that behaves as `True` in a logical context — essentially everything that is not falsy. |
+
+### 3.4 Syntax
+
+**Arithmetic operators** — work on `int` and `float` operands:
 
 | Operator | Name | Example | Result |
 |---|---|---|---|
@@ -38,41 +81,77 @@ Arithmetic operators do the math you'd expect, on `int` and `float` values:
 | `%` | modulo (remainder) | `7 % 2` | `1` |
 | `**` | exponentiation | `7 ** 2` | `49` |
 
-The *type* of the result depends on the operands: if both are `int`, `+`/`-`/`*` give back an `int`; the moment even one operand is a `float`, the result "promotes" to a `float` to keep the fractional part. `7 + 3` is `10`, but `7 + 3.0` is `10.0`.
+**Comparison operators** — work on two operands, always produce a `bool`:
 
-Division is where Python most often surprises newcomers. `/` is **true division** — it *always* gives a `float`, even when the numbers divide evenly, so `6 / 2` is `3.0`, not `3`. `//` is **floor division** — it divides and rounds *down* to the nearest whole number, discarding the fraction. Read `//` as "how many whole times does the second number fit into the first?" — `20 // 6` is `3`. The precise rule is that `//` rounds *toward negative infinity*, never toward zero. For positive numbers that matches "chop off the decimal," but for negatives it doesn't: `-7 // 2` is `-4` (the true answer, `-3.5`, rounded *down*), not `-3`.
+| Operator | Name | Example | Result |
+|---|---|---|---|
+| `==` | equal to | `5 == 5` | `True` |
+| `!=` | not equal to | `5 != 3` | `True` |
+| `<` | less than | `3 < 5` | `True` |
+| `>` | greater than | `3 > 5` | `False` |
+| `<=` | less than or equal to | `5 <= 5` | `True` |
+| `>=` | greater than or equal to | `3 >= 5` | `False` |
 
-```python
-print(7 / 2)
-print(-7 // 2)
-```
+**Logical operators** — work on `bool` operands (or any value, via truthiness):
 
-Output:
+| Operator | Name | Example | Result |
+|---|---|---|---|
+| `and` | logical AND — true only if both sides are true | `True and False` | `False` |
+| `or` | logical OR — true if at least one side is true | `True or False` | `True` |
+| `not` | logical NOT — flips a single value | `not True` | `False` |
 
-```
-3.5
--4
-```
+### 3.5 Rules
 
-`%` gives the **remainder** left over after floor division — it fits together with `//` so that `(a // b) * b + (a % b)` reconstructs the original number. Two everyday uses: the **even/odd test** (`n % 2` is `0` for even, `1` for odd), and **wrap-around**, like a 12-hour clock where any hour taken `% 12` lands back in `0..11`. Because Python floors toward negative infinity, the remainder takes the sign of the *divisor*, so `-7 % 2` is `1`, not `-1`.
+- The *type* of an arithmetic result depends on the operands: if both are `int`, `+`/`-`/`*` give back an `int`; the moment even one operand is a `float`, the result "promotes" to `float`. So `7 + 3` is `10`, but `7 + 3.0` is `10.0`.
+- `/` (true division) **always** returns a `float`, even when the numbers divide evenly — `6 / 2` is `3.0`, not `3`.
+- `//` (floor division) rounds *toward negative infinity*, never toward zero. For positive numbers this matches "drop the decimal part," but for negatives it does not: `-7 // 2` is `-4` (the true answer, `-3.5`, rounded *down*), not `-3`.
+- `%` (modulo) gives the remainder, and it takes the **sign of the divisor** — so `-7 % 2` is `1`, not `-1`. `//` and `%` fit together: `(a // b) * b + (a % b)` always reconstructs `a`.
+- Dividing by zero with `/`, `//`, or `%` raises a `ZeroDivisionError` — Python never silently returns `0` or `infinity`.
+- Every comparison operator (`==`, `!=`, `<`, `>`, `<=`, `>=`) always produces a `bool` — never anything else.
+- Comparisons can be **chained**: `1 < x < 10` is evaluated as a single combined condition, exactly like "is `x` between 1 and 10?"
+- `and` and `or` are **short-circuit**: the right-hand side is skipped entirely once the left-hand side has already decided the result.
+- The **falsy** values in Python are a short, fixed list: `False`, `0`, `0.0`, and `""` (the empty string). Every other value — including negative numbers and the text `"False"` — is **truthy**.
+- Operator precedence is fixed and cannot be changed, but parentheses `()` always override it.
 
-Finally, `**` is exponentiation: `7 ** 2` is `49`. Don't confuse it with `*` — `2 ** 3` is `8` (2×2×2), while `2 * 3` is `6`.
+### 3.6 Best Practices
 
-### 3.2 Operator Precedence
+- Use parentheses to make your intended order of evaluation obvious, even when precedence would already give the right answer — clarity for the next reader matters more than saving a few characters.
+- Never assume `/` behaves like `//`, or the reverse — decide up front whether you need a fractional result or a whole-number count, and pick the operator that matches.
+- Compare values of compatible types; comparing a number to text (like `5 == "5"`) is legal Python but always gives `False`, since they are different types.
+- Write chained comparisons (`18 <= age < 65`) instead of `18 <= age and age < 65` — they mean the same thing, but the chained form reads closer to plain English.
+- Rely on truthiness for a direct check (`if cart_items:`) instead of writing it out longhand (`if cart_items != ""`) — Python code that uses truthiness idiomatically is considered more "Pythonic."
+- When a condition is long, break it across variables with descriptive names (as shown in the Worked Example) rather than writing one giant expression — it is far easier to debug.
 
-When an expression has more than one operator, Python doesn't read left to right — it follows **operator precedence**, a fixed ranking of which operator runs first. This is the same "order of operations" from arithmetic class (multiplication before addition), extended to every operator Python has.
+### 3.7 Common Mistakes
 
-```python
-print(2 + 3 * 4)
-```
+- **Confusing `=` with `==`** — a single `=` assigns a value; a double `==` asks a question and returns `True`/`False`. This is the single most common beginner bug in this entire unit.
+- **Expecting `/` to behave like floor division** — forgetting that `/` always returns a `float`, even for `10 / 2`.
+- **Misreading `-2 ** 2`** — because `**` binds *tighter* than unary minus, this reads as "negate `2 ** 2`," giving `-4`, not `4`. To square `-2` itself, write `(-2) ** 2`.
+- **Ignoring precedence in mixed expressions** — assuming Python evaluates strictly left to right and getting `2 + 3 * 4` wrong by computing `2 + 3` first instead of `3 * 4` first.
+- **Treating the string `"False"` as falsy** — it is a non-empty string, so Python treats it as truthy; only the actual boolean `False` and the specific falsy values are false-ish.
+- **Not realizing short-circuit evaluation can hide bugs** — code on the right-hand side of `and`/`or` that would normally crash (like a division by zero) may never run at all, silently masking a problem you meant to catch.
 
-Output:
+### 3.8 Important Notes (Interview Insights)
 
-```
-14
-```
+- A very common fresher interview question: *"What is the difference between `/` and `//` in Python?"* Answer confidently: `/` is true division and always returns a `float`; `//` is floor division and rounds down toward negative infinity, returning an `int` when both operands are `int`.
+- Interviewers often ask you to evaluate an expression on paper, such as `2 + 3 * 4` or `-2 ** 2`, purely to check whether you understand operator precedence rather than reading left to right.
+- Be ready to explain **short-circuit evaluation** in your own words — it is a favourite question because it tests whether you understand *why* `False and expensive_function()` never actually calls that function.
+- Interviewers frequently ask what values are "falsy" in Python — the confident answer is the fixed list: `False`, `0`, `0.0`, and `""`; everything else is truthy (and later in the course, empty collections like an empty list or dictionary join this falsy list too).
+- Knowing the difference between `=` (assignment) and `==` (comparison) sounds trivial, but interviewers use it to filter out candidates who have only memorized syntax without understanding what each operator actually does.
 
-Python doesn't compute `2 + 3` first. Multiplication outranks addition, so `3 * 4` runs first (`12`), then `2 + 12` gives `14`. Here's the ladder, highest (runs first) at the top:
+### 3.9 Comparison Table: `=` vs `==`
+
+| Aspect | `=` (Assignment) | `==` (Equality Comparison) |
+|---|---|---|
+| Purpose | Binds a name to a value (from Unit 1.2) | Asks whether two values are equal |
+| Result | No result value — it performs an action | Always produces a `bool`: `True` or `False` |
+| Example | `x = 5` — stores `5` in `x` | `x == 5` — asks "does `x` currently equal `5`?" |
+| Where it's used | Only in a statement, to create or update a variable | Inside any expression — conditions, print statements, calculations |
+| Beginner risk | Using it where a question was intended | Using it where a value was meant to be stored |
+
+### 3.10 Diagram: Operator Precedence Ladder
+
+When an expression has more than one operator, Python does not read left to right — it follows a fixed ranking called **operator precedence**. Here is the ladder, highest (evaluated first) at the top:
 
 | Precedence | Operators | Group |
 |---|---|---|
@@ -122,213 +201,228 @@ flowchart TB
     classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px
 ```
 
-A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `-2 ** 2` reads as "negate `2 ** 2`" and gives `-4`; to square the negative number itself you must write `(-2) ** 2`, which is `4`. Arithmetic runs before comparison, and comparison runs before logic, so `2 + 3 > 4 and 1 < 2` reads as `((2 + 3) > 4) and (1 < 2)`. And when two operators share a precedence level (like `*` and `/`), Python evaluates left to right — **left-associativity** — so `20 / 4 * 2` is `(20 / 4) * 2 = 10.0`, not `2.5`.
+A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `-2 ** 2` gives `-4`, not `4`. Arithmetic runs before comparison, and comparison runs before logic, so `2 + 3 > 4 and 1 < 2` reads as `((2 + 3) > 4) and (1 < 2)`. And when two operators share a precedence level (like `*` and `/`), Python evaluates left to right — **left-associativity** — so `20 / 4 * 2` is `(20 / 4) * 2 = 10.0`, not `2.5`. You don't have to memorize the ladder; any time the order isn't obvious, wrap the part you want done first in parentheses — they always win, cost nothing, and can never turn a correct expression into a wrong one.
 
-You don't have to memorize the ladder. Any time the order isn't obvious, wrap the part you want done first in parentheses — they always win, cost nothing, and can never turn a correct expression into a wrong one.
+### 3.11 Diagram: Short-Circuit Evaluation Flow
 
-### 3.3 Comparison Operators
+Logical operators stop evaluating the moment the final answer is already known. This diagram shows what Python actually does when it evaluates `A and B` and `A or B`:
 
-A comparison operator compares two values and produces a `bool` — a comparison is a question, and Python answers yes or no.
+```mermaid
+flowchart TD
+    A1["Evaluate left side of A and B"] --> A2{Is left side falsy?}
+    A2 -->|Yes| A3["Result is already False<br/>right side is SKIPPED"]
+    A2 -->|No| A4["Must check right side<br/>result = value of B"]
 
-| Operator | Meaning | Example | Result |
-|---|---|---|---|
-| `==` | equal to | `5 == 5` | `True` |
-| `!=` | not equal to | `5 != 3` | `True` |
-| `<` | less than | `3 < 5` | `True` |
-| `>` | greater than | `3 > 5` | `False` |
-| `<=` | less than or equal to | `5 <= 5` | `True` |
-| `>=` | greater than or equal to | `3 >= 5` | `False` |
+    O1["Evaluate left side of A or B"] --> O2{Is left side truthy?}
+    O2 -->|Yes| O3["Result is already True<br/>right side is SKIPPED"]
+    O2 -->|No| O4["Must check right side<br/>result = value of B"]
+```
 
-These work on more than numbers — two `str` values are equal only if they're the exact same text, character for character, and the comparison is case sensitive, just as identifiers were in unit 1.2:
+### 3.12 Code Examples
+
+**Basic example** — arithmetic operators, including the true-division vs floor-division surprise:
 
 ```python
-print("cat" == "cat")
-print("cat" == "Cat")
+print(7 / 2)
+print(7 // 2)
+print(7 % 2)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `print(7 / 2)` — true division always returns a `float`, so this prints `3.5`.
+- `print(7 // 2)` — floor division rounds down to the nearest whole number, printing `3`.
+- `print(7 % 2)` — modulo gives the remainder after floor division: `7 // 2` is `3`, `3 * 2` is `6`, and `7 - 6` is `1`, so this prints `1`.
+- Output:
+  ```
+  3.5
+  3
+  1
+  ```
 
-```
-True
-False
-```
-
-**The single most common beginner bug** is confusing `==` with `=`. A single `=` is the assignment operator from unit 1.2 — it stores a value. A double `==` is the equality comparison — it asks a question and yields `True` or `False`. `x = 5` puts `5` into `x`; `x == 5` asks "does `x` currently equal `5`?"
-
-Python also lets you **chain** comparisons the way mathematics does. Instead of `18 <= age and age < 65`, write `18 <= age < 65`, and Python reads it as "is `age` between 18 and 65?", evaluating each link and combining them for you:
+**Beginner example** — operator precedence and the role of parentheses:
 
 ```python
-x = 7
-print(1 < x < 10)
+result_1 = 2 + 3 * 4
+result_2 = (2 + 3) * 4
+print(result_1)
+print(result_2)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `result_1 = 2 + 3 * 4` — `*` outranks `+`, so `3 * 4` is computed first (`12`), then `2 + 12` gives `14`.
+- `result_2 = (2 + 3) * 4` — the parentheses force `2 + 3` to be computed first (`5`), then `5 * 4` gives `20`.
+- Both lines use the exact same numbers in the exact same order — only the parentheses differ, and that alone changes the result.
+- Output:
+  ```
+  14
+  20
+  ```
 
-```
-True
-```
-
-### 3.4 Logical Operators and Short-Circuit Evaluation
-
-Logical operators combine or invert `bool` values into compound conditions. There are exactly three, written as plain English words:
-
-- `A and B` is `True` only when **both** are true.
-- `A or B` is `True` when **at least one** is true.
-- `not A` flips the value.
-
-| `A` | `B` | `A and B` | `A or B` |
-|---|---|---|---|
-| `True` | `True` | `True` | `True` |
-| `True` | `False` | `False` | `True` |
-| `False` | `True` | `False` | `True` |
-| `False` | `False` | `False` | `False` |
-
-Among these three, precedence runs highest to lowest as `not`, then `and`, then `or`. So `True or False and False` reads as `True or (False and False)` = `True` — *not* `(True or False) and False`, which would be `False`. In practice you rarely type bare booleans; you combine comparisons, and because comparisons outrank the logical operators, `age >= 18 and has_ticket` reads naturally with no extra parentheses needed.
-
-The logical operators are also **short-circuit**: Python evaluates the left side first and stops early the instant the answer is already decided. For `and`, if the left side is falsy the whole thing can't be true, so the right side is never even checked. For `or`, if the left side is truthy the result is already true, so the right side is skipped. You can prove it by putting something that would crash on the right side:
+**Practical example** — comparison and logical operators combined to check loan eligibility:
 
 ```python
-print(False and (10 / 0))
-print(True or (10 / 0))
+age = 22
+monthly_income = 35000
+has_existing_loan = False
+
+age_eligible = age >= 21
+income_eligible = monthly_income >= 25000
+loan_eligible = age_eligible and income_eligible and not has_existing_loan
+
+print(age_eligible)
+print(income_eligible)
+print(loan_eligible)
 ```
 
-Output:
+*Line-by-line explanation:*
+- `age_eligible = age >= 21` — a comparison that produces `True`, since `22 >= 21`.
+- `income_eligible = monthly_income >= 25000` — another comparison, also `True`, since `35000 >= 25000`.
+- `loan_eligible = age_eligible and income_eligible and not has_existing_loan` — `not has_existing_loan` first flips `False` to `True`; then `and` requires all three booleans to be `True` for the whole expression to be `True`.
+- Output:
+  ```
+  True
+  True
+  True
+  ```
 
-```
-False
-True
-```
-
-Neither line crashes — in the first, `and` already knows the answer is `False` from the left side alone; in the second, `or` already knows it's `True`. If short-circuiting didn't happen, both would raise a division-by-zero error.
-
-### 3.5 Truthiness
-
-Python treats *any* value as "true-ish" or "false-ish" in a logical context, not just `True` and `False` themselves — this is called **truthiness**. The falsy values are a short, fixed list: `False`, the numbers `0` and `0.0`, and the empty string `""`. Almost everything else is **truthy** — any non-zero number (including negatives like `-3`) and any non-empty string, even `"False"` written as text, because it's a non-empty string, not the boolean.
+**Industry-oriented example** — a food delivery app checking free-delivery eligibility:
 
 ```python
-cart_items = ""
+order_total = 249.0
+delivery_distance_km = 4
+is_prime_member = True
+coupon_code = ""
 
-if cart_items:
-    print("Proceed to checkout")
-else:
-    print("Your cart is empty")
+qualifies_by_amount = order_total >= 199
+qualifies_by_distance = delivery_distance_km <= 5
+free_delivery = (qualifies_by_amount or is_prime_member) and qualifies_by_distance
+has_coupon = bool(coupon_code)
+
+print("Free delivery:", free_delivery)
+print("Coupon applied:", has_coupon)
 ```
 
-Output:
-
-```
-Your cart is empty
-```
-
-There's no `== ""` anywhere in that condition — the empty string is simply falsy on its own. These truthy/falsy verdicts are exactly what `and`, `or`, and `not` react to when you hand them a bare value instead of a comparison.
+*Line-by-line explanation:*
+- `order_total = 249.0` and `delivery_distance_km = 4` — the raw order data, a `float` and an `int`.
+- `is_prime_member = True` — a `bool` flag for a paid membership.
+- `coupon_code = ""` — an empty string, meaning no coupon was entered.
+- `qualifies_by_amount = order_total >= 199` — a comparison; `True`, since `249.0 >= 199`.
+- `qualifies_by_distance = delivery_distance_km <= 5` — another comparison; `True`, since `4 <= 5`.
+- `free_delivery = (qualifies_by_amount or is_prime_member) and qualifies_by_distance` — the parentheses force the `or` to be evaluated first ("did they cross the minimum amount, OR are they a prime member?"), and the result is then combined with the distance check using `and`; because `qualifies_by_amount` is already `True`, the `or` short-circuits and never even needs to check `is_prime_member`.
+- `has_coupon = bool(coupon_code)` — this relies on **truthiness**: an empty string is falsy, so wrapping it in `bool()` reports `False` directly, with no need to write `coupon_code != ""`.
+- Output:
+  ```
+  Free delivery: True
+  Coupon applied: False
+  ```
 
 ---
 
 ## 4. Real-World Application
 
-A ride-hailing app's fare estimate leans on §3.1 and §3.2: base fare, distance, and a surge multiplier get combined with `+` and `*`, and precedence — not the order you'd read it in — decides the multiplier is applied before the totals are added. A login or payment screen leans on §3.3 and §3.4 together: a comparison checks the entered PIN, and `and` combines it with a balance check, where short-circuit evaluation means the PIN may never even get checked if the balance test already fails.
+Operators and expressions are working quietly behind almost every screen you use in India every day:
 
-A checkout button that's greyed out on an empty cart is §3.5's truthiness at work — the app checks the cart directly, letting an empty list or string act as automatically falsy instead of writing out `if len(cart) != 0`.
+- **UPI / Payment Systems:** A payment app compares the entered amount against the account balance (`amount <= balance`) and combines that with a PIN check using `and` — short-circuit evaluation means the balance check can be skipped the instant the PIN comparison already fails.
+- **E-commerce:** A checkout page calculates the final price with arithmetic (`subtotal - discount + delivery_fee`), then uses a comparison to decide whether free shipping applies, exactly as shown in the industry example above.
+- **Food Delivery:** A food delivery app's "free delivery" banner is a live logical expression, recalculated every time the cart total or distance changes.
+- **Banking & FinTech:** A minimum-balance check (`balance >= 10000`) and a fraud-flag check (`not is_flagged`) are combined with `and` before a transaction is allowed to proceed.
+- **Railway Booking (IRCTC-style systems):** A booking screen checks `available_seats > 0` before allowing confirmation, and uses `%` internally to distribute passengers evenly across coaches.
+- **Healthcare:** A patient monitoring system compares a temperature reading against a threshold (`temperature > 100.4`) to decide whether to raise an alert.
+- **AI/ML:** A model's confidence score is compared against a threshold (`confidence >= 0.8`) using exactly the comparison operators from this unit, before the result is accepted or rejected.
 
 ---
 
 ## 5. Worked Example
 
-**Goal:** Build a realistic "may this user enter?" condition step by step, storing intermediate booleans in well-named variables, then see the exact mistake that makes this kind of expression misbehave.
+### Problem Statement
 
-**1. Set the values.**
+An online store wants to check whether a customer's order qualifies for a **festive discount**. The rule: the order qualifies if the order total (after adding a small packaging fee) is at least ₹1000, **and** the customer has entered a non-empty coupon code, **and** the order is not already marked as cancelled. You must calculate the final order total, evaluate each condition, and combine them into one final decision.
 
-```python
-score = 85
-is_member = True
-is_banned = False
-```
+### Step 1: Understand the Problem
 
-**2. Check the score threshold, and confirm the result is really a `bool`.**
+You need one arithmetic calculation (adding a packaging fee to the item total) and three separate checks: a comparison against a minimum amount, a truthiness check on the coupon code, and a negated check on the cancellation flag. All three checks must combine into a single `bool` using logical operators.
 
-```python
-passed = score >= 60
-print(passed)
-print(type(passed))
-```
+### Step 2: Plan the Solution
 
-Output:
+First calculate `final_total` using `+`. Then create three named boolean variables — one per condition — using a comparison, a truthiness check via `bool()`, and `not`. Finally combine all three with `and` into one `discount_eligible` variable, and print every intermediate result so the decision is fully traceable.
 
-```
-True
-<class 'bool'>
-```
-
-**3. Check a range with a chained comparison.**
+### Step 3: Write the Python Code
 
 ```python
-in_range = 60 <= score <= 100
-print(in_range)
+item_total = 950.0
+packaging_fee = 60.0
+coupon_code = "FEST2026"
+order_cancelled = False
+
+final_total = item_total + packaging_fee
+
+amount_ok = final_total >= 1000
+coupon_ok = bool(coupon_code)
+not_cancelled = not order_cancelled
+
+discount_eligible = amount_ok and coupon_ok and not_cancelled
+
+print("Final total:", final_total)
+print("Amount OK:", amount_ok)
+print("Coupon OK:", coupon_ok)
+print("Not cancelled:", not_cancelled)
+print("Discount eligible:", discount_eligible)
 ```
 
-Output:
+### Step 4: Explain Each Line
+
+- `item_total = 950.0` and `packaging_fee = 60.0` — two `float` values representing the raw order figures.
+- `coupon_code = "FEST2026"` — a non-empty `str`, so it will be truthy.
+- `order_cancelled = False` — a `bool` flag; the order is currently active.
+- `final_total = item_total + packaging_fee` — arithmetic addition; Python evaluates the right-hand side first (`950.0 + 60.0 = 1010.0`) and then binds it to `final_total`.
+- `amount_ok = final_total >= 1000` — a comparison producing a `bool`; `1010.0 >= 1000` is `True`.
+- `coupon_ok = bool(coupon_code)` — truthiness check; a non-empty string is truthy, so this is `True`.
+- `not_cancelled = not order_cancelled` — `not` flips `False` to `True`, meaning "the order is indeed not cancelled."
+- `discount_eligible = amount_ok and coupon_ok and not_cancelled` — `and` requires all three to be `True`; since every one of them is `True`, the whole expression is `True`.
+- The five `print()` calls display the final total and each step of reasoning so nothing is hidden inside one giant expression.
+
+### Step 5: Sample Input
+
+None. All values are assigned directly in the code; no user input is involved in this unit yet.
+
+### Step 6: Expected Output
 
 ```
-True
+Final total: 1010.0
+Amount OK: True
+Coupon OK: True
+Not cancelled: True
+Discount eligible: True
 ```
 
-**4. Combine three booleans into one final decision.**
+### Step 7: Why the Output Is Produced
 
-```python
-may_enter = passed and is_member and not is_banned
-print(may_enter)
-```
-
-Output:
-
-```
-True
-```
-
-Because `not` binds tighter than `and`, `not is_banned` is evaluated first (to `True`), and `True and True and True` is `True`.
-
-**5. Now trigger the #1 beginner bug on purpose — writing `=` inside a condition where you meant `==`.**
-
-```python
-age = 20
-
-if age = 20:
-    print("Exactly 20")
-```
-
-Output:
-
-```
-SyntaxError: invalid syntax
-```
-
-Python won't even let this one slip by silently — assignment isn't allowed inside a condition at all, so it refuses to run. The fix is the operator you actually meant:
-
-```python
-if age == 20:
-    print("Exactly 20")
-```
-
-Output:
-
-```
-Exactly 20
-```
-
-*Common mistake: reaching for a single `=` inside a condition because it "looks like" the comparison you mean. If your code seems to always take the same branch regardless of the data, or crashes with a syntax error inside an `if`, check for a missing second `=` first.*
+`final_total` is `1010.0` because Python evaluates the arithmetic expression on the right of `=` completely before storing it — `950.0 + 60.0` gives `1010.0`. `amount_ok` is `True` because the comparison `1010.0 >= 1000` holds. `coupon_ok` is `True` purely because of truthiness — `coupon_code` is a non-empty string, and Python treats any non-empty string as truthy without needing an explicit `!= ""` check. `not_cancelled` is `True` because `not` inverted the stored `False`. Finally, `discount_eligible` is `True` because `and` only produces `True` when every single operand is `True` — and here, all three are.
 
 ---
 
-## 6. Summary
+## 6. Key Takeaways
 
-- **Arithmetic operators** include `+ - * **`, plus two kinds of division — `/` (true division, always a `float`) and `//` (floor division, rounds toward negative infinity) — and `%` (remainder, whose sign follows the divisor); mixing an `int` with a `float` promotes the result to `float`.
-- **Operator precedence** fixes which operator runs first (`**` before unary minus, the `*`/`/`/`//`/`%` family before `+`/`-`, arithmetic before comparison, comparison before logical, and `not` before `and` before `or`); parentheses override it and make intent unmistakable.
-- **Comparison operators** (`==`, `!=`, `<`, `>`, `<=`, `>=`) each produce a `bool`, can be chained as in `1 < x < 10`, and must never be confused with `=` (assign) versus `==` (compare).
-- **Logical operators** `and`, `or`, and `not` combine or invert conditions using short-circuit evaluation, skipping the right side the moment the result is already decided.
-- **Truthiness** means every value acts as true or false in a logical context — `False`, `0`, `0.0`, and `""` are falsy; everything else is truthy — and that verdict is what `and`, `or`, and `not` actually react to.
+- An **operator** performs an operation on values (**operands**); an **expression** is any combination of values, variables, and operators that Python reduces to one result.
+- **Arithmetic operators** include `+ - * **`, plus two kinds of division — `/` (true division, always a `float`) and `//` (floor division, rounds toward negative infinity) — and `%` (remainder, whose sign follows the divisor).
+- **Operator precedence** fixes which operator runs first (`**` before unary minus, the `*`/`/`/`//`/`%` family before `+`/`-`, arithmetic before comparison, comparison before logical, and `not` before `and` before `or`); parentheses always override it.
+- **Comparison operators** (`==`, `!=`, `<`, `>`, `<=`, `>=`) each produce a `bool` and can be chained, as in `1 < x < 10`.
+- The single most common beginner bug is confusing `=` (assignment) with `==` (equality comparison) — keep the Section 3.9 comparison table in mind.
+- **Logical operators** `and`, `or`, and `not` combine or invert conditions using **short-circuit evaluation**, skipping the right side the moment the result is already decided.
+- **Truthiness** means every value acts as true or false in a logical context — `False`, `0`, `0.0`, and `""` are falsy; everything else is truthy.
+- Being ready to explain operator precedence, short-circuit evaluation, and truthiness in your own words is common ground for entry-level Python interview questions.
 
-Next up: statements, type conversion, and formatted output — how to take the values and conditions from this unit and shape them into readable results.
+Coming next: statements, type conversion, and formatted output — how to take the values and conditions from this unit and shape them into readable, well-presented results (Unit 1.4 — Statements, Conversion & Output).
 
 ---
 
-*© 2026 Revature · AI Native Engineering — Foundations · Unit 1.3 · Version 1.0*
+## 7. Reference Links
+
+- [Python 3 Documentation — Expressions](https://docs.python.org/3/reference/expressions.html)
+- [Python 3 Documentation — Built-in Types (Truth Value Testing)](https://docs.python.org/3/library/stdtypes.html#truth-value-testing)
+- [Real Python — Operators and Expressions in Python](https://realpython.com/python-operators-expressions/)
+- [W3Schools — Python Operators](https://www.w3schools.com/python/python_operators.asp)
+
+---
+
+*© 2026 Revature · AI Native Engineering — Foundations · Unit 1.3 · Version 2.0*
