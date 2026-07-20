@@ -92,6 +92,20 @@ else:
 | `elif` | Optional keyword, short for "else if." | Adds another condition to check, only reached if all prior conditions were `False`. You may write zero, one, or many `elif` branches. |
 | `else` | Optional, final keyword with no condition. | Catches every case not matched by any `if` or `elif` above it. |
 
+**Diagram: Decision Flow Through `if`/`elif`/`else`**
+
+```mermaid
+flowchart TD
+    A["Start: evaluate condition_1"] -->|True| B["Run if-block"]
+    A -->|False| C["Evaluate condition_2 (elif)"]
+    C -->|True| D["Run elif-block"]
+    C -->|False| E["Evaluate next elif, if any"]
+    E -->|No more elif / all False| F["Run else-block"]
+    B --> G["Continue after conditional"]
+    D --> G
+    F --> G
+```
+
 **Conditional (ternary) expression syntax:**
 
 ```
@@ -131,30 +145,7 @@ value_if_true if condition else value_if_false
 - **Over-nesting** — stacking three or four levels of nested `if` statements when a single compound condition with `and`/`or` would say the same thing far more clearly.
 - **Overusing the ternary expression** — chaining several ternary expressions together to cover more than two outcomes produces a line that is technically valid but very hard to read; a full `if`/`elif`/`else` chain is the better choice there.
 
-### 3.8 Comparison Table: `if`/`elif`/`else` vs Ternary Expression vs `match`-`case`
-
-| Aspect | `if`/`elif`/`else` | Ternary Expression | `match`-`case` (Unit 1.4) |
-|---|---|---|---|
-| Produces a value? | No — it is a statement that directs control flow | Yes — it evaluates to a value | No — it is a statement, like `if` |
-| Best suited for | Any number of branches, simple or complex conditions | Exactly two outcomes, chosen from one condition, in a single line | Matching one value against several fixed patterns |
-| Readability with many branches | Stays readable even with several `elif` branches | Becomes unreadable if chained for more than two outcomes | Very readable for matching many distinct fixed values |
-| Typical use case | A task priority classifier with several ranges | `status = "adult" if age >= 18 else "minor"` | Matching a menu choice like `"1"`, `"2"`, `"3"` |
-
-### 3.9 Diagram: Decision Flow Through `if`/`elif`/`else`
-
-```mermaid
-flowchart TD
-    A["Start: evaluate condition_1"] -->|True| B["Run if-block"]
-    A -->|False| C["Evaluate condition_2 (elif)"]
-    C -->|True| D["Run elif-block"]
-    C -->|False| E["Evaluate next elif, if any"]
-    E -->|No more elif / all False| F["Run else-block"]
-    B --> G["Continue after conditional"]
-    D --> G
-    F --> G
-```
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — a single `if` statement:
 

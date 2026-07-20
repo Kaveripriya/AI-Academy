@@ -195,39 +195,7 @@ match subject:
 | Introduced | Python 3.6 (PEP 498) | Python 2.6+ | Original Python string formatting |
 | Recommended for new code | Yes | Acceptable, mostly in older codebases | Avoid in new code |
 
-### 3.9 Diagrams
-
-**Type Conversion Map** — each arrow is a conversion function, with the behavior worth remembering:
-
-```mermaid
-flowchart LR
-    STR["str<br/>text form"]
-    INT["int<br/>whole number"]
-    FLOAT["float<br/>decimal number"]
-    BOOL["bool<br/>True / False"]
-
-    STR -->|"int() digits only"| INT
-    STR -->|"float()"| FLOAT
-    FLOAT -->|"int() truncates"| INT
-    INT -->|"float()"| FLOAT
-    INT -->|"str()"| STR
-    FLOAT -->|"str()"| STR
-    INT -->|"bool() 0 -> False"| BOOL
-    STR -->|"bool() '' -> False"| BOOL
-```
-
-**How `match`/`case` Evaluates** — patterns are checked top to bottom, and the first match wins:
-
-```mermaid
-flowchart TD
-    A["match subject:"] --> B{"Does subject match case 1?"}
-    B -- Yes --> C["Run case 1 block, stop"]
-    B -- No --> D{"Does subject match case 2?"}
-    D -- Yes --> E["Run case 2 block, stop"]
-    D -- No --> F["case _: wildcard runs"]
-```
-
-### 3.10 Code Examples
+### 3.9 Code Examples
 
 **Basic example** — converting a value between types:
 
