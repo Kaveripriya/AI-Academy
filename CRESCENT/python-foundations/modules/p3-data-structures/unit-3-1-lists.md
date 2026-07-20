@@ -75,39 +75,61 @@ A list solves this with one mechanism: hold any number of values, of any type, u
 
 **List literal:**
 
+Writing a list literal simply means typing out the values you want, separated by commas, inside square brackets. Whatever you write between `[` and `]` becomes the list, in exactly that order — nothing more to it.
+
 ```python
-my_list = [item1, item2, item3]
+fruits = ["apple", "banana", "cherry"]
 ```
 
-| Part | What it is | Why it's there |
-|---|---|---|
-| `[ ]` | The **list literal** brackets. | Tells Python "everything inside is one ordered collection." |
-| `item1, item2, ...` | The **elements**, separated by commas. | These become the contents of the list, in the order you write them. |
+`fruits` is assigned a list literal here: three string values, separated by commas, wrapped in square brackets, kept in the order they were typed.
 
 **Indexing:**
 
+Indexing means asking the list for the single value sitting at one particular position. Every element has a position number, called its **index**, and Python always starts counting from `0` — not `1`. To read a value, write the list's name followed by that position number in square brackets.
+
 ```python
-my_list[i]
+fruits = ["apple", "banana", "cherry"]
+
+print(fruits[0])    # apple  — the 1st element, at index 0
+print(fruits[2])    # cherry — the 3rd element, at index 2
 ```
 
-| Part | What it is | Why it's there |
-|---|---|---|
-| `my_list` | The list you are reading from. | Identifies which collection to look inside. |
-| `[i]` | The **index** — a whole number position. | `0` is the first element; negative values (`-1`, `-2`, ...) count from the end. |
+```mermaid
+flowchart LR
+    A["'apple'<br/>index 0 / -3"]
+    B["'banana'<br/>index 1 / -2"]
+    C["'cherry'<br/>index 2 / -1"]
+    A --> B --> C
+```
+
+You can also count backward from the end using **negative indexing**: `-1` refers to the last element, `-2` to the second-to-last, and so on — this saves you from writing `fruits[len(fruits) - 1]` every time you need the last item.
+
+```python
+print(fruits[-1])   # cherry — last element
+print(fruits[-3])   # apple  — same slot as fruits[0]
+```
+
+Asking for an index that does not exist — for example `fruits[3]` on this three-element list — raises an `IndexError`. For a list of length `n`, valid positive indices run from `0` to `n - 1`, and valid negative indices run from `-1` to `-n`.
 
 **Slicing:**
 
+Slicing means pulling out a whole chunk of the list at once, instead of one element at a time. You describe the chunk with up to three numbers separated by colons — `start` (included), `stop` (excluded), and `step` (how many positions to jump each time) — and Python hands back a brand-new list containing just that chunk, leaving the original list untouched. Leave out `start` and it defaults to `0`; leave out `stop` and it defaults to `len(my_list)` — so `a[:]` copies the whole list.
+
 ```python
-my_list[start:stop:step]
+a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+print(a[0:2])      # [0, 1]           — start at index 0, stop before index 2
+print(a[1:5])      # [1, 2, 3, 4]     — index 5 is excluded
+print(a[:3])       # [0, 1, 2]        — start defaults to 0
+print(a[7:])       # [7, 8, 9]        — stop defaults to len(a)
+print(a[::2])      # [0, 2, 4, 6, 8]  — every 2nd element
+print(a[1:5:2])    # [1, 3]           — from index 1 to 5, stepping by 2
+print(a[::-1])     # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] — a reversed copy
 ```
 
-| Part | What it is | Why it's there |
-|---|---|---|
-| `start` | The index to begin from (included). | Defaults to `0` if left out. |
-| `stop` | The index to stop before (excluded). | Defaults to `len(my_list)` if left out. |
-| `step` | How many positions to jump each time. | Defaults to `1`; a negative step walks backward. |
+Two slicing idioms come up so often that they are worth memorizing: `a[::2]` takes every second element, and `a[::-1]` produces the list reversed, because a negative step walks backward through the list. Since a slice always builds a *new* list, slicing itself never changes the original — this is different from the in-place methods you will meet in §3.6.
 
-**Common methods (a small sample — the full set is covered in §3.8):**
+**Common methods (a small sample — the full set is covered in §3.6):**
 
 | Method | What it does |
 |---|---|
@@ -128,47 +150,7 @@ Many languages you may encounter later (C, Java, and others) have a data structu
 
 This is why Python lists are often described as more flexible but with some run-time overhead compared to a fixed, single-type array in a statically typed language.
 
-### 3.5 Creating and Indexing a List
-
-Each element of a list has a numbered position, its **index**. Python indexes from **zero** — the first element sits at index `0`, the second at `1`, and so on. You reach an element with the list's name followed by the index in square brackets: `my_list[i]`.
-
-Python also supports **negative indexing**, which counts from the end of the list: `-1` refers to the last element, `-2` to the second-to-last, and so on. This saves you from writing `my_list[len(my_list) - 1]` every time you need the last item.
-
-```mermaid
-flowchart LR
-    A["'apple'<br/>index 0 / -3"]
-    B["'banana'<br/>index 1 / -2"]
-    C["'cherry'<br/>index 2 / -1"]
-    A --> B --> C
-```
-
-```python
-fruits = ["apple", "banana", "cherry"]
-print(fruits[0])    # apple  — first element
-print(fruits[-1])   # cherry — last element
-print(fruits[-3])   # apple  — same slot as fruits[0]
-```
-
-Asking for an index that does not exist — for example `fruits[3]` on a three-element list — raises an `IndexError`. For a list of length `n`, valid positive indices run from `0` to `n - 1`, and valid negative indices run from `-1` to `-n`.
-
-### 3.6 Slicing with a Step
-
-**Slicing** extracts a *range* of elements and returns them as a brand-new list, leaving the original untouched. The syntax is `my_list[start:stop:step]`: `start` is included, `stop` is excluded, and `step` controls how many positions to move each time. If you omit `start`, it defaults to `0`; if you omit `stop`, it defaults to `len(my_list)` — so `a[:]` copies the whole list.
-
-```python
-a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-print(a[1:5])      # [1, 2, 3, 4]     — index 5 is excluded
-print(a[:3])       # [0, 1, 2]        — start defaults to 0
-print(a[7:])       # [7, 8, 9]        — stop defaults to len(a)
-print(a[::2])      # [0, 2, 4, 6, 8]  — every 2nd element
-print(a[1:5:2])    # [1, 3]           — from index 1 to 5, stepping by 2
-print(a[::-1])     # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] — a reversed copy
-```
-
-Two slicing idioms come up so often that they are worth memorizing: `a[::2]` takes every second element, and `a[::-1]` produces the list reversed, because a negative step walks backward through the list. Since a slice always builds a *new* list, slicing itself never changes the original — this is different from the in-place methods you will meet in §3.8.
-
-### 3.7 Mutability
+### 3.5 Mutability
 
 A list is **mutable** — its contents can be changed after creation without building a new list. Assigning to a single index replaces that one element; assigning to a slice can replace several elements at once:
 
@@ -189,7 +171,7 @@ print(a)           # [1, 2, 3, 4] — a changed too, even though we only touched
 
 To get an independent list, use a full slice (`b = a[:]`) or the `copy()` method (`b = a.copy()`). Both create a **shallow copy** — a new outer list whose elements are copied by reference. For a list of simple values (numbers, strings), this behaves exactly like an independent copy. For a *nested* list, a shallow copy only copies the outer list; the inner lists are still shared, so mutating an inner list through the copy still affects the original. This shallow-copy pitfall is a very common source of hard-to-find bugs and is worth remembering as you move toward more advanced data structures.
 
-### 3.8 List Methods
+### 3.6 List Methods
 
 Lists carry built-in **methods** — functions attached to the list object, invoked with dot syntax: `my_list.method(...)`. The everyday set falls into three groups.
 
@@ -220,7 +202,7 @@ last = nums.pop()      # last = 6, nums = [99, 1, 2, 3, 4, 5]
 
 Notice the difference between `append` and `extend`: `nums.append([5, 6])` adds the list `[5, 6]` as **one** nested element, whereas `nums.extend([5, 6])` unpacks it and adds `5` and `6` as two separate elements. All of `append`, `insert`, `extend`, `remove`, `pop`, and `clear` change the list *in place* — this is mutability at work — while `index` and `count` only read from the list and never change it.
 
-### 3.9 Sorting: `sort()` vs. `sorted()`
+### 3.7 Sorting: `sort()` vs. `sorted()`
 
 Python gives you two ways to order a list, and the difference between them is a frequent interview question:
 
@@ -254,7 +236,7 @@ print(sorted(words, key=len))        # ['kiwi', 'apple', 'banana'] — shortest 
 
 The `key` function can be a built-in like `len`, or any function you define with `def` that accepts one element and returns something comparable.
 
-### 3.10 Nested Lists
+### 3.8 Nested Lists
 
 A list element can itself be a list — this is called a **nested list**, and it is a natural way to represent a grid, a table, or rows of related data, such as a spreadsheet of student marks or a set of railway seat rows. The first index selects the "row"; a second index then reaches inside that row:
 
@@ -281,7 +263,7 @@ for row in grid:
 
 Each inner list is a complete list in its own right, with every slicing operation and every method already covered available on it. To visit every value in a nested list, nest one `for` loop inside another, exactly as shown above — the outer loop walks the rows, the inner loop walks the values within each row.
 
-### 3.11 List Comprehension
+### 3.9 List Comprehension
 
 A **list comprehension** builds a new list from an existing sequence in a single expression, replacing the longer "create an empty list, loop, and `append`" pattern. Read the general form `[expression for item in iterable]` left to right: "the expression, for each item in the iterable." The part before `for` decides what each new element becomes. A comprehension can map, filter, or do both together:
 
@@ -297,7 +279,7 @@ print(doubled_evens)   # [4, 8, 12]
 
 Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one at a time; `if n % 2 == 0` keeps only `2, 4, 6` and silently drops the rest; `n * 2` is the expression applied to each survivor, giving `4, 8, 12`, which become the new list. Comprehensions are considered idiomatic Python — once you know the pattern, they read faster than the equivalent loop, and they always return a fresh list without touching the source sequence.
 
-### 3.12 Rules
+### 3.10 Rules
 
 - List elements are accessed with a zero-based **index**; valid positive indices run from `0` to `len(my_list) - 1`, and valid negative indices run from `-1` to `-len(my_list)`.
 - Accessing an index outside this range raises an `IndexError`; this applies to both positive and negative indices.
@@ -306,9 +288,9 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 - Lists are **mutable**; assigning a list to a new name creates an **alias**, not a copy — use `.copy()` or a full slice `[:]` for an independent list.
 - Methods that change a list (`append`, `insert`, `extend`, `remove`, `pop`, `clear`, `sort`) act **in place** and typically return `None`; do not assign their result back to the list.
 - `sorted()` and slicing always return a **new** list and never modify the argument they were given.
-- Never add or remove elements from a list while a `for` loop is directly iterating over it — doing so can skip elements or raise errors (see §3.14).
+- Never add or remove elements from a list while a `for` loop is directly iterating over it — doing so can skip elements or raise errors (see §3.12).
 
-### 3.13 Best Practices
+### 3.11 Best Practices
 
 - Prefer a list comprehension over a manual "empty list + loop + `append`" pattern when the transformation is simple enough to read in one line.
 - Use `sorted()` (not `sort()`) whenever you still need the original, unsorted list later in the program.
@@ -317,7 +299,7 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 - When looping with both position and value, use `enumerate(my_list)` (from Module P2) instead of manually managing `range(len(my_list))`.
 - Give lists plural, descriptive names (`student_names`, `cart_prices`) so it is clear at a glance that the variable holds many values, not one.
 
-### 3.14 Common Mistakes
+### 3.12 Common Mistakes
 
 - **`IndexError: list index out of range`** — accessing an index that does not exist, most often the classic off-by-one error of assuming the last valid index is `len(my_list)` instead of `len(my_list) - 1`.
 - **Off-by-one errors in slicing** — forgetting that `stop` is excluded, so `my_list[0:3]` gives 3 elements (indices `0, 1, 2`), not 4; and confusing `my_list[1:3]` with "elements 1 through 3."
@@ -326,7 +308,7 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 - **Writing `my_list = my_list.sort()`** — this discards the list entirely, because `sort()` returns `None`.
 - **Confusing `append()` with `extend()`** — `my_list.append([1, 2])` adds one nested list as a single element; `my_list.extend([1, 2])` adds `1` and `2` as two separate elements.
 
-### 3.15 Code Examples
+### 3.13 Code Examples
 
 The following single, running example follows a class teacher tracking the marks of a 5-student Python quiz, one operation at a time — using every core list skill from this unit inside one coherent scenario, instead of several disconnected snippets.
 
