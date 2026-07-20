@@ -304,14 +304,6 @@ Booking confirmed status: True
 
 Each `type()` call reports exactly the type Python inferred at the moment of assignment — a quoted value becomes `str`, a decimal value becomes `float`, a whole number becomes `int`, and `True`/`False` becomes `bool`. The final line reflects the reassignment: `booking_confirmed` was created as `False`, then explicitly reassigned to `True` before the last `print()` ran, so the *old* value is never seen again — only the current one is shown.
 
-### Step 8: Time Complexity
-
-Each assignment and each `type()` call is a single, constant-time operation. With a fixed number of variables and print statements, the overall time complexity is **O(1)** — it does not grow with any input, because there is no input yet in this unit.
-
-### Step 9: Space Complexity
-
-Four variables are stored in memory, regardless of anything else in the program, so the space complexity is also **O(1)** — constant space, since the number of variables does not depend on any external input size.
-
 ---
 
 ## 6. Key Takeaways
