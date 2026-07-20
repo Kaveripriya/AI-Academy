@@ -132,6 +132,39 @@ class C(A, B):
 | Main risk | Very low — straightforward to reason about | Chains that grow too long become hard to trace | The diamond problem — ambiguity about method order, resolved by MRO |
 | Typical use | A specific case of a general class (`SavingsAccount` from `BankAccount`) | Layered specialization (`Employee` → `Manager` → `SeniorManager`) | Combining independent behaviors (mixins) into one class |
 
+**Diagram: Single Inheritance**
+
+```mermaid
+flowchart BT
+    A["Parent"]
+    B["Child"] -- "inherits" --> A
+```
+
+One subclass, one direct superclass — `Child` gains everything `Parent` has.
+
+**Diagram: Multi-Level Inheritance**
+
+```mermaid
+flowchart BT
+    A["A"]
+    B["B"] -- "inherits" --> A
+    C["C"] -- "inherits" --> B
+```
+
+A chain, each class extending the one directly above it — `C` gets everything from `B`, which already got everything from `A`.
+
+**Diagram: Multiple Inheritance**
+
+```mermaid
+flowchart BT
+    A["A"]
+    B["B"]
+    C["C"] -- "inherits" --> A
+    C -- "inherits" --> B
+```
+
+One subclass, two (or more) direct superclasses at the same level — `C` combines behaviour from both `A` and `B`.
+
 **Diagram: Class Hierarchy and MRO**
 
 ```mermaid

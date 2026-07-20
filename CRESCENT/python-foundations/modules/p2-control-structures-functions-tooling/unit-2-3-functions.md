@@ -1,4 +1,4 @@
-﻿# Functions
+# Functions
 
 ---
 
@@ -57,7 +57,76 @@ answer = square(5)   # answer is now 25
 
 This is the single most important distinction in this entire unit. `print()` displays a value on the screen and that value is then gone — no other part of the program can retrieve it. `return` hands the value back to the caller, so the rest of the program — including an automated test — can use it. A function with no `return` statement at all (or a bare `return` with nothing after it) hands back the special value `None`.
 
-### 3.2 Parameters, Arguments, and How Values Flow In
+### 3.2 Why This Concept Exists
+
+Without functions, every program would be one long, ever-growing script — any task you needed twice would have to be retyped, and any change to that task would mean hunting down and fixing every copy by hand. Real software constantly needs to:
+
+- **Reuse** the same logic in many places without duplicating code (calculating GST on every invoice line, not just one).
+- **Isolate** a task so it can be tested, fixed, and improved on its own, without touching unrelated code.
+- **Communicate intent** through a name and a docstring, so another engineer — or your future self — understands what a block of code is for without re-reading every line.
+
+A function solves all three problems with one mechanism: give a task a name and a clear input/output contract once, then let the rest of the program call that name instead of repeating the logic. This is exactly why "functions" is universally the concept every programming course teaches right after control flow — it is the first real tool for managing complexity.
+
+### 3.3 Key Terminology
+
+| Term | Simple Meaning |
+|---|---|
+| **Function** | A named, reusable block of code that performs one specific task. |
+| **`def`** | The keyword used to define a function. |
+| **Parameter** | A name listed in a function's definition — a placeholder for a value supplied later. |
+| **Argument** | The actual value supplied when a function is called. |
+| **Positional argument** | An argument matched to a parameter by its order in the call. |
+| **Keyword argument** | An argument matched to a parameter by name, regardless of order. |
+| **Default argument** | A parameter's fallback value, used when the caller does not supply one. |
+| **`*args`** | A parameter prefixed with `*` that collects any extra positional arguments together. |
+| **Return value** | The value a function hands back to its caller using `return`. |
+| **Scope** | The region of a program where a given name is visible and usable. |
+| **Local variable** | A variable created inside a function; visible only while that function runs. |
+| **Global variable** | A variable created at the top level of a file, outside any function. |
+| **`global`** | A keyword that lets a function reassign an existing global variable instead of creating a local one. |
+| **Recursion** | A technique where a function calls itself on a smaller version of the same problem. |
+| **Base case** | The simplest input in a recursive function, answered directly, that stops further calls. |
+| **Recursive case** | The branch where a function calls itself on a smaller input and combines that result. |
+| **Call stack** | The mechanism Python uses to track every function call still waiting on a result. |
+| **`RecursionError`** | The error Python raises when recursive calls exceed the maximum allowed stack depth. |
+| **Docstring** | A triple-quoted string as the first statement in a function body, documenting its purpose. |
+
+### 3.4 Syntax
+
+```python
+def function_name(parameter1, parameter2=default_value):
+    """One-line docstring describing what this function does."""
+    # function body — any valid Python statements
+    return result
+```
+
+| Part | What it is | Why it's there |
+|---|---|---|
+| `def` | The keyword that starts a function definition. | Tells Python "the following name is a function, not a variable." |
+| `function_name` | The identifier you choose for this function. | This is what you type later, followed by `()`, to call it. |
+| `(parameter1, parameter2=default_value)` | The **parameter list** — names the function expects, optionally with defaults. | Declares what inputs the function needs and which ones are optional. |
+| `:` | Marks the end of the `def` line. | Tells Python the indented block underneath is the function's body. |
+| `"""..."""` | The **docstring**, as the first line inside the body. | Documents the function's purpose so tools and readers can see it without reading the logic. |
+| indented body | The statements that run every time the function is called. | This is the actual work the function performs. |
+| `return result` | Sends `result` back to the caller and ends the function immediately. | Without it, the function silently returns `None`. |
+
+Calling the function reuses the same familiar shape you've used since Unit 1.1:
+
+```python
+function_name(argument1, argument2)
+```
+
+**Diagram: Function Call Flow**
+
+```mermaid
+flowchart LR
+    A["Caller writes:<br/>total(3, 4, 5)"] --> B["Arguments 3, 4, 5<br/>bound to parameter *args"]
+    B --> C["Function body runs:<br/>loop adds each value"]
+    C --> D["return running<br/>sends 12 back"]
+    D --> E["Caller receives 12<br/>e.g. print(total(3, 4, 5))"]
+```
+
+### 3.5 Parameters, Arguments, and How Values Flow In
 
 A **parameter** is a name listed inside the parentheses when you **define** a function — it is a placeholder for a value that will be supplied later. An **argument** is the actual value you supply when you **call** the function. In the `power` function below, `base` and `exponent` are the parameters — chosen when the function is defined; in the call `power(2, 3)`, `2` and `3` are the arguments — the actual values supplied at that moment. Keeping this pair of words straight is a very common interview check, so hold onto it: parameter = the name in the definition, argument = the value in the call.
 
@@ -106,7 +175,7 @@ total()          # 0
 
 The `*` symbol is what does the work here; `args` is simply the name everyone agrees to use by convention. The idea to hold onto is this: `*args` lets one function accept a flexible, unknown number of positional inputs, instead of forcing you to write a fixed, exact list of parameters.
 
-### 3.3 Scope — Local vs. Global
+### 3.6 Scope — Local vs. Global
 
 **Scope** is the region of a program where a given name is visible and usable. A variable created inside a function is **local** to that function — it exists only while the function is running, and it cannot be seen or used from outside it:
 
@@ -134,7 +203,7 @@ print(counter)       # 1
 
 Use `global` sparingly. Functions that receive their inputs as parameters and hand results back with `return` are far easier to read, reuse, and test than functions that quietly reach outside themselves and change shared state. Treat `global` as the rare, deliberate exception — not the everyday habit.
 
-### 3.4 Recursion
+### 3.7 Recursion
 
 **Recursion** is a technique where a function solves a problem by calling itself on a smaller version of the same problem. Every correct recursive function needs exactly two parts. The **base case** is the simplest possible input — one small enough that the answer is already known, with no further calling required — and it is what stops the recursion from running forever. The **recursive case** is the branch where the function calls itself on a smaller or simpler input, and combines that result to produce its own answer.
 
@@ -150,7 +219,7 @@ def factorial(n):
 factorial(4)   # 4 * 3 * 2 * 1 = 24
 ```
 
-(The triple-quoted line right under `def` is a **docstring** — you will meet it properly in section 3.5. For now, just notice that it briefly documents what the function returns, and keep your attention on the base case and recursive case below it.)
+(The triple-quoted line right under `def` is a **docstring** — you will meet it properly in section 3.8. For now, just notice that it briefly documents what the function returns, and keep your attention on the base case and recursive case below it.)
 
 Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. The diagram below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
 
@@ -202,7 +271,7 @@ If the base case were missing, or written so it could never actually be reached,
 
 The exact same job can also be done with a `for` loop and an accumulator, precisely as you practiced in Unit 2.2. Recursion is not faster here — it is a different way of *thinking* about a problem, one that fits naturally when a problem is already defined in terms of a smaller copy of itself. Getting the base case exactly right is the whole game.
 
-### 3.5 Docstrings
+### 3.8 Docstrings
 
 A **docstring** is a string literal placed as the very first statement inside a function's body, written in triple quotes. Python stores this string so that tools, IDEs, and other developers can see what the function does, without having to read its implementation — it is the standard, built-in way to document a function, formalized in **PEP 257**.
 
@@ -215,75 +284,6 @@ def factorial(n):
 ```
 
 A good docstring states, in one or a few plain sentences, what the function does, what it expects as input, and what it returns. Because it lives inside the function itself, it travels everywhere the code travels and cannot drift out of sync the way a separate document can.
-
-### 3.6 Why This Concept Exists
-
-Without functions, every program would be one long, ever-growing script — any task you needed twice would have to be retyped, and any change to that task would mean hunting down and fixing every copy by hand. Real software constantly needs to:
-
-- **Reuse** the same logic in many places without duplicating code (calculating GST on every invoice line, not just one).
-- **Isolate** a task so it can be tested, fixed, and improved on its own, without touching unrelated code.
-- **Communicate intent** through a name and a docstring, so another engineer — or your future self — understands what a block of code is for without re-reading every line.
-
-A function solves all three problems with one mechanism: give a task a name and a clear input/output contract once, then let the rest of the program call that name instead of repeating the logic. This is exactly why "functions" is universally the concept every programming course teaches right after control flow — it is the first real tool for managing complexity.
-
-### 3.7 Key Terminology
-
-| Term | Simple Meaning |
-|---|---|
-| **Function** | A named, reusable block of code that performs one specific task. |
-| **`def`** | The keyword used to define a function. |
-| **Parameter** | A name listed in a function's definition — a placeholder for a value supplied later. |
-| **Argument** | The actual value supplied when a function is called. |
-| **Positional argument** | An argument matched to a parameter by its order in the call. |
-| **Keyword argument** | An argument matched to a parameter by name, regardless of order. |
-| **Default argument** | A parameter's fallback value, used when the caller does not supply one. |
-| **`*args`** | A parameter prefixed with `*` that collects any extra positional arguments together. |
-| **Return value** | The value a function hands back to its caller using `return`. |
-| **Scope** | The region of a program where a given name is visible and usable. |
-| **Local variable** | A variable created inside a function; visible only while that function runs. |
-| **Global variable** | A variable created at the top level of a file, outside any function. |
-| **`global`** | A keyword that lets a function reassign an existing global variable instead of creating a local one. |
-| **Recursion** | A technique where a function calls itself on a smaller version of the same problem. |
-| **Base case** | The simplest input in a recursive function, answered directly, that stops further calls. |
-| **Recursive case** | The branch where a function calls itself on a smaller input and combines that result. |
-| **Call stack** | The mechanism Python uses to track every function call still waiting on a result. |
-| **`RecursionError`** | The error Python raises when recursive calls exceed the maximum allowed stack depth. |
-| **Docstring** | A triple-quoted string as the first statement in a function body, documenting its purpose. |
-
-### 3.8 Syntax
-
-```python
-def function_name(parameter1, parameter2=default_value):
-    """One-line docstring describing what this function does."""
-    # function body — any valid Python statements
-    return result
-```
-
-| Part | What it is | Why it's there |
-|---|---|---|
-| `def` | The keyword that starts a function definition. | Tells Python "the following name is a function, not a variable." |
-| `function_name` | The identifier you choose for this function. | This is what you type later, followed by `()`, to call it. |
-| `(parameter1, parameter2=default_value)` | The **parameter list** — names the function expects, optionally with defaults. | Declares what inputs the function needs and which ones are optional. |
-| `:` | Marks the end of the `def` line. | Tells Python the indented block underneath is the function's body. |
-| `"""..."""` | The **docstring**, as the first line inside the body. | Documents the function's purpose so tools and readers can see it without reading the logic. |
-| indented body | The statements that run every time the function is called. | This is the actual work the function performs. |
-| `return result` | Sends `result` back to the caller and ends the function immediately. | Without it, the function silently returns `None`. |
-
-Calling the function reuses the same familiar shape you've used since Unit 1.1:
-
-```python
-function_name(argument1, argument2)
-```
-
-**Diagram: Function Call Flow**
-
-```mermaid
-flowchart LR
-    A["Caller writes:<br/>total(3, 4, 5)"] --> B["Arguments 3, 4, 5<br/>bound to parameter *args"]
-    B --> C["Function body runs:<br/>loop adds each value"]
-    C --> D["return running<br/>sends 12 back"]
-    D --> E["Caller receives 12<br/>e.g. print(total(3, 4, 5))"]
-```
 
 ### 3.9 Rules
 
