@@ -19,7 +19,9 @@ By the end of this unit, you will be able to:
 
 ## 2. Overview
 
-In Unit 4.1, you built a `Student` class with `name`, `roll_number`, `marks`, and a `has_passed()` method. Every real class you write from here on will rarely stand alone — it will build on something that already exists. **Inheritance** is Python's mechanism for saying "this new class is like that existing class, plus a little extra," without retyping a single line of the original class's code.
+In Unit 4.1, you created a **Student** class with attributes such as `name`, `roll_number`, and `marks`, along with a method like `has_passed()`.
+Now, suppose you want to create a new class called **GraduateStudent**. A graduate student has all the features of a student but also needs some additional information, such as a **research topic**.
+Instead of writing the `Student` class again, Python allows the new class to **reuse** the existing `Student` class and add only the new features. This concept is called **inheritance**.
 
 Think about how large-scale Indian software systems are actually built. A banking application does not write one giant `Account` class that handles savings accounts, current accounts, and loan accounts all at once — it writes one shared `BankAccount` class, and lets `SavingsAccount` and `CurrentAccount` extend it, each adding only what makes it different. A food delivery platform does the same with `DeliveryPartner`, `BikePartner`, and `CarPartner`. This is exactly the "is-a" relationship inheritance is built for: a `SavingsAccount` **is a** `BankAccount`, plus interest.
 
