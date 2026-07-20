@@ -96,6 +96,32 @@ for item in sequence:
 | `item` | The **loop variable** — your chosen name. | Holds the current item's value during each iteration. |
 | `sequence` | Anything Python can iterate over — a string, `range(...)`, `enumerate(...)`, or `zip(...)`. | Defines what values `item` will take, and how many iterations run. |
 
+**Comparison Table: `for` Loop vs `while` Loop**
+
+| Aspect | `for` Loop | `while` Loop |
+|---|---|---|
+| Driven by | A sequence (string, `range()`, etc.) | A condition (`True`/`False`) |
+| Iteration count | Known in advance — equals the length of the sequence | Not known in advance — depends on when the condition turns `False` |
+| Risk of infinite loop | None — it always ends when the sequence ends | Real risk if the condition never becomes `False` |
+| Typical use case | "Do this for every item / N times" | "Keep doing this until some event happens" |
+| Needs a manual counter? | No — the loop variable is managed automatically | Often yes, unless the condition depends on something external (like user input) |
+
+**Diagram: Loop Control Flow**
+
+```mermaid
+flowchart TD
+    A["Enter loop"] --> B{"Condition true?<br/>(while test / for has next item)"}
+    B -->|Yes| C["Run loop body"]
+    C --> D{"break?"}
+    D -->|Yes| F["Exit loop"]
+    D -->|No| E{"continue?"}
+    E -->|Yes| B
+    E -->|No| B
+    B -->|No more / False| F
+```
+
+Read this top to bottom: Python checks the condition (or whether the sequence has a next item), runs the body if it's `True`, then checks whether that body hit a `break` (leave immediately) or a `continue` (skip back to the condition check without finishing the rest of the body). Once the condition is `False` or the sequence runs out, the loop exits.
+
 **`range()`, `enumerate()`, `zip()`:**
 
 | Call | Meaning | Example | Produces |
@@ -141,33 +167,7 @@ for item in sequence:
 - **Forgetting that `zip()` silently truncates** — pairing sequences of different lengths and being surprised that some items from the longer one never appear.
 - **Modifying the loop variable inside a `for` loop** — reassigning the loop variable inside the body has no effect on which item comes next; the `for` loop still advances on its own.
 
-### 3.8 Comparison Table: `for` Loop vs `while` Loop
-
-| Aspect | `for` Loop | `while` Loop |
-|---|---|---|
-| Driven by | A sequence (string, `range()`, etc.) | A condition (`True`/`False`) |
-| Iteration count | Known in advance — equals the length of the sequence | Not known in advance — depends on when the condition turns `False` |
-| Risk of infinite loop | None — it always ends when the sequence ends | Real risk if the condition never becomes `False` |
-| Typical use case | "Do this for every item / N times" | "Keep doing this until some event happens" |
-| Needs a manual counter? | No — the loop variable is managed automatically | Often yes, unless the condition depends on something external (like user input) |
-
-### 3.9 Diagram: Loop Control Flow
-
-```mermaid
-flowchart TD
-    A["Enter loop"] --> B{"Condition true?<br/>(while test / for has next item)"}
-    B -->|Yes| C["Run loop body"]
-    C --> D{"break?"}
-    D -->|Yes| F["Exit loop"]
-    D -->|No| E{"continue?"}
-    E -->|Yes| B
-    E -->|No| B
-    B -->|No more / False| F
-```
-
-Read this top to bottom: Python checks the condition (or whether the sequence has a next item), runs the body if it's `True`, then checks whether that body hit a `break` (leave immediately) or a `continue` (skip back to the condition check without finishing the rest of the body). Once the condition is `False` or the sequence runs out, the loop exits.
-
-### 3.10 Code Examples
+### 3.8 Code Examples
 
 **Basic example** — a `while` loop counting up:
 
