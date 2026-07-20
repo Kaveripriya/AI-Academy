@@ -251,6 +251,131 @@ with open("invalid_rows.csv", "w", newline="") as error_file:
 
 *Explanation:* `csv.writer(error_file)` (Unit 5.1) writes the header row first with `writerow()`, then every rejected row at once with `writerows()`. This turns the rejected data into a permanent, reviewable file — anyone can open `invalid_rows.csv` later and see exactly what was skipped, without needing to re-run the whole program.
 
+#### Try It Yourself
+
+Extend the `students.csv` example from Steps A–D above. Here's a slightly messier version of the file, `students_extended.csv`:
+
+```
+Name,Marks
+Priya,78
+Rohan,eighty
+Arjun,91
+Kavya,150
+Meena,
+```
+
+Two new problem rows have been added: `Kavya,150` has marks that convert to a number just fine but are impossible for an exam out of 100, and `Meena,` has a blank marks field entirely.
+
+**Part 1 (Easier):** Write a robust reader — following the Step B/C pattern — that reads `students_extended.csv` and separates it into `valid_records` and `invalid_records`. Marks must convert to an integer **and** fall within 0–100 to count as valid. Print both lists.
+
+**Solution:**
+
+```python
+import csv
+
+valid_records = []
+invalid_records = []
+
+with open("students_extended.csv", "r", newline="") as file:
+    reader = csv.reader(file)
+    next(reader)
+    for row in reader:
+        name = row[0]
+        try:
+            marks = int(row[1])
+            if not (0 <= marks <= 100):
+                raise ValueError(f"marks {marks} out of range")
+            valid_records.append((name, marks))
+        except ValueError:
+            invalid_records.append(row)
+
+print("Valid records:", valid_records)
+print("Invalid records:", invalid_records)
+```
+
+Expected output:
+
+```
+Valid records: [('Priya', 78), ('Arjun', 91)]
+Invalid records: [['Rohan', 'eighty'], ['Kavya', '150'], ['Meena', '']]
+```
+
+`int("")` raises a `ValueError` too, so Meena's blank field is naturally caught by the very same `except` that catches Rohan's text and Kavya's out-of-range rule violation — no extra code needed.
+
+**Part 2 (Medium):** Extend Part 1's program so that, after the loop, it also prints the class average marks — computed **only** over `valid_records`, never over the rejected rows.
+
+**Solution:**
+
+```python
+# ... same loop as Part 1, then: ...
+if valid_records:
+    total_marks = sum(marks for name, marks in valid_records)
+    average_marks = total_marks / len(valid_records)
+    print(f"Average marks (valid records only): {average_marks:.2f}")
+else:
+    print("No valid records to average.")
+```
+
+Expected output (in addition to Part 1's two lines):
+
+```
+Average marks (valid records only): 84.50
+```
+
+(78 + 91 = 169, and 169 / 2 = 84.5 — Rohan, Kavya, and Meena are correctly left out of this calculation entirely.)
+
+**Part 3 (Harder):** Combine everything into one complete program: read `students_extended.csv`, separate valid and invalid rows using the 0–100 rule, print a summary count and the average, and — exactly like Step D — log the invalid rows to a real file, `invalid_students.csv`.
+
+**Solution:**
+
+```python
+import csv
+
+valid_records = []
+invalid_records = []
+
+with open("students_extended.csv", "r", newline="") as file:
+    reader = csv.reader(file)
+    next(reader)
+    for row in reader:
+        name = row[0]
+        try:
+            marks = int(row[1])
+            if not (0 <= marks <= 100):
+                raise ValueError(f"marks {marks} out of range")
+            valid_records.append((name, marks))
+        except ValueError:
+            invalid_records.append(row)
+
+total_rows = len(valid_records) + len(invalid_records)
+print(f"Processed {total_rows} rows: {len(valid_records)} valid, {len(invalid_records)} invalid.")
+
+if valid_records:
+    average_marks = sum(marks for name, marks in valid_records) / len(valid_records)
+    print(f"Average marks (valid records only): {average_marks:.2f}")
+
+with open("invalid_students.csv", "w", newline="") as error_file:
+    writer = csv.writer(error_file)
+    writer.writerow(["Name", "Marks"])
+    writer.writerows(invalid_records)
+```
+
+Expected console output:
+
+```
+Processed 5 rows: 2 valid, 3 invalid.
+Average marks (valid records only): 84.50
+```
+
+And `invalid_students.csv` now exists on disk containing:
+
+```
+Name,Marks
+Rohan,eighty
+Kavya,150
+Meena,
+```
+
 ---
 
 ## 4. Real-World Application

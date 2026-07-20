@@ -170,6 +170,54 @@ priya-ai-native-portfolio/
 
 *Explanation:* Each project sits in its own clearly named folder, so a reader can predict its contents without opening it. Larger projects (`csv_summary_tool/`, `student_records/`) carry their own short README, giving detail specific to that project without cluttering the top-level one. The `diagnostics/` folder keeps checkpoint submissions separate from regular practice work, so an instructor reviewing sign-off knows exactly where to look.
 
+#### Try It Yourself
+
+**Part 1 — Write a project description.** Imagine you have a new project folder called `grade_calculator/` containing a script that reads a CSV of student marks and prints each student's weighted average grade. Write a one-paragraph "What's Inside" style entry for it, in the same style as Priya's README above, that a stranger could read and immediately understand what the project does and how to run it.
+
+**Solution:**
+```markdown
+## What's Inside
+- `grade_calculator/` — reads student marks from a CSV and prints each student's weighted average grade
+
+## Quick Start
+Run the grade calculator:
+`python grade_calculator/grades.py marks.csv`
+Prints each student's name alongside their computed weighted average.
+```
+
+**Part 2 — Spot what's missing.** A classmate shows you their portfolio's folder structure:
+
+```
+rahul-portfolio/
+├── week2.py
+├── week5_final.py
+├── stuff/
+│   ├── notes.txt
+│   └── old_test.py
+└── project2/
+    └── main.py
+```
+
+List at least three specific problems with this structure, referring to the messy-vs-well-organized criteria from §3.4 and the Comparison Table in §3.4.
+
+**Solution:** (1) There is no top-level `README.md`, so a visitor has no index or explanation of what the repository contains. (2) File and folder names are vague and uninformative — `week2.py`, `week5_final.py`, `stuff/`, and `project2/` say nothing about what the code actually does. (3) Unrelated files are dumped together instead of one folder per project — `stuff/` mixes personal notes with a leftover test file, and the two scripts sit loose at the top level instead of inside their own project folders. (4) Neither `project2/` nor the top level has its own README explaining what it does or how to run it.
+
+**Part 3 — Redesign it.** Using your answer to Part 2, rewrite Rahul's structure as a well-organized layout, following the pattern shown in §3.4's structure diagram (one folder per project, a top-level README, a `diagnostics/` folder if needed).
+
+**Solution:**
+```
+rahul-ai-native-portfolio/
+├── README.md
+├── python-foundations/
+│   └── unit-2-1-practice.py
+├── grade_calculator/
+│   ├── README.md
+│   └── main.py
+└── diagnostics/
+    └── part-a-diagnostic.py
+```
+`week2.py` becomes clearly labeled practice work under `python-foundations/`, `week5_final.py` and `project2/main.py` are merged into a single, sensibly named `grade_calculator/` project with its own README, and `stuff/notes.txt` / `old_test.py` are either deleted or moved into the relevant project folder if still useful — nothing is left loose or unexplained at the top level.
+
 ---
 
 ## 4. Real-World Application

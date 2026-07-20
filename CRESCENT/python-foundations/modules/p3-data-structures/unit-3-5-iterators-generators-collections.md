@@ -144,11 +144,13 @@ flowchart TD
 
 ### 3.8 Code Examples
 
-**Basic example** — the iterator protocol, by hand:
+**Consolidated example** — running "Chennai Bites," a food-delivery app's order pipeline, from the raw iterator protocol all the way up to `Counter`, `defaultdict`, and `namedtuple`. One running scenario, built up step by step.
+
+**Step 1 — The iterator protocol, by hand:**
 
 ```python
-nums = [10, 20, 30]
-it = iter(nums)
+orders = ["Saravana Bhavan", "Biryani Blues", "Pizza Hub"]
+it = iter(orders)
 
 print(next(it))
 print(next(it))
@@ -157,124 +159,227 @@ print(next(it))
 ```
 
 *Line-by-line explanation:*
-- `nums = [10, 20, 30]` — an ordinary, reusable list; a list is an iterable, not an iterator.
-- `it = iter(nums)` — asks the list for a fresh iterator, positioned before the first value.
-- Each `next(it)` call returns the next value and moves the position forward by one — first `10`, then `20`, then `30`.
-- The **fourth** `next(it)` call has nothing left to return, so Python raises `StopIteration` instead of printing a fourth value.
+- `orders = [...]` — an ordinary, reusable list of restaurant names, one per order; a list is an iterable, not an iterator.
+- `it = iter(orders)` — asks the list for a fresh iterator, positioned before the first order.
+- Each `next(it)` call returns the next order and moves the position forward by one — first `"Saravana Bhavan"`, then `"Biryani Blues"`, then `"Pizza Hub"`.
+- The **fourth** `next(it)` call has no order left to return, so Python raises `StopIteration` instead of printing a fourth value.
 - Output:
   ```
-  10
-  20
-  30
+  Saravana Bhavan
+  Biryani Blues
+  Pizza Hub
   Traceback (most recent call last):
       ...
   StopIteration
   ```
 
-**Beginner example** — what a `for` loop actually does underneath, and why an iterator is one-shot:
+**Step 2 — What a `for` loop does underneath, and why an iterator is one-shot:**
 
 ```python
-nums = [10, 20, 30]
-it = iter(nums)
+it = iter(orders)
 while True:
     try:
-        n = next(it)
+        order = next(it)
     except StopIteration:
         break
-    print(n)
+    print("Processing:", order)
 
 print(list(it))
 print(list(it))
 ```
 
 *Line-by-line explanation:*
-- `it = iter(nums)` — a fresh iterator, exactly as a `for n in nums:` line would create automatically.
-- The `while True` loop calls `next(it)` on every pass, printing each value — this is precisely what `for` does behind the scenes.
+- `it = iter(orders)` — a fresh iterator, exactly as a `for order in orders:` line would create automatically.
+- The `while True` loop calls `next(it)` on every pass, printing each order as it is "processed" — this is precisely what `for` does behind the scenes.
 - `except StopIteration: break` — the loop exits the *moment* `next()` signals "nothing left," with no error ever visible to the programmer. This is the exact mechanism a plain `for` loop hides from you.
 - `print(list(it))` — collects whatever is left in `it` into a list; since `it` was already walked to the end above, nothing remains, so this prints an empty list.
-- `print(list(it))` a second time still prints an empty list — an exhausted iterator cannot rewind, no matter how many times you ask.
+- `print(list(it))` a second time still prints an empty list — an exhausted iterator cannot rewind, no matter how many times the app asks.
 - Output:
   ```
-  10
-  20
-  30
+  Processing: Saravana Bhavan
+  Processing: Biryani Blues
+  Processing: Pizza Hub
   []
   []
   ```
 
-**Practical example** — a generator function, and why it saves memory:
+**Step 3 — A generator recap, applied to the same orders:**
 
 ```python
 import sys
 
-def countdown(n):
-    while n > 0:
-        yield n
-        n -= 1
+def order_stream(order_list):
+    for order in order_list:
+        yield order
 
-for number in countdown(3):
-    print(number)
+for order in order_stream(orders):
+    print("Order received:", order)
 
-squares_list = [n * n for n in range(1_000_000)]
-squares_gen = (n * n for n in range(1_000_000))
+all_amounts_list = [n * 10 for n in range(1_000_000)]
+all_amounts_gen = (n * 10 for n in range(1_000_000))
 
-print(sys.getsizeof(squares_list), "bytes")
-print(sys.getsizeof(squares_gen), "bytes")
+print(sys.getsizeof(all_amounts_list), "bytes")
+print(sys.getsizeof(all_amounts_gen), "bytes")
 ```
 
 *Line-by-line explanation:*
-- `def countdown(n):` with `yield n` inside — this is a **generator function**; calling `countdown(3)` does not run the body yet, it only creates a generator object.
-- Each time the `for` loop calls `next()` on that generator (automatically), the function runs until `yield n`, hands back that value, and *pauses* with `n`'s value frozen — it resumes from exactly that point on the next call.
-- `squares_list = [...]` builds the **entire** list of a million squares in memory immediately, using a list comprehension.
-- `squares_gen = (...)` builds a **generator expression** instead — it stores only the plan for producing each square, not the million values themselves.
+- `def order_stream(order_list):` with `yield order` inside — this is a **generator function**; calling `order_stream(orders)` does not run the body yet, it only creates a generator object, exactly like a live feed of incoming orders instead of a batch already sitting in memory.
+- Each time the `for` loop calls `next()` on that generator (automatically), the function runs until `yield order`, hands back that order, and *pauses* right there until the next call.
+- `all_amounts_list = [...]` builds the **entire** list of a million order-amount calculations in memory immediately, using a list comprehension — imagine an end-of-day analytics job scanning a huge order history.
+- `all_amounts_gen = (...)` builds a **generator expression** instead — it stores only the plan for producing each amount, not the million values themselves.
 - `sys.getsizeof(...)` reports the memory, in bytes, that each object itself occupies.
 - Output:
   ```
-  3
-  2
-  1
+  Order received: Saravana Bhavan
+  Order received: Biryani Blues
+  Order received: Pizza Hub
   8448728 bytes
   200 bytes
   ```
-- The list costs roughly 8 megabytes before you have used a single value from it; the generator costs only a couple hundred bytes — and that stays true whether the range were a thousand or a billion, because it stores a plan, not the values. (The exact byte count for the generator can shift slightly between Python versions; the point that matters is that it stays tiny and constant, not the precise number.) For large or unpredictable amounts of data, this is often the difference between a program that runs and one that runs out of memory.
+- The list costs roughly 8 megabytes before a single value has even been used; the generator costs only a couple hundred bytes — and that stays true whether the app processed a thousand orders or a billion, because it stores a plan, not the values. (The exact byte count for the generator can shift slightly between Python versions; the point that matters is that it stays tiny and constant, not the precise number.)
 
-**Industry-oriented example** — `Counter`, `defaultdict`, and `namedtuple` in one realistic scenario:
+**Step 4 — `Counter`, `defaultdict`, and `namedtuple` working together on today's orders:**
 
 ```python
-from collections import Counter, defaultdict, namedtuple
+from collections import namedtuple, Counter, defaultdict
 
-# Food delivery: how many orders did each restaurant receive today?
-orders = ["Saravana Bhavan", "Biryani Blues", "Saravana Bhavan",
-          "Pizza Hub", "Saravana Bhavan", "Biryani Blues"]
-order_counts = Counter(orders)
-print(order_counts)
-print(order_counts.most_common(1))
+Order = namedtuple("Order", ["customer", "restaurant", "amount"])
 
-# Education: group students by grade, with no manual key checks
-students = [("Priya", "A"), ("Rohan", "B"), ("Arjun", "A"), ("Meera", "C")]
-by_grade = defaultdict(list)
-for name, grade in students:
-    by_grade[grade].append(name)
-print(dict(by_grade))
+orders_today = [
+    Order("Priya", "Saravana Bhavan", 350),
+    Order("Rohan", "Biryani Blues", 620),
+    Order("Arjun", "Saravana Bhavan", 280),
+    Order("Meera", "Pizza Hub", 540),
+    Order("Kavya", "Saravana Bhavan", 410),
+    Order("Sara", "Biryani Blues", 300),
+]
 
-# Railway booking: a seat record with readable field names
-Seat = namedtuple("Seat", ["coach", "seat_number", "passenger"])
-seat1 = Seat("S4", 23, "Ananya Sharma")
-print(seat1.coach, seat1.seat_number, seat1.passenger)
+restaurant_counts = Counter(o.restaurant for o in orders_today)
+print(restaurant_counts)
+print(restaurant_counts.most_common(1))
+
+customers_by_restaurant = defaultdict(list)
+for o in orders_today:
+    customers_by_restaurant[o.restaurant].append(o.customer)
+print(dict(customers_by_restaurant))
 ```
 
 *Line-by-line explanation:*
-- `Counter(orders)` tallies how many times each restaurant name appears in one call — no hand-written counting loop, no manual `dict.get()` pattern.
-- `order_counts.most_common(1)` returns the single highest-count entry, already sorted — exactly what a "top restaurant today" dashboard tile would need.
-- `defaultdict(list)` auto-creates an empty list the first time a new grade key is used, so `by_grade[grade].append(name)` works immediately, with no `if grade not in by_grade` check anywhere.
-- `namedtuple("Seat", ["coach", "seat_number", "passenger"])` builds a small, readable record type; `seat1.coach` is far clearer to a future reader than `seat1[0]` would be, while still behaving exactly like a tuple underneath.
+- `Order = namedtuple("Order", ["customer", "restaurant", "amount"])` — builds a small, readable record type; each `Order` behaves like a tuple but supports `.customer`, `.restaurant`, and `.amount` instead of `order[0]`, `order[1]`, `order[2]`.
+- `orders_today = [...]` — six `Order` instances, created exactly like calling any function with positional arguments.
+- `Counter(o.restaurant for o in orders_today)` — a **generator expression** feeds restaurant names to `Counter` one at a time, without first building a separate list of names; `Counter` tallies them into `restaurant_counts`.
+- `restaurant_counts.most_common(1)` returns the single highest-count entry, already sorted — exactly what a "top restaurant today" dashboard tile would need.
+- `defaultdict(list)` auto-creates an empty list the first time a new restaurant key is used, so `customers_by_restaurant[o.restaurant].append(o.customer)` works immediately, with no `if restaurant not in customers_by_restaurant` check anywhere.
 - Output:
   ```
   Counter({'Saravana Bhavan': 3, 'Biryani Blues': 2, 'Pizza Hub': 1})
   [('Saravana Bhavan', 3)]
-  {'A': ['Priya', 'Arjun'], 'B': ['Rohan'], 'C': ['Meera']}
-  S4 23 Ananya Sharma
+  {'Saravana Bhavan': ['Priya', 'Arjun', 'Kavya'], 'Biryani Blues': ['Rohan', 'Sara'], 'Pizza Hub': ['Meera']}
   ```
+
+**Step 5 — A generator built on the same records, and its one-shot nature:**
+
+```python
+def big_orders(order_list, minimum):
+    for o in order_list:
+        if o.amount >= minimum:
+            yield o.customer
+
+top_spenders = big_orders(orders_today, 400)
+for customer in top_spenders:
+    print(customer)
+
+for customer in top_spenders:
+    print(customer)
+```
+
+*Line-by-line explanation:*
+- `def big_orders(order_list, minimum):` with `yield o.customer` inside — a **generator function** that produces only the customers whose order amount meets the threshold, one at a time, on demand.
+- `top_spenders = big_orders(orders_today, 400)` — calling the generator function creates the generator object but does **not** run any of its body yet.
+- The **first** `for customer in top_spenders:` walks the generator fully, printing each qualifying customer in order, which exhausts it.
+- The **second** `for customer in top_spenders:` reuses the *same, already-exhausted* generator object — there is nothing left to yield, so the loop body never runs and nothing prints, exactly as Section 3.5's one-shot rule predicts.
+- Output:
+  ```
+  Rohan
+  Meera
+  Kavya
+  ```
+
+#### Try It Yourself
+
+**Exercise — Extending the "Chennai Bites" order pipeline:**
+
+**Part 1 (easiest).** Tomorrow's first two orders are `["Dosa Corner", "Momo Point"]`. Create an iterator over this list with `iter()`, then call `next()` on it **three** times. Before running it, predict what the third call will do.
+
+**Solution:**
+```python
+tomorrow_orders = ["Dosa Corner", "Momo Point"]
+it = iter(tomorrow_orders)
+
+print(next(it))
+print(next(it))
+print(next(it))
+```
+Expected output:
+```
+Dosa Corner
+Momo Point
+Traceback (most recent call last):
+    ...
+StopIteration
+```
+The list only has two items, so the third `next(it)` call has nothing left to give and raises `StopIteration` — the iterator does not restart or return `None`.
+
+**Part 2 (moderate).** Using the same `Order` namedtuple from the consolidated example, here is a new batch of orders:
+```python
+orders_tomorrow = [
+    Order("Divya", "Dosa Corner", 220),
+    Order("Karthik", "Momo Point", 480),
+    Order("Divya", "Momo Point", 310),
+    Order("Farhan", "Dosa Corner", 260),
+]
+```
+Write code that (a) tallies how many orders each restaurant received using `Counter`, and (b) groups the order **amounts** (not customer names) by restaurant using `defaultdict(list)`.
+
+**Solution:**
+```python
+restaurant_counts_tomorrow = Counter(o.restaurant for o in orders_tomorrow)
+print(restaurant_counts_tomorrow)
+
+amounts_by_restaurant = defaultdict(list)
+for o in orders_tomorrow:
+    amounts_by_restaurant[o.restaurant].append(o.amount)
+print(dict(amounts_by_restaurant))
+```
+Expected output:
+```
+Counter({'Dosa Corner': 2, 'Momo Point': 2})
+{'Dosa Corner': [220, 260], 'Momo Point': [480, 310]}
+```
+`Counter` tallies each restaurant name as it comes out of the generator expression, and `defaultdict(list)` auto-creates a new empty list the first time each restaurant name is seen, so every amount lands in the right bucket with no manual key check.
+
+**Part 3 (hardest).** Write a generator function `budget_orders(order_list, ceiling)` that yields the **customer** name for every order whose `amount` is *less than or equal to* `ceiling`. Using `orders_tomorrow` and a ceiling of `260`, walk the generator once with a `for` loop and print each name, then try walking the *same* generator object a second time.
+
+**Solution:**
+```python
+def budget_orders(order_list, ceiling):
+    for o in order_list:
+        if o.amount <= ceiling:
+            yield o.customer
+
+cheap_orders = budget_orders(orders_tomorrow, 260)
+for customer in cheap_orders:
+    print(customer)
+
+for customer in cheap_orders:
+    print(customer)
+```
+Expected output:
+```
+Divya
+Farhan
+```
+Only `Divya` (220) and `Farhan` (260) meet the `amount <= 260` condition, so the first loop prints both names in order. The second `for customer in cheap_orders:` prints nothing at all — `cheap_orders` is the same generator object already walked to exhaustion, and a generator, like any iterator, cannot be rewound; getting the names again would require calling `budget_orders(orders_tomorrow, 260)` fresh.
 
 ---
 

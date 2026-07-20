@@ -212,101 +212,120 @@ A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `
 
 ### 3.8 Code Examples
 
-**Basic example** — arithmetic operators, including the true-division vs floor-division surprise:
+**Code example** — a college fest snack stall: calculating a bill, splitting it among friends, and deciding on a discount:
 
 ```python
-print(7 / 2)
-print(7 // 2)
-print(7 % 2)
-```
-
-*Line-by-line explanation:*
-- `print(7 / 2)` — true division always returns a `float`, so this prints `3.5`.
-- `print(7 // 2)` — floor division rounds down to the nearest whole number, printing `3`.
-- `print(7 % 2)` — modulo gives the remainder after floor division: `7 // 2` is `3`, `3 * 2` is `6`, and `7 - 6` is `1`, so this prints `1`.
-- Output:
-  ```
-  3.5
-  3
-  1
-  ```
-
-**Beginner example** — operator precedence and the role of parentheses:
-
-```python
-result_1 = 2 + 3 * 4
-result_2 = (2 + 3) * 4
-print(result_1)
-print(result_2)
-```
-
-*Line-by-line explanation:*
-- `result_1 = 2 + 3 * 4` — `*` outranks `+`, so `3 * 4` is computed first (`12`), then `2 + 12` gives `14`.
-- `result_2 = (2 + 3) * 4` — the parentheses force `2 + 3` to be computed first (`5`), then `5 * 4` gives `20`.
-- Both lines use the exact same numbers in the exact same order — only the parentheses differ, and that alone changes the result.
-- Output:
-  ```
-  14
-  20
-  ```
-
-**Practical example** — comparison and logical operators combined to check loan eligibility:
-
-```python
-age = 22
-monthly_income = 35000
-has_existing_loan = False
-
-age_eligible = age >= 21
-income_eligible = monthly_income >= 25000
-loan_eligible = age_eligible and income_eligible and not has_existing_loan
-
-print(age_eligible)
-print(income_eligible)
-print(loan_eligible)
-```
-
-*Line-by-line explanation:*
-- `age_eligible = age >= 21` — a comparison that produces `True`, since `22 >= 21`.
-- `income_eligible = monthly_income >= 25000` — another comparison, also `True`, since `35000 >= 25000`.
-- `loan_eligible = age_eligible and income_eligible and not has_existing_loan` — `not has_existing_loan` first flips `False` to `True`; then `and` requires all three booleans to be `True` for the whole expression to be `True`.
-- Output:
-  ```
-  True
-  True
-  True
-  ```
-
-**Industry-oriented example** — a food delivery app checking free-delivery eligibility:
-
-```python
-order_total = 249.0
-delivery_distance_km = 4
-is_prime_member = True
+samosa_price = 15
+samosa_qty = 4
+cold_drink_price = 20
+cold_drink_qty = 2
+packing_fee = 10
+friends_sharing = 3
+has_student_card = True
 coupon_code = ""
+order_cancelled = False
 
-qualifies_by_amount = order_total >= 199
-qualifies_by_distance = delivery_distance_km <= 5
-free_delivery = (qualifies_by_amount or is_prime_member) and qualifies_by_distance
+item_total = samosa_price * samosa_qty + cold_drink_price * cold_drink_qty
+final_bill = item_total + packing_fee
+share_per_friend = final_bill // friends_sharing
+leftover_rupees = final_bill % friends_sharing
+
+qualifies_by_amount = final_bill >= 100
 has_coupon = bool(coupon_code)
+not_cancelled = not order_cancelled
+discount_eligible = qualifies_by_amount and has_student_card and not_cancelled
+free_packing = discount_eligible or has_coupon
 
-print("Free delivery:", free_delivery)
-print("Coupon applied:", has_coupon)
+print(final_bill)
+print(share_per_friend)
+print(leftover_rupees)
+print(discount_eligible)
+print(free_packing)
 ```
 
 *Line-by-line explanation:*
-- `order_total = 249.0` and `delivery_distance_km = 4` — the raw order data, a `float` and an `int`.
-- `is_prime_member = True` — a `bool` flag for a paid membership.
-- `coupon_code = ""` — an empty string, meaning no coupon was entered.
-- `qualifies_by_amount = order_total >= 199` — a comparison; `True`, since `249.0 >= 199`.
-- `qualifies_by_distance = delivery_distance_km <= 5` — another comparison; `True`, since `4 <= 5`.
-- `free_delivery = (qualifies_by_amount or is_prime_member) and qualifies_by_distance` — the parentheses force the `or` to be evaluated first ("did they cross the minimum amount, OR are they a prime member?"), and the result is then combined with the distance check using `and`; because `qualifies_by_amount` is already `True`, the `or` short-circuits and never even needs to check `is_prime_member`.
+- `samosa_price = 15` through `order_cancelled = False` — nine variables holding the raw facts about the order: prices and quantities (`int`), a student-card flag and a cancellation flag (`bool`), and a coupon code (`str`) that happens to be empty because no coupon was entered.
+- `item_total = samosa_price * samosa_qty + cold_drink_price * cold_drink_qty` — no parentheses are needed here because `*` already outranks `+` on the precedence ladder from Section 3.4: Python computes `samosa_price * samosa_qty` (`15 * 4 = 60`) and `cold_drink_price * cold_drink_qty` (`20 * 2 = 40`) first, *then* adds them, giving `100`.
+- `final_bill = item_total + packing_fee` — plain addition: `100 + 10 = 110`.
+- `share_per_friend = final_bill // friends_sharing` — floor division splits the bill into whole rupees per friend: `110 // 3` is `36`.
+- `leftover_rupees = final_bill % friends_sharing` — modulo gives whatever floor division couldn't split evenly: `110 % 3` is `2`. Check the rule from Section 3.5: `(36 * 3) + 2 = 110`, which reconstructs `final_bill` exactly.
+- `qualifies_by_amount = final_bill >= 100` — a comparison that always produces a `bool`; `110 >= 100` is `True`.
 - `has_coupon = bool(coupon_code)` — this relies on **truthiness**: an empty string is falsy, so wrapping it in `bool()` reports `False` directly, with no need to write `coupon_code != ""`.
+- `not_cancelled = not order_cancelled` — `not` flips the stored `False` to `True`, meaning "the order is indeed not cancelled."
+- `discount_eligible = qualifies_by_amount and has_student_card and not_cancelled` — `and` needs every operand to be `True`; all three are, so the whole expression is `True`.
+- `free_packing = discount_eligible or has_coupon` — `or` needs only one side to be `True`; because `discount_eligible` is already `True`, this **short-circuits** and Python doesn't even need to look at `has_coupon` to know the answer is `True`.
 - Output:
   ```
-  Free delivery: True
-  Coupon applied: False
+  110
+  36
+  2
+  True
+  True
   ```
+
+#### Try It Yourself
+
+The fest is busier than expected: more friends show up, and the order grows. Reuse the same snack-stall scenario from the example above and work through these three parts in order.
+
+**Part 1 (arithmetic):** The stall now sells `6` samosas (still ₹15 each) and `3` cold drinks (still ₹20 each), with the same ₹10 packing fee. Write code that computes `item_total` and `final_bill` using the same expressions as the example, then print `final_bill`.
+
+**Solution:**
+```python
+samosa_price = 15
+samosa_qty = 6
+cold_drink_price = 20
+cold_drink_qty = 3
+packing_fee = 10
+
+item_total = samosa_price * samosa_qty + cold_drink_price * cold_drink_qty
+final_bill = item_total + packing_fee
+print(final_bill)
+```
+`item_total` is `15 * 6 + 20 * 3` = `90 + 60` = `150` (multiplication before addition), and `final_bill` is `150 + 10` = `160`.
+Output:
+```
+160
+```
+
+**Part 2 (floor division and modulo):** This time `4` friends are sharing the `final_bill` of `160` from Part 1. Compute `share_per_friend` and `leftover_rupees`.
+
+**Solution:**
+```python
+friends_sharing = 4
+share_per_friend = final_bill // friends_sharing
+leftover_rupees = final_bill % friends_sharing
+print(share_per_friend)
+print(leftover_rupees)
+```
+`160 // 4` is `40`, and `160 % 4` is `0` — the bill splits perfectly this time, with nothing left over.
+Output:
+```
+40
+0
+```
+
+**Part 3 (comparison, logical operators, and truthiness):** This particular friend does **not** have a student card (`has_student_card = False`), but did enter a coupon code (`coupon_code = "FEST10"`), and the order was not cancelled (`order_cancelled = False`). Using `final_bill = 160` from Part 1, compute `discount_eligible` and `free_packing` with the exact same expressions as the main example, then explain in one sentence why `free_packing` still ends up `True` even though `discount_eligible` is `False`.
+
+**Solution:**
+```python
+has_student_card = False
+coupon_code = "FEST10"
+order_cancelled = False
+
+qualifies_by_amount = final_bill >= 100
+has_coupon = bool(coupon_code)
+not_cancelled = not order_cancelled
+discount_eligible = qualifies_by_amount and has_student_card and not_cancelled
+free_packing = discount_eligible or has_coupon
+print(discount_eligible)
+print(free_packing)
+```
+`discount_eligible` is `False` because `and` requires *every* operand to be `True`, and `has_student_card` is `False` here. But `free_packing` is still `True`, because `has_coupon` is `True` (`"FEST10"` is a non-empty, truthy string), and `or` only needs one side to be `True`.
+Output:
+```
+False
+True
+```
 
 ---
 

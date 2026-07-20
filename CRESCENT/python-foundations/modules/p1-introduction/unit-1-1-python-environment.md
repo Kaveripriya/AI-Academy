@@ -194,66 +194,158 @@ Let's break this down piece by piece, because as a fresher you must be able to n
 
 ### 3.9 Code Examples
 
-**Basic example** — the smallest possible program:
+**Scenario: Aditi Sharma's first day as a fresher at an IT company.** Aditi has just joined an IT company as a fresher, and her onboarding system needs to print a few things to the screen on her first day — starting with a simple welcome, and gradually building up to a fully formatted digital ID card. We'll build this up one small step at a time, exactly as you would in your own Colab notebook — running one cell, reading its output, then extending it.
+
+**Step 1 — print a single welcome line.**
+
+The absolute smallest thing Aditi's onboarding program can do is display one line of text:
 
 ```python
-print("Hello, world!")
+print("Welcome to your first day, Aditi!")
 ```
 
 *Line-by-line explanation:*
 - `print(...)` — calls the built-in `print` function.
-- `"Hello, world!"` — a string literal, the exact text to display.
-- Running this cell displays `Hello, world!` directly beneath it. There is nothing else in this program — one function call, one line, one output.
+- `"Welcome to your first day, Aditi!"` — a string literal, the exact text to display, wrapped in matching double quotes.
+- Running this cell displays the text directly beneath it. There is nothing else in this program — one function call, one line, one output.
+- Expected output:
+  ```
+  Welcome to your first day, Aditi!
+  ```
 
-**Beginner example** — printing more than one line:
+**Step 2 — print more than one line.**
+
+A single welcome line isn't much of an onboarding message. Let's add a second `print()` call so Aditi sees two lines instead of one:
 
 ```python
-print("Welcome to Python Foundations.")
-print("This is your first program.")
+print("Welcome to your first day, Aditi!")
+print("Please find your employee details below.")
 ```
 
 *Line-by-line explanation:*
-- Line 1: calls `print()` with the string `"Welcome to Python Foundations."`. Output: that exact text.
-- Line 2: calls `print()` again with a different string. Because each `print()` call automatically moves to a new line afterward, this appears on its own separate line below the first.
+- Line 1: calls `print()` with the welcome string, exactly as in Step 1.
+- Line 2: calls `print()` again with a different string. Because each `print()` call automatically moves to a new line afterward, this second line appears directly below the first, not next to it.
+- Python runs both lines strictly top to bottom — the order you write your `print()` calls is the order the output appears in.
 - Expected output:
   ```
-  Welcome to Python Foundations.
-  This is your first program.
+  Welcome to your first day, Aditi!
+  Please find your employee details below.
   ```
 
-**Practical example** — a student ID card printed to the console:
+**Step 3 — print Aditi's employee details as an ID card.**
+
+Now let's extend the same idea to display Aditi's actual employee details, one detail per line — this is exactly the "print several related lines" pattern used in real onboarding tools:
 
 ```python
-print("Student Name: Aditi Sharma")
-print("Course: AI Native Engineering - Python Foundations")
+print("Welcome to your first day, Aditi!")
+print("Please find your employee details below.")
+print("Employee Name: Aditi Sharma")
+print("Employee ID: EMP-2026-0143")
+print("Department: AI Native Engineering")
+```
+
+*Line-by-line explanation:*
+- The first two lines are unchanged from Step 2 — we are building on top of what already worked, not starting over.
+- Each new line is its own independent `print()` call with its own string.
+- Python executes all five calls strictly top to bottom, so the five lines of output appear in exactly the order they were written.
+- Expected output:
+  ```
+  Welcome to your first day, Aditi!
+  Please find your employee details below.
+  Employee Name: Aditi Sharma
+  Employee ID: EMP-2026-0143
+  Department: AI Native Engineering
+  ```
+
+**Step 4 — format it like a real, industry-style confirmation card.**
+
+Finally, let's make it look like something a real company system would print — with a bordered header and footer, similar to how a UPI app shows "Payment Successful" after a transaction:
+
+```python
+print("======================================")
+print("      NEW EMPLOYEE ONBOARDING")
+print("======================================")
+print("Employee Name: Aditi Sharma")
+print("Employee ID: EMP-2026-0143")
+print("Department: AI Native Engineering")
+print("Status: ACTIVE")
+print("======================================")
+```
+
+*Line-by-line explanation:*
+- The `"======================================"` lines are just ordinary string literals made of `=` characters — Python does not treat them specially in any way; it prints them exactly as written, the same as any other string.
+- The middle three lines print Aditi's details, exactly as in Step 3, now framed by a header and footer.
+- `print("Status: ACTIVE")` is a new fixed-text line added the same way as every other line in this example — one more `print()` call, executed in order.
+- Every one of the eight `print()` calls is independent and produces exactly one line of output, and Python runs them strictly top to bottom.
+- Expected output:
+  ```
+  ======================================
+        NEW EMPLOYEE ONBOARDING
+  ======================================
+  Employee Name: Aditi Sharma
+  Employee ID: EMP-2026-0143
+  Department: AI Native Engineering
+  Status: ACTIVE
+  ======================================
+  ```
+- This mirrors something you have almost certainly seen for real: a payment app confirming a UPI transaction, or an HR system confirming a new joiner. In this unit, you are only printing fixed text — later units (starting with variables in Unit 1.2) will let you print information that *changes*, like a real employee ID pulled from a database instead of typed directly into the code.
+
+#### Try It Yourself
+
+**Exercise: Build your own "First Day" card.**
+
+Using only `print()` and string literals (nothing else — no variables, no user input), recreate Aditi's onboarding flow for *yourself* in a new Colab cell:
+
+- **(a)** Print a single line welcoming yourself to your first day, e.g. `"Welcome to your first day, <Your Name>!"`.
+- **(b)** Add a second and third line printing your own name and the course/batch you are part of, e.g. `"Student Name: ..."` and `"Batch: ..."`, so your cell now prints three lines in total.
+- **(c)** Add a bordered header and footer around your details, using a line of `=` or `-` characters, so the final output looks like a proper formatted card (similar to Step 4 above).
+
+**Solution (a):**
+
+```python
+print("Welcome to your first day, Rohan!")
+```
+
+Expected output:
+```
+Welcome to your first day, Rohan!
+```
+
+**Solution (b):**
+
+```python
+print("Welcome to your first day, Rohan!")
+print("Student Name: Rohan Verma")
 print("Batch: 2026-Colab-01")
 ```
 
-*Line-by-line explanation:*
-- Each line is an independent `print()` call with its own string.
-- Python executes them strictly top to bottom, so the output lines appear in exactly the order they were written.
-- Expected output:
-  ```
-  Student Name: Aditi Sharma
-  Course: AI Native Engineering - Python Foundations
-  Batch: 2026-Colab-01
-  ```
+Expected output:
+```
+Welcome to your first day, Rohan!
+Student Name: Rohan Verma
+Batch: 2026-Colab-01
+```
 
-**Industry-oriented example** — a UPI payment confirmation message (the kind of thing a real payment app shows you after a transaction):
+**Solution (c):**
 
 ```python
 print("--------------------------------------")
-print("      UPI PAYMENT SUCCESSFUL")
-print("--------------------------------------")
-print("Paid to: Sharma General Store")
-print("Status: SUCCESS")
+print("Welcome to your first day, Rohan!")
+print("Student Name: Rohan Verma")
+print("Batch: 2026-Colab-01")
 print("--------------------------------------")
 ```
 
-*Line-by-line explanation:*
-- The `"--------------------------------------"` lines are just strings made of dash characters — Python does not treat them specially; it prints them exactly as written, the same as any other string.
-- Each `print()` call is independent and produces exactly one line of output, in order.
-- This mirrors something you have almost certainly seen for real: a payment app confirming a UPI transaction. In this unit, you are only printing fixed text — later units (starting with variables in Unit 1.2) will let you print information that *changes*, like a real payment amount.
+Expected output:
+```
+--------------------------------------
+Welcome to your first day, Rohan!
+Student Name: Rohan Verma
+Batch: 2026-Colab-01
+--------------------------------------
+```
+
+Notice that each part only adds `print()` calls on top of the previous part — nothing you already had needs to change. That "extend, don't rewrite" habit is exactly what you will keep doing as your programs grow in later units.
 
 ---
 

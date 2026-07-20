@@ -33,6 +33,8 @@ In this unit, you will learn how to create variables, the rules and conventions 
 
 A **variable** is a name that refers to a value stored in the computer's memory. Think of it like a labelled box: the label is the name you choose, and the box holds whatever value you put inside. You create a variable using the **assignment operator**, the single equals sign `=`, with the name on the left and the value on the right:
 
+**Example:**
+
 ```python
 x = 5
 ```
@@ -85,6 +87,8 @@ name = value
 
 Reassignment uses the exact same syntax, just written again later in the program:
 
+**Example:**
+
 ```python
 score = 100      # first assignment — score is created
 score = 150      # reassignment — score's old value (100) is replaced
@@ -93,6 +97,8 @@ score = 150      # reassignment — score's old value (100) is replaced
 **Getting a value from the user: `input()`**
 
 Every example so far has assigned a value you typed directly into the code. Real programs usually need to ask the *person running the program* for a value instead — a name, an age, an amount to pay. The built-in **`input()`** function does exactly this: it pauses the program, displays an optional prompt message, waits for the user to type something and press Enter, and then hands back whatever they typed.
+
+**Example:**
 
 ```python
 name = input("Enter your name: ")
@@ -116,6 +122,8 @@ print("Hello,", name)
 | Return value | **Always a `str`**, no matter what the user types — even `input("Enter your age: ")` with `20` typed in returns the *string* `"20"`, not the number `20`. | This is the single most important fact about `input()`: you must explicitly convert it (using `int()` or `float()`, covered in Unit 1.4) before using it as a number. |
 
 See this for yourself — even though the user types a number below, `type()` proves what `input()` actually handed back:
+
+**Example:**
 
 ```python
 age = input("Enter your age: ")
@@ -184,81 +192,175 @@ flowchart TD
 
 ### 3.8 Code Examples
 
-**Basic example** — creating and printing a single variable:
+**Scenario:** we'll build one running example — tracking a Swiggy-style food delivery order — in four short stages. Each stage keeps every line from the stage before it and adds a few new ones, so by the end you can see the whole idea of variables, reassignment, types, and `input()` working together in a single program.
+
+**Stage 1 — create and print a single variable (the item's price):**
 
 ```python
-x = 5
-print(x)
+item_price = 149
+print(item_price)
 ```
 
 *Line-by-line explanation:*
-- `x = 5` — binds the name `x` to the value `5`.
-- `print(x)` — Python looks up what `x` refers to and displays it.
-- Output: `5`.
+- `item_price = 149` — binds the name `item_price` to the value `149`.
+- `print(item_price)` — Python looks up what `item_price` refers to and displays it.
+- Output: `149`.
 
-**Beginner example** — reassigning a variable:
+**Stage 2 — the customer changes their order, so the price is reassigned:**
 
 ```python
-count = 10
-print(count)
-count = 20
-print(count)
+item_price = 149
+print(item_price)
+
+item_price = 249
+print(item_price)
 ```
 
 *Line-by-line explanation:*
-- `count = 10` creates `count` with value `10`; the first `print(count)` shows `10`.
-- `count = 20` replaces the old value entirely — `count` now refers to `20` and the `10` is gone.
+- The first two lines are unchanged from Stage 1 and still print `149`.
+- `item_price = 249` is a **reassignment** — the old value `149` is discarded, and `item_price` now refers to `249`.
+- The second `print(item_price)` shows the new value.
 - Output:
   ```
-  10
-  20
+  149
+  249
   ```
 
-**Practical example** — one variable of each basic type, inspected with `type()`:
+**Stage 3 — store the rest of the order using one variable of each basic type, and inspect them with `type()`:**
 
 ```python
-age = 30
-price = 9.99
-name = "Ada"
-is_active = True
+item_price = 149
+print(item_price)
 
-print(type(age))
-print(type(price))
-print(type(name))
-print(type(is_active))
+item_price = 249
+print(item_price)
+
+customer_name = "Ananya Roy"
+delivery_fee = 29.50
+order_id = "SWG10234"
+is_paid = False
+
+print(type(customer_name))
+print(type(delivery_fee))
+print(type(order_id))
+print(type(is_paid))
 ```
 
 *Line-by-line explanation:*
-- `age = 30` — no decimal point, so Python stores it as an `int`.
-- `price = 9.99` — written with a decimal point, so Python stores it as a `float`.
-- `name = "Ada"` — wrapped in quotes, so Python stores it as a `str`.
-- `is_active = True` — one of exactly two allowed values, so Python stores it as a `bool`.
-- The `print(type(...))` lines report each stored type. Output:
+- `customer_name = "Ananya Roy"` — wrapped in quotes, so Python stores it as a `str`.
+- `delivery_fee = 29.50` — written with a decimal point, so Python stores it as a `float`.
+- `order_id = "SWG10234"` — quoted, so it's a `str`, even though it contains digits; it is text to display, not a number to calculate with.
+- `is_paid = False` — one of exactly two allowed values, so Python stores it as a `bool`, starting as "not yet paid."
+- The four `print(type(...))` lines report each stored type, with no need to declare any of them in advance — this is dynamic typing in action. Output:
   ```
-  <class 'int'>
+  149
+  249
+  <class 'str'>
   <class 'float'>
   <class 'str'>
   <class 'bool'>
   ```
 
-**Industry-oriented example** — variables behind a UPI payment confirmation:
+**Stage 4 — ask the customer for their delivery address with `input()`, then confirm payment:**
 
 ```python
-payer_name = "Rohit Verma"
-amount_paid = 499.00
-transaction_id = "UPI2026071900123"
-payment_successful = True
+item_price = 149
+print(item_price)
 
-print("Payer:", payer_name)
-print("Amount:", amount_paid)
-print("Transaction ID:", transaction_id)
-print("Status:", payment_successful)
+item_price = 249
+print(item_price)
+
+customer_name = "Ananya Roy"
+delivery_fee = 29.50
+order_id = "SWG10234"
+is_paid = False
+
+print(type(customer_name))
+print(type(delivery_fee))
+print(type(order_id))
+print(type(is_paid))
+
+address = input("Enter your delivery address: ")
+print("Deliver to:", address)
+print(type(address))
+
+is_paid = True
+print("Payment status:", is_paid)
 ```
 
 *Line-by-line explanation:*
-- Four variables hold four different types: a `str` for the payer's name, a `float` for the amount, a `str` for the transaction ID (even though it contains digits, it is quoted text, not a number to calculate with), and a `bool` for the payment result.
-- Each `print()` call passes two things separated by a comma — a text label and the variable — and `print()` displays both, separated by a space, on one line.
-- This is precisely the shape of data a real UPI backend service works with: named values, each of a specific type, that get checked, stored, and displayed.
+- `address = input("Enter your delivery address: ")` displays the prompt and pauses until the user types a response and presses Enter; whatever they type is assigned to `address`.
+- `print("Deliver to:", address)` displays a label and the address together.
+- `print(type(address))` proves that `input()` always hands back a `str`, no matter what the user types.
+- `is_paid = True` is another reassignment — the same name that held `False` now refers to `True`, simulating the moment payment succeeds.
+- Sample run (user types `12 MG Road, Bengaluru` and presses Enter):
+  ```
+  149
+  249
+  <class 'str'>
+  <class 'float'>
+  <class 'str'>
+  <class 'bool'>
+  Enter your delivery address: 12 MG Road, Bengaluru
+  Deliver to: 12 MG Road, Bengaluru
+  <class 'str'>
+  Payment status: True
+  ```
+
+#### Try It Yourself
+
+Sticking with the same food delivery scenario, extend the program yourself. Attempt each part before checking the solution.
+
+**(a)** Create a variable `restaurant_name` holding the text `"Spice Route"`, print it, and then print its type.
+
+**Solution:**
+```python
+restaurant_name = "Spice Route"
+print(restaurant_name)
+print(type(restaurant_name))
+```
+Expected output:
+```
+Spice Route
+<class 'str'>
+```
+
+**(b)** Add two more variables: `quantity` set to `3` (the number of items ordered) and `packing_charge` set to `15.0`. Print the type of `restaurant_name`, `quantity`, and `packing_charge`, one per line.
+
+**Solution:**
+```python
+restaurant_name = "Spice Route"
+quantity = 3
+packing_charge = 15.0
+
+print(type(restaurant_name))
+print(type(quantity))
+print(type(packing_charge))
+```
+Expected output:
+```
+<class 'str'>
+<class 'int'>
+<class 'float'>
+```
+
+**(c)** Using `input()`, ask the customer to type their name into a variable called `customer_name`. Print a message that says `"Order for:"` followed by `customer_name`. Then create a variable `order_confirmed` starting as `False`, reassign it to `True` once the order is placed, and print `"Order confirmed:"` followed by `order_confirmed`.
+
+**Solution:**
+```python
+customer_name = input("Enter your name: ")
+print("Order for:", customer_name)
+
+order_confirmed = False
+order_confirmed = True
+print("Order confirmed:", order_confirmed)
+```
+Expected output (user types `Rahul` and presses Enter):
+```
+Enter your name: Rahul
+Order for: Rahul
+Order confirmed: True
+```
 
 ---
 

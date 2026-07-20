@@ -169,87 +169,88 @@ Read this top to bottom: Python checks the condition (or whether the sequence ha
 
 ### 3.8 Code Examples
 
-**Basic example** — a `while` loop counting up:
+One scenario runs through this entire section: a railway booking clerk is searching for the first available seat across three coaches (numbered `1` to `3`), each with five seats (numbered `1` to `5`). Each part below tackles a piece of that same scenario with a different loop tool, building up to the full search.
+
+**Part 1** — checking coaches one by one with a `while` loop:
 
 ```python
-count = 1
+coach = 1
 
-while count <= 5:
-    print(count)
-    count = count + 1
+while coach <= 3:
+    print("Checking Coach", coach)
+    coach = coach + 1
 ```
 
 *Line-by-line explanation:*
-- `count = 1` creates the variable that the loop's condition depends on.
-- `while count <= 5:` checks the condition before every iteration; as long as it's `True`, the body runs.
-- `print(count)` displays the current value.
-- `count = count + 1` is the crucial line — it moves `count` closer to making the condition `False`. Without it, this loop would never stop.
+- `coach = 1` creates the variable that the loop's condition depends on — the clerk starts at coach `1`.
+- `while coach <= 3:` checks the condition before every iteration; as long as it's `True`, the body runs.
+- `print("Checking Coach", coach)` announces which coach is currently being checked.
+- `coach = coach + 1` is the crucial line — it moves `coach` closer to making the condition `False`. Without it, this loop would never stop.
 - Output:
   ```
-  1
-  2
-  3
-  4
-  5
+  Checking Coach 1
+  Checking Coach 2
+  Checking Coach 3
   ```
-  Once `count` becomes `6`, `6 <= 5` is `False`, and the loop ends.
+  Once `coach` becomes `4`, `4 <= 3` is `False`, and the loop ends.
 
-**Beginner example** — a `for` loop with `range()`:
+**Part 2** — the same check, written as a `for` loop with `range()`:
 
 ```python
-for i in range(1, 6):
-    print("Row", i)
+for coach in range(1, 4):
+    print("Checking Coach", coach)
 ```
 
 *Line-by-line explanation:*
-- `range(1, 6)` produces the integers `1, 2, 3, 4, 5` — starting at `1`, stopping before `6`.
-- `for i in range(1, 6):` binds `i` to each of those integers, one per iteration, five iterations in total.
-- `print("Row", i)` runs once per iteration with the current value of `i`.
+- `range(1, 4)` produces the integers `1, 2, 3` — starting at `1`, stopping before `4`.
+- `for coach in range(1, 4):` binds `coach` to each of those integers, one per iteration, three iterations in total.
+- `print("Checking Coach", coach)` runs once per iteration with the current value of `coach`.
 - Output:
   ```
-  Row 1
-  Row 2
-  Row 3
-  Row 4
-  Row 5
+  Checking Coach 1
+  Checking Coach 2
+  Checking Coach 3
   ```
-  Notice there's no counter to manage by hand — `range()` and the `for` loop take care of that entirely.
+  This is exactly the same output as Part 1, but with no counter to manage by hand — `range()` and the `for` loop take care of that entirely.
 
-**Practical example** — `enumerate()` and `zip()` together:
+**Part 3** — checking coach names and seat counts together with `enumerate()` and `zip()`:
 
 ```python
-roll_numbers = (101, 102, 103)
-attendance = ("Present", "Absent", "Present")
+coach_names = ("S1", "S2", "S3")
+seats_available = (0, 5, 3)
 
-for index, roll in enumerate(roll_numbers, 1):
-    print("Position", index, "-> Roll number", roll)
+for position, name in enumerate(coach_names, 1):
+    print("Position", position, "-> Coach", name)
 
-for roll, status in zip(roll_numbers, attendance):
-    print(roll, status)
+for name, seats in zip(coach_names, seats_available):
+    print("Coach", name, "has", seats, "seat(s) available")
 ```
 
 *Line-by-line explanation:*
-- `roll_numbers` and `attendance` are two short, fixed sequences of values written directly in parentheses — for now, just think of them as ready-made lists of values to loop over (you'll learn their proper name, tuples, in a later module).
-- `enumerate(roll_numbers, 1)` pairs each roll number with a position counter that starts at `1` instead of the default `0`.
-- The first loop prints each position alongside its roll number.
-- `zip(roll_numbers, attendance)` walks both sequences together, pairing `101` with `"Present"`, `102` with `"Absent"`, and `103` with `"Present"` — one pair per iteration.
-- The second loop prints each roll number next to its attendance status.
+- `coach_names` and `seats_available` are two short, fixed sequences of values written directly in parentheses — for now, just think of them as ready-made lists of values to loop over (you'll learn their proper name, tuples, in a later module).
+- `enumerate(coach_names, 1)` pairs each coach name with a position counter that starts at `1` instead of the default `0`.
+- The first loop prints each coach's position in the train alongside its name.
+- `zip(coach_names, seats_available)` walks both sequences together, pairing `"S1"` with `0`, `"S2"` with `5`, and `"S3"` with `3` — one pair per iteration.
+- The second loop prints each coach name next to how many seats it currently has free.
 - Output:
   ```
-  Position 1 -> Roll number 101
-  Position 2 -> Roll number 102
-  Position 3 -> Roll number 103
-  101 Present
-  102 Absent
-  103 Present
+  Position 1 -> Coach S1
+  Position 2 -> Coach S2
+  Position 3 -> Coach S3
+  Coach S1 has 0 seat(s) available
+  Coach S2 has 5 seat(s) available
+  Coach S3 has 3 seat(s) available
   ```
 
-**Industry-oriented example** — searching for an available train seat with nested loops and `break`:
+**Part 4** — putting it together: searching for one free seat with nested loops, `continue`, and `break`:
 
 ```python
 seat_found = False
 
-for coach in range(1, 4):
+for coach, seats in zip(range(1, 4), seats_available):
+    if seats == 0:
+        print("Coach", coach, "is full. Skipping to next coach.")
+        continue
     for seat in range(1, 6):
         if coach == 2 and seat == 3:
             print(f"Seat {seat} in Coach {coach} is available. Booking now.")
@@ -264,16 +265,84 @@ if not seat_found:
 
 *Line-by-line explanation:*
 - `seat_found = False` is a flag that tracks whether the search has succeeded yet.
-- The outer `for coach in range(1, 4):` walks through coaches `1`, `2`, `3`; for every single coach, the inner loop runs completely (or until it breaks) — this is a **nested loop**.
-- The inner `for seat in range(1, 6):` walks through seats `1` to `5` inside the current coach.
+- `for coach, seats in zip(range(1, 4), seats_available):` walks through coach numbers `1, 2, 3` together with their seat counts from Part 3 (`0, 5, 3`), pairing each coach with its own count.
+- `if seats == 0: ... continue` skips a full coach immediately — it prints a message, then jumps straight to the next coach without ever looking at its seats. Coach `1` has `0` seats available, so this fires for it.
+- The inner `for seat in range(1, 6):` only runs for a coach that has at least one seat free; it walks through seats `1` to `5` inside the current coach. An inner loop running inside the body of an outer loop like this is called a **nested loop**.
 - `if coach == 2 and seat == 3:` simulates finding a free seat — in a real system this condition would check a database instead.
 - `break` inside the inner loop stops scanning seats **only within the current coach** — it does not touch the outer loop.
 - `if seat_found: break` right after the inner loop is what actually stops the outer loop too — this is exactly why the common mistake in §3.7 matters: one `break` alone would not have been enough to leave both loops.
-- If no seat is ever found, `seat_found` stays `False`, and the final `if` prints a "no seats" message.
+- If no seat is ever found across every coach, `seat_found` stays `False`, and the final `if` prints a "no seats" message.
 - Output:
   ```
+  Coach 1 is full. Skipping to next coach.
   Seat 3 in Coach 2 is available. Booking now.
   ```
+
+#### Try It Yourself
+
+Using the same scenario — a train with coaches numbered `1` to `3`, each holding seats numbered `1` to `5` — work through the following, building up from a single loop to a full nested search.
+
+**Part A:** A fourth coach, Coach `4`, has just been attached to the train. Write a `for` loop using `range()` that prints every seat number from `1` to `5` for Coach `4`, in the format `"Coach 4, Seat 1"`, `"Coach 4, Seat 2"`, and so on.
+
+**Solution:**
+
+```python
+for seat in range(1, 6):
+    print("Coach 4, Seat", seat)
+```
+
+Expected output:
+```
+Coach 4, Seat 1
+Coach 4, Seat 2
+Coach 4, Seat 3
+Coach 4, Seat 4
+Coach 4, Seat 5
+```
+
+**Part B:** Coach `4`'s seat statuses, in seat order from `1` to `5`, are: `("Booked", "Booked", "Free", "Booked", "Free")`. Use `enumerate()` to print each seat number next to its status, in the format `"Seat 1: Booked"`.
+
+**Solution:**
+
+```python
+coach_4_status = ("Booked", "Booked", "Free", "Booked", "Free")
+
+for seat, status in enumerate(coach_4_status, 1):
+    print(f"Seat {seat}: {status}")
+```
+
+Expected output:
+```
+Seat 1: Booked
+Seat 2: Booked
+Seat 3: Free
+Seat 4: Booked
+Seat 5: Free
+```
+
+**Part C:** Using the same `coach_4_status` sequence from Part B, write a loop that finds the **first** free seat and prints `"First free seat in Coach 4 is Seat <n>"`, then stops searching immediately (`break`) — booked seats should be skipped silently (`continue`) without printing anything for them. If no free seat exists at all, print `"Coach 4 is fully booked."` instead.
+
+**Solution:**
+
+```python
+coach_4_status = ("Booked", "Booked", "Free", "Booked", "Free")
+free_seat_found = False
+
+for seat, status in enumerate(coach_4_status, 1):
+    if status == "Booked":
+        continue
+    print("First free seat in Coach 4 is Seat", seat)
+    free_seat_found = True
+    break
+
+if not free_seat_found:
+    print("Coach 4 is fully booked.")
+```
+
+Expected output:
+```
+First free seat in Coach 4 is Seat 3
+```
 
 ---
 

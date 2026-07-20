@@ -218,162 +218,285 @@ graph TD
 
 ### 3.8 Code Examples
 
-**Basic example** — converting text to a number, with one specific `except`:
+All four examples below build **one single scenario** — a shop counter accepting a UPI payment — adding one new piece of the `try`/`except` toolkit at a time. By the end, one function has grown to use every tool from §3.4.
+
+**Step 1 — a basic `try`/`except`:** just convert the text the customer typed into a number.
 
 ```python
+amount_text = "499.00"
+
 try:
-    marks = int("95")
-    print("Marks:", marks)
+    amount = float(amount_text)
+    print("Amount entered:", amount)
 except ValueError:
-    print("That was not a valid number.")
+    print("Please enter a valid number.")
 ```
 
 *Line-by-line explanation:*
+- `amount_text = "499.00"` — stands in for whatever a customer types into a payment app's amount field; it arrives as text.
 - `try:` — marks the start of the code Python should attempt.
-- `marks = int("95")` — `"95"` converts cleanly to the integer `95`, so this line succeeds.
-- `print("Marks:", marks)` — runs normally since no exception occurred.
+- `amount = float(amount_text)` — `"499.00"` converts cleanly to the number `499.0`, so this line succeeds.
+- `print("Amount entered:", amount)` — runs normally since no exception occurred.
 - `except ValueError:` — this block is skipped entirely, because nothing went wrong above it.
-- Output: `Marks: 95`
+- Output: `Amount entered: 499.0`
 
-**Beginner example** — two specific `except` blocks plus `else` and `finally`:
-
-```python
-try:
-    num1 = int(input("Enter numerator: "))
-    num2 = int(input("Enter denominator: "))
-    result = num1 / num2
-except ValueError:
-    print("Please enter valid whole numbers.")
-except ZeroDivisionError:
-    print("You cannot divide by zero.")
-else:
-    print("Result:", result)
-finally:
-    print("Calculation attempt finished.")
-```
-
-*Line-by-line explanation:*
-- `try:` — wraps the two conversions and the division, the three lines that might fail.
-- `int(input(...))` (twice) — reads text from the user and converts it to a whole number; fails with `ValueError` if the text isn't a valid integer.
-- `result = num1 / num2` — fails with `ZeroDivisionError` if `num2` is `0`.
-- `except ValueError:` — runs only if a conversion failed.
-- `except ZeroDivisionError:` — runs only if the division itself failed.
-- `else:` — runs only when both conversions *and* the division succeeded with zero exceptions.
-- `finally:` — runs after every single attempt, regardless of which path above was taken.
-- Sample run with `10` and `2`:
-  ```
-  Result: 5.0
-  Calculation attempt finished.
-  ```
-- Sample run with `10` and `0`:
-  ```
-  You cannot divide by zero.
-  Calculation attempt finished.
-  ```
-
-**Practical example** — reusing Unit 5.1's file-reading pattern, now protected against a missing file and a missing lookup key:
+**Step 2 — multiple `except` clauses:** the shop also needs to look up the customer's account balance, which can fail in a completely different way (an unknown customer) than a bad amount.
 
 ```python
-import json
+balances = {"Rohit Verma": 300, "Asha Singh": 1000, "Karan Mehta": 5000}
 
-def get_passenger_status(pnr):
+def process_payment(payer, amount_text):
     try:
-        with open("railway_bookings.json", "r") as file:
-            bookings = json.load(file)
-        return bookings[pnr]
-    except FileNotFoundError:
-        return "Booking file not found. Please try again later."
-    except KeyError:
-        return f"No booking found for PNR {pnr}."
-
-print(get_passenger_status("PNR1234"))
-```
-
-*Line-by-line explanation:*
-- `import json` — brings in the module from Unit 5.1 used to parse JSON files.
-- `def get_passenger_status(pnr):` — a function that looks up one passenger's booking by PNR number.
-- `with open("railway_bookings.json", "r") as file:` — opens the file for reading, exactly as in Unit 5.1; `with` still guarantees the file closes automatically.
-- `bookings = json.load(file)` — parses the file's JSON content into a Python dictionary.
-- `return bookings[pnr]` — looks up the given PNR; this is where a missing key would fail.
-- `except FileNotFoundError:` — catches the case where `railway_bookings.json` doesn't exist at all — perhaps it was deleted or never created.
-- `except KeyError:` — catches the case where the file opened fine, but this particular PNR isn't in it.
-- Assuming `railway_bookings.json` does not exist in this run, output is:
-  ```
-  Booking file not found. Please try again later.
-  ```
-
-**Industry-oriented example** — validating a UPI payment against an account-balance file, using a custom exception, several specific `except` blocks, and `finally` for logging:
-
-```python
-import json
-
-class InvalidAmountError(Exception):
-    pass
-
-def process_upi_payment(payer, amount_text):
-    try:
-        with open("account_balances.json", "r") as file:
-            balances = json.load(file)
-        current_balance = balances[payer]
-
         amount = float(amount_text)
-        if amount <= 0:
-            raise InvalidAmountError(f"Rs.{amount} is not a valid payment amount.")
-        if amount > current_balance:
-            raise InvalidAmountError(f"Insufficient balance: Rs.{current_balance} available.")
-
-        print(f"Payment of Rs.{amount} by {payer} approved.")
-    except FileNotFoundError:
-        print("Account balance file not found. Payment cannot proceed.")
+        current_balance = balances[payer]
+        print(f"{payer} wants to pay Rs.{amount}; balance is Rs.{current_balance}.")
+    except ValueError:
+        print("Please enter a valid number.")
     except KeyError:
         print(f"No account found for {payer}.")
+
+process_payment("Rohit Verma", "150")
+process_payment("Unknown User", "200")
+process_payment("Asha Singh", "five hundred")
+```
+
+*Line-by-line explanation:*
+- `balances = {...}` — a small dictionary standing in for a real account-balance lookup, exactly the kind of dictionary you built in earlier units.
+- `amount = float(amount_text)` — fails with `ValueError` if the text isn't numeric.
+- `current_balance = balances[payer]` — fails with `KeyError` if `payer` isn't a key in `balances`.
+- `except ValueError:` — runs only if the amount conversion failed.
+- `except KeyError:` — runs only if the balance lookup failed; Python checks these top to bottom and runs the first one that matches.
+- Output:
+  ```
+  Rohit Verma wants to pay Rs.150.0; balance is Rs.300.
+  No account found for Unknown User.
+  Please enter a valid number.
+  ```
+
+**Step 3 — adding `else` and `finally`:** decide whether to approve the payment only once both lines in `try` succeeded, and log every attempt no matter what happened.
+
+```python
+def process_payment(payer, amount_text):
+    try:
+        amount = float(amount_text)
+        current_balance = balances[payer]
     except ValueError:
-        print("Amount must be a valid number, e.g. 499.00")
-    except InvalidAmountError as e:
-        print("Payment rejected:", e)
+        print("Please enter a valid number.")
+    except KeyError:
+        print(f"No account found for {payer}.")
+    else:
+        if amount <= current_balance:
+            print(f"Payment of Rs.{amount} by {payer} approved.")
+        else:
+            print(f"Insufficient balance: Rs.{current_balance} available.")
     finally:
         print(f"Payment attempt for {payer} logged.\n")
 
-process_upi_payment("Rohit Verma", "-500")
-process_upi_payment("Unknown User", "200")
-process_upi_payment("Asha Singh", "five hundred")
-process_upi_payment("Karan Mehta", "99999")
+process_payment("Rohit Verma", "150")
+process_payment("Unknown User", "200")
+process_payment("Asha Singh", "five hundred")
+process_payment("Karan Mehta", "99999")
 ```
 
 *Line-by-line explanation:*
-- `class InvalidAmountError(Exception):` — a custom exception, inheriting from `Exception` exactly like the class inheritance from Part 4, used for problems no built-in exception describes well.
-- `with open("account_balances.json", "r") as file:` / `json.load(file)` — reuses Unit 5.1's file-and-JSON pattern to load each customer's current balance.
-- `current_balance = balances[payer]` — looks up this payer's balance; fails with `KeyError` if the payer has no account.
-- `amount = float(amount_text)` — converts the text amount to a number; fails with `ValueError` if the text isn't numeric.
-- `if amount <= 0: raise InvalidAmountError(...)` — the code detects a problem itself (a zero or negative amount) and deliberately raises its own exception with `raise`.
-- `if amount > current_balance: raise InvalidAmountError(...)` — a second, different condition that raises the *same* custom exception type with a different message.
-- Five `except` clauses each handle one specific failure: a missing file, a missing account, a non-numeric amount, and an invalid amount (covering both `raise` cases above, since both use the same custom class).
-- `finally:` — logs that an attempt was made for this payer, on every single call, regardless of which outcome occurred.
-- Assuming `account_balances.json` already contains `{"Rohit Verma": 300, "Asha Singh": 1000, "Karan Mehta": 5000}`, the output is:
+- `else:` — runs only when *both* lines inside `try` succeeded with zero exceptions; here it decides approve-or-reject using the amount and balance that are now safely available.
+- `finally:` — runs after every single call, regardless of which of the three outcomes above occurred, logging that an attempt was made for this payer.
+- Output:
   ```
-  Payment rejected: Rs.-500.0 is not a valid payment amount.
+  Payment of Rs.150.0 by Rohit Verma approved.
   Payment attempt for Rohit Verma logged.
 
   No account found for Unknown User.
   Payment attempt for Unknown User logged.
 
-  Amount must be a valid number, e.g. 499.00
+  Please enter a valid number.
+  Payment attempt for Asha Singh logged.
+
+  Insufficient balance: Rs.5000 available.
+  Payment attempt for Karan Mehta logged.
+
+  ```
+
+**Step 4 — `raise` for a custom validation:** a zero/negative amount and an over-the-balance amount are not describable by any built-in exception, so the function detects each itself and deliberately `raise`s a custom `InvalidAmountError`.
+
+```python
+class InvalidAmountError(Exception):
+    pass
+
+def process_payment(payer, amount_text):
+    try:
+        amount = float(amount_text)
+        current_balance = balances[payer]
+
+        if amount <= 0:
+            raise InvalidAmountError(f"Rs.{amount} is not a valid payment amount.")
+        if amount > current_balance:
+            raise InvalidAmountError(f"Insufficient balance: Rs.{current_balance} available.")
+
+    except ValueError:
+        print("Please enter a valid number.")
+    except KeyError:
+        print(f"No account found for {payer}.")
+    except InvalidAmountError as e:
+        print("Payment rejected:", e)
+    else:
+        print(f"Payment of Rs.{amount} by {payer} approved.")
+    finally:
+        print(f"Payment attempt for {payer} logged.\n")
+
+process_payment("Rohit Verma", "-150")
+process_payment("Unknown User", "200")
+process_payment("Asha Singh", "five hundred")
+process_payment("Karan Mehta", "99999")
+process_payment("Rohit Verma", "150")
+```
+
+*Line-by-line explanation:*
+- `class InvalidAmountError(Exception):` — a custom exception, inheriting from `Exception` exactly like the class inheritance from Part 4, used for problems no built-in exception describes well.
+- `if amount <= 0: raise InvalidAmountError(...)` — the code detects a problem itself (a zero or negative amount) and deliberately raises its own exception with `raise`.
+- `if amount > current_balance: raise InvalidAmountError(...)` — a second, different condition that raises the *same* custom exception type with a different message.
+- `except InvalidAmountError as e:` — catches either `raise` above, and `e` holds whichever message was attached to it.
+- `else:` now only prints "approved" once nothing above — not even a custom-raised exception — went wrong.
+- `finally:` — still logs every single attempt, exactly as in Step 3.
+- Output:
+  ```
+  Payment rejected: Rs.-150.0 is not a valid payment amount.
+  Payment attempt for Rohit Verma logged.
+
+  No account found for Unknown User.
+  Payment attempt for Unknown User logged.
+
+  Please enter a valid number.
   Payment attempt for Asha Singh logged.
 
   Payment rejected: Insufficient balance: Rs.5000 available.
   Payment attempt for Karan Mehta logged.
 
+  Payment of Rs.150.0 by Rohit Verma approved.
+  Payment attempt for Rohit Verma logged.
+
   ```
+
+#### Try It Yourself
+
+Extend the UPI payment scenario above to enforce a **Rs.20,000 daily transaction limit** per customer. Use this dictionary of how much each customer has already spent today:
+
+```python
+already_spent_today = {"Rohit Verma": 15000, "Asha Singh": 500}
+```
+
+**Part 1 (basic `try`/`except`):** Write `check_new_amount(amount_text)` that converts `amount_text` to a number and prints `"Amount accepted: Rs.<amount>"`, or, if the text isn't a valid number, prints `"Please enter a valid number."`. Test it with `"2000"` and `"two thousand"`.
+
+**Solution:**
+
+```python
+def check_new_amount(amount_text):
+    try:
+        amount = float(amount_text)
+        print(f"Amount accepted: Rs.{amount}")
+    except ValueError:
+        print("Please enter a valid number.")
+
+check_new_amount("2000")
+check_new_amount("two thousand")
+```
+
+Expected output:
+```
+Amount accepted: Rs.2000.0
+Please enter a valid number.
+```
+
+**Part 2 (multiple `except` clauses, plus `else`/`finally`):** Write `check_daily_limit(payer, amount_text)` that converts `amount_text`, looks up `already_spent_today[payer]`, and adds them together. Catch `ValueError` for bad text and `KeyError` for an unknown customer. Use `else` to print `"Amount accepted. Total spent today would be Rs.<total>."` only when nothing failed, and `finally` to print `"Checked limit for <payer>."` on every call.
+
+**Solution:**
+
+```python
+def check_daily_limit(payer, amount_text):
+    try:
+        amount = float(amount_text)
+        spent_so_far = already_spent_today[payer]
+        total = spent_so_far + amount
+    except ValueError:
+        print("Please enter a valid number.")
+    except KeyError:
+        print(f"No spending record found for {payer}.")
+    else:
+        print(f"Amount accepted. Total spent today would be Rs.{total}.")
+    finally:
+        print(f"Checked limit for {payer}.\n")
+
+check_daily_limit("Rohit Verma", "2000")
+check_daily_limit("Unknown User", "500")
+check_daily_limit("Asha Singh", "five hundred")
+```
+
+Expected output:
+```
+Amount accepted. Total spent today would be Rs.17000.0.
+Checked limit for Rohit Verma.
+
+No spending record found for Unknown User.
+Checked limit for Unknown User.
+
+Please enter a valid number.
+Checked limit for Asha Singh.
+
+```
+
+**Part 3 (`raise` for a custom validation):** Add a custom exception class `DailyLimitExceededError(Exception)`. Inside the `try`, once `total` is computed, `raise DailyLimitExceededError(...)` whenever `total` exceeds `20000`, with a message stating how much over the limit it is. Catch it with its own `except` block that prints `"Transaction blocked:"` followed by the message. Test with `("Rohit Verma", "6000")` and `("Asha Singh", "1000")`.
+
+**Solution:**
+
+```python
+DAILY_LIMIT = 20000
+
+class DailyLimitExceededError(Exception):
+    pass
+
+def check_daily_limit_v2(payer, amount_text):
+    try:
+        amount = float(amount_text)
+        spent_so_far = already_spent_today[payer]
+        total = spent_so_far + amount
+        if total > DAILY_LIMIT:
+            raise DailyLimitExceededError(
+                f"Rs.{total - DAILY_LIMIT} over the Rs.{DAILY_LIMIT} daily limit."
+            )
+    except ValueError:
+        print("Please enter a valid number.")
+    except KeyError:
+        print(f"No spending record found for {payer}.")
+    except DailyLimitExceededError as e:
+        print("Transaction blocked:", e)
+    else:
+        print(f"Amount accepted. Total spent today would be Rs.{total}.")
+    finally:
+        print(f"Checked limit for {payer}.\n")
+
+check_daily_limit_v2("Rohit Verma", "6000")
+check_daily_limit_v2("Asha Singh", "1000")
+```
+
+Expected output:
+```
+Transaction blocked: Rs.1000.0 over the Rs.20000 daily limit.
+Checked limit for Rohit Verma.
+
+Amount accepted. Total spent today would be Rs.1500.0.
+Checked limit for Asha Singh.
+
+```
 
 ---
 
 ## 4. Real-World Application
 
 - **Banking & FinTech:** A funds-transfer service must reject a transfer to a non-existent account (`KeyError` on the account lookup) or an invalid amount (a custom exception via `raise`) without ever crashing the banking app for the customer standing in the queue behind them.
-- **UPI / Payment Systems:** The industry example above is precisely what a real UPI backend does — validate the amount, check the balance, and log every attempt via `finally`, whether the payment was approved or rejected.
+- **UPI / Payment Systems:** The consolidated example above is precisely what a real UPI backend does — validate the amount, check the balance, and log every attempt via `finally`, whether the payment was approved or rejected.
 - **E-commerce:** A checkout page that reads a discount-coupon file must handle `FileNotFoundError` gracefully instead of blocking every customer's checkout because one configuration file went missing.
 - **Healthcare:** A patient-record lookup by ID must handle a missing record (`KeyError`) distinctly from a corrupted data file (`FileNotFoundError` or a JSON parsing exception), so hospital staff see a meaningful message instead of a crash.
-- **Railway Booking (IRCTC-style systems):** The practical example above — a missing booking file, or a PNR with no matching booking — is exactly the kind of failure a real booking-status page must handle every day, at massive scale.
+- **Railway Booking (IRCTC-style systems):** The same pattern — a missing lookup key caught with `KeyError`, or a missing file caught with `FileNotFoundError` — is exactly the kind of failure a real booking-status page must handle every day, at massive scale, whether the record being looked up is an account balance or a PNR.
 - **Data engineering / AI-ML pipelines:** A script processing a million rows and skipping the three malformed ones, instead of crashing at row 40,502, is running a specific, named `except` inside a loop — catch the one bad row, log it, and continue to the next.
 
 The inverse also shows up in real production incidents: teams whose code used a blanket `except Exception: pass` have had genuine bugs silently swallowed for months before anyone noticed — the exact danger described in §3.7, at a scale where it actually costs money and trust.

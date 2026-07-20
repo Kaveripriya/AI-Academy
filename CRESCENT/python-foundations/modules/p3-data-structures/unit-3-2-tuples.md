@@ -137,120 +137,168 @@ flowchart LR
 
 ### 3.8 Code Examples
 
-**Basic example** — creating a tuple and accessing its elements:
+**Consolidated example — a college fresher's academic record, built entirely with tuples**
+
+A college registration system needs to store a fixed set of facts about each student — details that are read constantly but must never be edited in place once the record is created. This single example builds up one student's record step by step, using nothing but tuples.
+
+**Step 1 — Creating a tuple and indexing into it, including a nested tuple:**
 
 ```python
-point = (3, 5)
-print(point[0])
-print(point[1])
+student = ("STU2026047", "Ananya Rao", "CSE", ("Mysuru", "Karnataka"))
+
+print(student[0])
+print(student[1])
+print(student[3])
+print(student[3][0])
 ```
 
 *Line-by-line explanation:*
-- `point = (3, 5)` packs two values into a tuple named `point`.
-- `point[0]` accesses the element at index `0` — the first value, `3`.
-- `point[1]` accesses the element at index `1` — the second value, `5`.
+- `student = (...)` packs four values into one tuple: a roll number, a name, a branch, and a **nested tuple** `("Mysuru", "Karnataka")` holding the student's home city and state.
+- `student[0]` accesses the element at index `0` — the roll number.
+- `student[1]` accesses the element at index `1` — the name.
+- `student[3]` accesses the element at index `3` — the entire nested tuple.
+- `student[3][0]` uses **chained indexing**: `[3]` reaches the nested tuple first, then `[0]` reaches its first element, the city.
 - Output:
   ```
-  3
-  5
+  STU2026047
+  Ananya Rao
+  ('Mysuru', 'Karnataka')
+  Mysuru
   ```
 
-**Beginner example** — unpacking a tuple, including the classic swap:
+**Step 2 — Unpacking the record, including star-unpacking a tuple of semester marks:**
 
 ```python
-name, age, branch = ("Priya", 21, "Computer Science")
-print(name, age, branch)
+roll_no, name, branch, hometown = student
+city, state = hometown
+print(roll_no, name, branch, city, state)
 
-a, b = 5, 10
-a, b = b, a
-print(a, b)
+semester_marks = (78, 82, 85, 90, 91)
+first_semester, *later_semesters = semester_marks
+print(first_semester, later_semesters)
+```
 
-first, *rest = (1, 2, 3, 4)
+*Line-by-line explanation:*
+- `roll_no, name, branch, hometown = student` unpacks the outer tuple into four variables in one line — the number of names on the left matches the number of values on the right.
+- `city, state = hometown` unpacks the nested tuple the same way, now that `hometown` has been pulled out on its own.
+- `print(roll_no, name, branch, city, state)` displays every piece of the record now that it has been unpacked into readable variables.
+- `semester_marks = (78, 82, 85, 90, 91)` packs five semester scores into a fixed tuple — a record of results that should not be edited after the fact.
+- `first_semester, *later_semesters = semester_marks` demonstrates **star-unpacking**: `first_semester` takes the first value, `78`, and `*later_semesters` collects every remaining value into a new list, however many there are.
+- Output:
+  ```
+  STU2026047 Ananya Rao CSE Mysuru Karnataka
+  78 [82, 85, 90, 91]
+  ```
+
+**Step 3 — Immutability: a fixed record cannot be edited in place:**
+
+```python
+try:
+    student[1] = "Ananya R. Rao"
+except TypeError as error:
+    print("Error:", error)
+```
+
+*Line-by-line explanation:*
+- The `try` block attempts `student[1] = "Ananya R. Rao"` — changing the name in place — which raises a `TypeError`, because a tuple does not support item assignment.
+- The `except TypeError as error:` block catches that error and prints a clear message instead of letting the program crash.
+- Output:
+  ```
+  Error: 'tuple' object does not support item assignment
+  ```
+
+**Step 4 — Basic tuple operations: concatenation, repetition, membership, `count()`, and `index()`:**
+
+```python
+semester_6_marks = (88, 84)
+all_marks = semester_marks + semester_6_marks
+print(all_marks)
+
+fresh_admission_marks = (0,) * 3
+print(fresh_admission_marks)
+
+print(90 in all_marks)
+print(all_marks.count(84))
+print(all_marks.index(85))
+```
+
+*Line-by-line explanation:*
+- `semester_6_marks = (88, 84)` packs two more scores into their own tuple.
+- `all_marks = semester_marks + semester_6_marks` **concatenates** the two tuples into a brand-new, longer tuple — neither original tuple is changed.
+- `fresh_admission_marks = (0,) * 3` **repeats** the single-element tuple `(0,)` three times over — a quick way to build a placeholder record of three zero scores for a newly admitted student who hasn't taken any exams yet.
+- `90 in all_marks` checks **membership** and returns `True`, since `90` does appear somewhere in `all_marks`.
+- `all_marks.count(84)` counts how many times the value `84` appears in `all_marks`.
+- `all_marks.index(85)` returns the position of the *first* occurrence of `85` in `all_marks`.
+- Output:
+  ```
+  (78, 82, 85, 90, 91, 88, 84)
+  (0, 0, 0)
+  True
+  1
+  2
+  ```
+
+#### Try It Yourself
+
+**Exercise: A second student's record**
+
+A new student joins the CSE branch: roll number `"STU2026048"`, name `"Rahul Menon"`, branch `"CSE"`, and hometown `("Kochi", "Kerala")`. Their first four semester scores are `(65, 70, 88, 92)`.
+
+**Part 1 (Easy):** Create a tuple named `student2` holding all four pieces of the record described above, with the hometown stored as a nested tuple. Then, using indexing, print the student's name and their home state.
+
+**Solution:**
+
+```python
+student2 = ("STU2026048", "Rahul Menon", "CSE", ("Kochi", "Kerala"))
+print(student2[1])
+print(student2[3][1])
+```
+
+Output:
+```
+Rahul Menon
+Kerala
+```
+
+**Part 2 (Medium):** Unpack `student2` into four variables (`roll_no`, `name`, `branch`, `hometown`). Then create a tuple `marks2 = (65, 70, 88, 92)` and use star-unpacking to capture the first score in its own variable and the remaining scores in a list. Print both unpacked results.
+
+**Solution:**
+
+```python
+roll_no, name, branch, hometown = student2
+marks2 = (65, 70, 88, 92)
+first, *rest = marks2
+print(roll_no, name, branch, hometown)
 print(first, rest)
 ```
 
-*Line-by-line explanation:*
-- `name, age, branch = ("Priya", 21, "Computer Science")` unpacks the three-element tuple into three variables in one line — `name` gets `"Priya"`, `age` gets `21`, and `branch` gets `"Computer Science"`.
-- `print(name, age, branch)` displays all three values.
-- `a, b = 5, 10` packs and assigns in one step — no parentheses needed.
-- `a, b = b, a` builds the tuple `(b, a)` completely first, *then* unpacks it back into `a` and `b` — this is how Python swaps two variables without a temporary third variable.
-- `first, *rest = (1, 2, 3, 4)` demonstrates **star-unpacking**: `first` takes the first value, and the `*rest` collects every remaining value into a new list, however many there are.
-- Output:
-  ```
-  Priya 21 Computer Science
-  10 5
-  1 [2, 3, 4]
-  ```
+Output:
+```
+STU2026048 Rahul Menon CSE ('Kochi', 'Kerala')
+65 [70, 88, 92]
+```
 
-**Practical example** — nested tuples, immutability, and basic operations:
+**Part 3 (Harder):** Concatenate `marks2` with a new semester score tuple `(95,)` to form `full_marks2`. Check whether the student ever scored above `90` by testing `95 in full_marks2`. Then, inside a `try`/`except`, attempt to overwrite the branch in `student2` (e.g. change it to `"ECE"`) and print the error Python raises.
+
+**Solution:**
 
 ```python
-delivery_point = ("Central Library", (12.9716, 77.5946))
-print(delivery_point[0])
-print(delivery_point[1][0])
+full_marks2 = marks2 + (95,)
+print(full_marks2)
+print(95 in full_marks2)
 
-coordinates = (12.9716, 77.5946)
 try:
-    coordinates[0] = 13.0
+    student2[2] = "ECE"
 except TypeError as error:
     print("Error:", error)
-
-marks = (7, 3, 7, 7, 1)
-print(marks.count(7))
-print(marks.index(7))
-print((1, 2) + (3, 4))
-print(marks * 2)
-print(7 in marks)
 ```
 
-*Line-by-line explanation:*
-- `delivery_point = ("Central Library", (12.9716, 77.5946))` creates a tuple whose second element is itself a tuple — a **nested tuple**, here representing a location name paired with its GPS coordinates.
-- `delivery_point[0]` reaches the outer tuple's first element, the location name.
-- `delivery_point[1][0]` first reaches the inner tuple with `[1]`, then its first element with `[0]` — chained indexing into a nested structure.
-- The `try`/`except` block attempts `coordinates[0] = 13.0`, which raises a `TypeError` because tuples do not support item assignment; the `except` catches it and prints the error message instead of crashing the program.
-- `marks.count(7)` counts how many times `7` appears in the tuple.
-- `marks.index(7)` returns the position of the *first* occurrence of `7`.
-- `(1, 2) + (3, 4)` concatenates two tuples into a brand-new tuple — the originals are untouched.
-- `marks * 2` **repeats** the tuple's elements twice over, producing a longer tuple — `marks` itself is left unchanged.
-- `7 in marks` checks **membership** and returns `True`, since `7` does appear inside `marks`.
-- Output:
-  ```
-  Central Library
-  12.9716
-  Error: 'tuple' object does not support item assignment
-  3
-  0
-  (1, 2, 3, 4)
-  (7, 3, 7, 7, 1, 7, 3, 7, 7, 1)
-  True
-  ```
-
-**Industry-oriented example** — a food delivery order record built from tuples:
-
-```python
-order = ("ORD10293", "Rohit Verma", (12.9352, 77.6146), 458.50)
-
-order_id, customer_name, location, amount = order
-latitude, longitude = location
-
-print("Order ID:", order_id)
-print("Customer:", customer_name)
-print("Delivery location:", latitude, longitude)
-print("Amount to collect:", amount)
+Output:
 ```
-
-*Line-by-line explanation:*
-- `order = ("ORD10293", "Rohit Verma", (12.9352, 77.6146), 458.50)` models one food delivery order as a single tuple — an order ID, a customer name, a nested `(latitude, longitude)` tuple, and the amount to collect. All four values naturally belong together and should never be edited individually mid-delivery.
-- `order_id, customer_name, location, amount = order` unpacks the outer tuple into four variables in one line.
-- `latitude, longitude = location` further unpacks the nested coordinate tuple into two separate variables.
-- The `print()` calls display each piece of the order clearly. This is exactly the shape of data a real food delivery backend (like Swiggy or Zomato) passes between its order service and its delivery-partner app — a fixed record, safely unpacked wherever it is needed.
-- Output:
-  ```
-  Order ID: ORD10293
-  Customer: Rohit Verma
-  Delivery location: 12.9352 77.6146
-  Amount to collect: 458.5
-  ```
+(65, 70, 88, 92, 95)
+True
+Error: 'tuple' object does not support item assignment
+```
 
 ---
 

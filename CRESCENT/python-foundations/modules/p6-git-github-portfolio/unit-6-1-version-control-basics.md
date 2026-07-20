@@ -138,7 +138,11 @@ flowchart TD
 
 ### 3.8 Examples
 
-**Example 1 — a bad commit message.**
+**Example — one project's commit history, from vague to professional.**
+
+Follow a single repository, `my-python-project`, containing `average_calculator.py`, through three real commits made in order over a few days.
+
+The first commit is made in a hurry, right after the script first runs successfully:
 
 ```
 update
@@ -146,7 +150,7 @@ update
 
 *Explanation:* This tells a reviewer nothing about what changed. A month later, even the author who wrote it would have to open the commit and read the code just to remember what it was for.
 
-**Example 2 — a better commit message.**
+A few days later, a rounding bug is fixed, and this time the commit message is written properly:
 
 ```
 Fix rounding error in average marks calculation
@@ -154,7 +158,7 @@ Fix rounding error in average marks calculation
 
 *Explanation:* This says exactly what changed (a rounding error) and where (average marks calculation). Anyone reading the history — including future-you — immediately understands the purpose of this checkpoint without opening a single file.
 
-**Example 3 — an escalating, well-structured commit message with a body.**
+The next change is bigger, so the commit gets a short summary line plus a body explaining the reasoning:
 
 ```
 Add input validation for negative marks
@@ -167,7 +171,7 @@ is calculated.
 
 *Explanation:* The first line is a short summary (used as the headline in the Commits tab); the blank line and paragraph beneath it explain the reasoning in more depth. This two-part structure is the professional standard for any commit that needs more explanation than a one-liner can give.
 
-**Example 4 — a simple, professional repository structure.**
+Across these three commits, the repository itself has kept the same simple, professional structure throughout:
 
 ```
 my-python-project/
@@ -176,7 +180,42 @@ my-python-project/
 └── average_calculator.py
 ```
 
-*Explanation:* `README.md` is the front door explaining what the project does; `.gitignore` keeps files like secrets or temporary files out of the tracked history; `average_calculator.py` is the actual working code. Even a small student project benefits from this same three-piece shape — it is exactly what a reviewer expects to find.
+*Explanation:* `README.md` is the front door explaining what the project does; `.gitignore` keeps files like secrets or temporary files out of the tracked history; `average_calculator.py` is the actual working code. Even a small student project benefits from this same three-piece shape — it is exactly what a reviewer expects to find. Notice how the *messages* improved from commit to commit while the *structure* stayed clean the whole time — both habits matter, and neither replaces the other.
+
+#### Try It Yourself
+
+You are working in the same `my-python-project` repository. For each part below, write the commit message you would use, then check it against the solution.
+
+**Part 1 (Easy).** You just wrote the very first working version of `average_calculator.py` — it reads a list of marks and prints the average. Write a clear commit message for this first commit.
+
+**Solution:**
+```
+Add initial version of average calculator
+```
+This names the exact file's purpose and makes clear this is the starting point of the project — far better than a default or vague message like `"first commit"` or `"add file"`.
+
+**Part 2 (Medium).** You notice `average_calculator.py` crashes with a `ZeroDivisionError` whenever it is given an empty list of marks. You fix it by adding a check that returns `0` instead of crashing when the list is empty. Write a commit message for this change.
+
+**Solution:**
+```
+Handle empty marks list to prevent division-by-zero crash
+```
+This names both *what* changed (a guard for the empty-list case) and *why* it mattered (preventing a crash) — exactly the "what and why" standard from §3.5, in a single imperative-mood line.
+
+**Part 3 (Harder).** You open the **Commits** tab and see this history, most recent first:
+
+```
+fixed it
+Handle empty marks list to prevent division-by-zero crash
+update
+```
+
+Identify which commit message violates the project's commit-message standard, and rewrite it as a professional message. Assume the underlying change was: you discovered the average was printed with 5 decimal places and rounded it to 2 for readability.
+
+**Solution:** The most recent commit, `"fixed it"`, is the violation — like `"update"` before it, it says nothing about what was fixed or why, forcing anyone reading the history to open the code just to understand the checkpoint. A professional rewrite, matching the style of the other two messages in this history:
+```
+Round average output to two decimal places for readability
+```
 
 ---
 

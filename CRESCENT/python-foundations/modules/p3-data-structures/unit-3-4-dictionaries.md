@@ -174,103 +174,189 @@ The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itsel
 
 ### 3.9 Code Examples
 
-**Basic example** — creating a dictionary and accessing a value:
+The example below follows **one running scenario** — a UPI wallet's transaction history — and builds it up one skill at a time: create and access a record, then add/modify/delete fields, then loop over it three ways, then grow it into a nested dictionary of many transactions, then sort it, and finally summarize it with a dictionary comprehension.
 
-```python
-capitals = {"India": "New Delhi", "Japan": "Tokyo"}
-print(capitals["India"])
-```
-
-*Line-by-line explanation:*
-- `capitals = {"India": "New Delhi", "Japan": "Tokyo"}` creates a dictionary with two keys, `"India"` and `"Japan"`, each mapped to its capital city.
-- `print(capitals["India"])` looks up the key `"India"` using bracket access and prints its value.
-- Output: `New Delhi`.
-
-**Beginner example** — adding, modifying, deleting, and looping:
-
-```python
-stock = {"pens": 120, "notebooks": 45}
-stock["erasers"] = 200          # add a new key
-stock["pens"] = 100             # modify an existing key
-del stock["notebooks"]          # delete a key
-
-for item, count in stock.items():
-    print(item, "->", count)
-```
-
-*Line-by-line explanation:*
-- `stock = {"pens": 120, "notebooks": 45}` creates the starting dictionary with two items.
-- `stock["erasers"] = 200` — `"erasers"` is a new key, so this **adds** a third entry.
-- `stock["pens"] = 100` — `"pens"` already exists, so this **overwrites** its old value of `120` with `100`.
-- `del stock["notebooks"]` removes the `"notebooks"` key and its value completely.
-- `for item, count in stock.items():` loops over every remaining key-value pair, unpacking each `(key, value)` tuple into `item` and `count` in one step.
-- Output:
-  ```
-  pens -> 100
-  erasers -> 200
-  ```
-
-**Practical example** — a nested student record, sorted by marks, accessed safely with `.get()`:
-
-```python
-students = {
-    101: {"name": "Ananya", "marks": 87},
-    102: {"name": "Rohit", "marks": 74},
-    103: {"name": "Meera", "marks": 91},
-}
-
-for roll_no, record in sorted(students.items(), key=lambda kv: kv[1]["marks"], reverse=True):
-    attendance = record.get("attendance", "not recorded")
-    print(roll_no, record["name"], record["marks"], attendance)
-```
-
-*Line-by-line explanation:*
-- `students = {...}` is a **nested dictionary**: the outer keys are roll numbers, and each value is itself a dictionary of that student's `name` and `marks`.
-- `sorted(students.items(), key=lambda kv: kv[1]["marks"], reverse=True)` takes every `(roll_no, record)` pair from `.items()`, and sorts them by `kv[1]["marks"]` — the marks inside each nested record — from highest to lowest.
-- `for roll_no, record in ...:` unpacks each sorted pair, giving `roll_no` (an `int`) and `record` (the inner dictionary) on every iteration.
-- `record.get("attendance", "not recorded")` reads an `"attendance"` field that was never actually added to any record — instead of raising `KeyError`, `.get()` safely falls back to `"not recorded"`.
-- Output:
-  ```
-  103 Meera 91 not recorded
-  101 Ananya 87 not recorded
-  102 Rohit 74 not recorded
-  ```
-
-**Industry-oriented example** — a UPI transaction record, plus a dictionary comprehension to summarize a batch of transactions:
+**Step 1 — create a transaction record and access its fields:**
 
 ```python
 transaction = {
-    "txn_id": "UPI2026071900123",
-    "payer": "Rohit Verma",
+    "txn_id": "UPI2026072000456",
     "payee": "Ananya Stores",
-    "amount": 499.00,
-    "status": "SUCCESS",
+    "amount": 499.0,
+    "status": "PENDING",
+    "note": "to be confirmed",
 }
-
-print(transaction.get("amount"))
+print(transaction["payee"])
 print(transaction.get("bank_ref", "not available"))
-
-transactions = [
-    {"txn_id": "T1", "amount": 250.0},
-    {"txn_id": "T2", "amount": 900.0},
-    {"txn_id": "T3", "amount": 120.0},
-]
-amount_by_txn = {t["txn_id"]: t["amount"] for t in transactions}
-print(amount_by_txn)
 ```
 
 *Line-by-line explanation:*
-- `transaction = {...}` models a single UPI payment exactly the way a real payments backend would represent it — a dictionary with named fields such as `txn_id`, `payer`, `payee`, `amount`, and `status`. This is precisely the shape of data a UPI API would send and receive as JSON.
-- `transaction.get("amount")` safely reads the amount field — here it exists, so it returns `499.0`.
-- `transaction.get("bank_ref", "not available")` reads a field that was never included in this record; `.get()` returns the fallback `"not available"` instead of crashing with `KeyError`.
-- `transactions = [...]` is a list of small dictionaries — one per transaction — the way a batch of records might arrive from a database query.
-- `amount_by_txn = {t["txn_id"]: t["amount"] for t in transactions}` is a **dictionary comprehension**: for every transaction dictionary `t` in the list, it builds a new key-value pair using `t["txn_id"]` as the key and `t["amount"]` as the value — turning a list of records into a single fast lookup table keyed by transaction ID.
+- `transaction = {...}` creates a dictionary with five keys — `txn_id`, `payee`, `amount`, `status`, and `note` — modeling one UPI payment exactly the way a payments backend would.
+- `transaction["payee"]` uses bracket access to fetch the value tied to the key `"payee"`.
+- `transaction.get("bank_ref", "not available")` looks up a key that does not exist in this record; instead of raising `KeyError`, `.get()` safely returns the fallback `"not available"`.
 - Output:
   ```
-  499.0
+  Ananya Stores
   not available
-  {'T1': 250.0, 'T2': 900.0, 'T3': 120.0}
   ```
+
+**Step 2 — add, modify, and delete fields:**
+
+```python
+transaction["timestamp"] = "2026-07-20 10:15"   # add a new key
+transaction["status"] = "SUCCESS"               # modify an existing key
+del transaction["note"]                         # delete a key
+print(transaction)
+```
+
+*Line-by-line explanation:*
+- `transaction["timestamp"] = "2026-07-20 10:15"` — `"timestamp"` is a new key, so this **adds** a sixth entry.
+- `transaction["status"] = "SUCCESS"` — `"status"` already exists, so this **overwrites** its old value `"PENDING"` with `"SUCCESS"`.
+- `del transaction["note"]` removes the `"note"` key and its value completely, since it is no longer needed.
+- Output:
+  ```
+  {'txn_id': 'UPI2026072000456', 'payee': 'Ananya Stores', 'amount': 499.0, 'status': 'SUCCESS', 'timestamp': '2026-07-20 10:15'}
+  ```
+
+**Step 3 — loop over the record three ways:**
+
+```python
+for field in transaction.keys():
+    print("key:", field)
+
+for value in transaction.values():
+    print("value:", value)
+
+for field, value in transaction.items():
+    print(field, "->", value)
+```
+
+*Line-by-line explanation:*
+- `for field in transaction.keys():` visits only the **keys** of the dictionary, one at a time.
+- `for value in transaction.values():` visits only the **values**, discarding the keys entirely.
+- `for field, value in transaction.items():` visits both together, unpacking each `(key, value)` tuple into `field` and `value` in one step — this is the style used for the rest of this example.
+- Output (abbreviated to the `.items()` loop, the one used going forward):
+  ```
+  txn_id -> UPI2026072000456
+  payee -> Ananya Stores
+  amount -> 499.0
+  status -> SUCCESS
+  timestamp -> 2026-07-20 10:15
+  ```
+
+**Step 4 — grow into a nested dictionary of many transactions:**
+
+```python
+wallet_history = {
+    "UPI2026072000456": {
+        "payee": "Ananya Stores", "amount": 499.0, "status": "SUCCESS",
+        "payer": {"name": "Rohit Verma", "upi_id": "rohit@okicici"},
+    },
+    "UPI2026071900123": {
+        "payee": "Meera Traders", "amount": 250.0, "status": "SUCCESS",
+        "payer": {"name": "Rohit Verma", "upi_id": "rohit@okicici"},
+    },
+    "UPI2026071500789": {
+        "payee": "Rohit Verma", "amount": 900.0, "status": "FAILED",
+        "payer": {"name": "Ananya Stores", "upi_id": "ananya@okhdfc"},
+    },
+}
+print(wallet_history["UPI2026072000456"]["payer"]["name"])
+```
+
+*Line-by-line explanation:*
+- `wallet_history = {...}` is a **nested dictionary**: the outer keys are transaction IDs, and each value is itself a dictionary holding `payee`, `amount`, `status`, and a further nested dictionary, `payer`, with that payer's `name` and `upi_id`.
+- `wallet_history["UPI2026072000456"]["payer"]["name"]` chains three bracket lookups — first the outer dictionary by transaction ID, then the `"payer"` sub-dictionary, then `"name"` inside it — to reach a value two levels deep.
+- Output: `Rohit Verma`.
+
+**Step 5 — sort the transactions by amount:**
+
+```python
+for txn_id, record in sorted(wallet_history.items(), key=lambda kv: kv[1]["amount"], reverse=True):
+    print(txn_id, record["payee"], record["amount"], record["status"])
+```
+
+*Line-by-line explanation:*
+- `sorted(wallet_history.items(), key=lambda kv: kv[1]["amount"], reverse=True)` takes every `(txn_id, record)` pair from `.items()` and sorts them by `kv[1]["amount"]` — the amount inside each nested record — from highest to lowest, returning a new sorted list without changing `wallet_history` itself.
+- `for txn_id, record in ...:` unpacks each sorted pair, giving `txn_id` and `record` (the inner dictionary) on every iteration.
+- Output:
+  ```
+  UPI2026071500789 Rohit Verma 900.0 FAILED
+  UPI2026072000456 Ananya Stores 499.0 SUCCESS
+  UPI2026071900123 Meera Traders 250.0 SUCCESS
+  ```
+
+**Step 6 — summarize with a dictionary comprehension:**
+
+```python
+success_amounts = {
+    txn_id: record["amount"]
+    for txn_id, record in wallet_history.items()
+    if record["status"] == "SUCCESS"
+}
+print(success_amounts)
+```
+
+*Line-by-line explanation:*
+- `{txn_id: record["amount"] for txn_id, record in wallet_history.items() if record["status"] == "SUCCESS"}` is a **dictionary comprehension**: it loops over every `(txn_id, record)` pair, keeps only the ones whose `"status"` is `"SUCCESS"`, and builds a brand-new, smaller dictionary mapping each surviving `txn_id` to its `amount`.
+- Output:
+  ```
+  {'UPI2026072000456': 499.0, 'UPI2026071900123': 250.0}
+  ```
+
+#### Try It Yourself
+
+Using the same `wallet_history` dictionary from Step 4 above, complete the following, in order:
+
+1. Add a new transaction to `wallet_history` with key `"UPI2026072000999"`, whose record has `payee`, `amount`, `status`, and `payer` fields of your choice. Then use `.get()` to safely print a `"remarks"` field on this new record, falling back to `"none"` if it is missing.
+2. Loop over `wallet_history` with `.items()` and print the `txn_id` and `amount` of only the transactions whose `"status"` is `"FAILED"`.
+3. Write a dictionary comprehension that builds a new dictionary mapping `txn_id` to `payee`, but only for transactions with `amount` greater than `300`. Then print that new dictionary.
+
+**Solution to Part 1:**
+
+```python
+wallet_history["UPI2026072000999"] = {
+    "payee": "Meera Traders",
+    "amount": 150.0,
+    "status": "SUCCESS",
+    "payer": {"name": "Ananya Stores", "upi_id": "ananya@okhdfc"},
+}
+print(wallet_history["UPI2026072000999"].get("remarks", "none"))
+```
+
+Expected output:
+```
+none
+```
+
+**Solution to Part 2:**
+
+```python
+for txn_id, record in wallet_history.items():
+    if record["status"] == "FAILED":
+        print(txn_id, record["amount"])
+```
+
+Expected output:
+```
+UPI2026071500789 900.0
+```
+
+**Solution to Part 3:**
+
+```python
+big_payees = {
+    txn_id: record["payee"]
+    for txn_id, record in wallet_history.items()
+    if record["amount"] > 300
+}
+print(big_payees)
+```
+
+Expected output:
+```
+{'UPI2026072000456': 'Ananya Stores', 'UPI2026071500789': 'Rohit Verma'}
+```
 
 ---
 

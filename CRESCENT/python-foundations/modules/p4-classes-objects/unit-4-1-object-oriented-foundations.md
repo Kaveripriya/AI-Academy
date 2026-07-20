@@ -197,7 +197,9 @@ The single `Student` blueprint never holds any real data itself. Every time it i
 
 ### 3.8 Code Examples
 
-**Basic example** — an empty class, instantiated twice, showing that each object is distinct:
+This one scenario — a `Student` class for a college — is built up in four small steps, each adding exactly one new idea on top of the last: an empty class, then a constructor, then methods, then a class attribute plus a state-changing method. By the end, several independent `Student` objects exist side by side, each with its own data.
+
+**Step 1** — an empty class, instantiated twice, showing that each object is distinct:
 
 ```python
 class Student:
@@ -222,7 +224,7 @@ print(s1 is s2)
   ```
 - `False` confirms that `Student()` allocated two distinct objects, even though both came from the identical blueprint.
 
-**Beginner example** — a constructor that sets instance attributes, read directly with no methods yet:
+**Step 2** — give the class a constructor so every object gets its own `name` and `marks` the moment it is created:
 
 ```python
 class Student:
@@ -249,7 +251,7 @@ print(s2.name, s2.marks)
   ```
 - Each `Student` object keeps its own independent copy of `name` and `marks` — changing `s1.marks` later would have no effect on `s2.marks`.
 
-**Practical example** — adding methods so the object can also do something with its own data:
+**Step 3** — add methods so each object can also do something with its own data:
 
 ```python
 class Student:
@@ -269,53 +271,123 @@ class Student:
         return f"{self.name} scored {self.marks} marks - Grade {self.calculate_grade()}"
 
 s1 = Student("Priya Nair", 91)
+s2 = Student("Arjun Rao", 68)
+
 print(s1.describe())
+print(s2.describe())
 ```
 
 *Line-by-line explanation:*
 - `calculate_grade(self)` is a **method** — a function defined inside the class, with `self` as its first parameter, so it can read `self.marks` for whichever object called it.
 - `describe(self)` calls `self.calculate_grade()` — one method calling another method on the same object through `self` — and builds a summary string using an f-string.
-- `s1.describe()` looks up `describe` on `s1`'s class, binds `s1` as `self` for the entire call (including the nested `calculate_grade()` call), and runs the method body.
+- `s1.describe()` looks up `describe` on `s1`'s class, binds `s1` as `self` for the entire call (including the nested `calculate_grade()` call), and runs the method body; `s2.describe()` does the same with `s2` bound as `self`.
 - Output:
   ```
   Priya Nair scored 91 marks - Grade A
+  Arjun Rao scored 68 marks - Grade C
   ```
 
-**Industry-oriented example** — a `FoodOrder` class modelling a food delivery order, in the style of a Swiggy- or Zomato-like backend:
+**Step 4** — add a class attribute shared by every student, and a method that changes an object's own state:
 
 ```python
-class FoodOrder:
-    platform_name = "QuickEats"   # class attribute - shared by every order
+class Student:
+    college_name = "Crescent College"   # class attribute - shared by every student
 
-    def __init__(self, customer_name, restaurant_name, order_amount):
-        self.customer_name = customer_name
-        self.restaurant_name = restaurant_name
-        self.order_amount = order_amount
-        self.is_delivered = False
+    def __init__(self, name, marks):
+        self.name = name
+        self.marks = marks
 
-    def mark_delivered(self):
-        self.is_delivered = True
+    def calculate_grade(self):
+        if self.marks >= 90:
+            return "A"
+        elif self.marks >= 75:
+            return "B"
+        else:
+            return "C"
 
-    def order_summary(self):
-        status = "Delivered" if self.is_delivered else "Preparing/On the way"
-        return f"[{self.platform_name}] {self.customer_name}'s order from {self.restaurant_name} - Rs.{self.order_amount} - {status}"
+    def add_bonus_marks(self, bonus):
+        self.marks = self.marks + bonus
 
-order1 = FoodOrder("Rohit Verma", "Punjabi Tadka", 349.00)
-order1.mark_delivered()
-print(order1.order_summary())
+    def describe(self):
+        return f"[{self.college_name}] {self.name} scored {self.marks} marks - Grade {self.calculate_grade()}"
+
+s1 = Student("Priya Nair", 91)
+s2 = Student("Arjun Rao", 68)
+s3 = Student("Meera Iyer", 72)
+
+s2.add_bonus_marks(10)
+
+print(s1.describe())
+print(s2.describe())
+print(s3.describe())
 ```
 
 *Line-by-line explanation:*
-- `platform_name = "QuickEats"` is a **class attribute**, defined directly in the class body — it is identical for every `FoodOrder` object, since the platform name never varies per order.
-- `__init__` takes three required parameters and stores each as an instance attribute; `self.is_delivered = False` sets a sensible starting state without requiring the caller to supply it.
-- `mark_delivered(self)` is a method with no extra parameters beyond `self` — it simply flips `self.is_delivered` to `True` on whichever order it is called on.
-- `order_summary(self)` reads both instance attributes (`customer_name`, `restaurant_name`, `order_amount`, `is_delivered`) and the class attribute (`platform_name`) together in one f-string.
-- `order1 = FoodOrder(...)` instantiates one order; `order1.mark_delivered()` updates its state; `order1.order_summary()` reads that updated state back.
+- `college_name = "Crescent College"` is a **class attribute**, defined directly in the class body — it is identical for every `Student` object, since the college never varies per student.
+- `add_bonus_marks(self, bonus)` is a method with one extra parameter besides `self`; it reads `self.marks`, adds `bonus`, and writes the result back into the same attribute — exactly the read-modify-write pattern used for `self.balance` elsewhere in this unit.
+- `describe(self)` now reads three things together: the instance attributes `self.name` and `self.marks`, the class attribute `self.college_name`, and the return value of `self.calculate_grade()`.
+- `s1`, `s2`, and `s3` are three independent `Student` objects created from the same blueprint.
+- `s2.add_bonus_marks(10)` binds `s2` as `self` and updates only `s2`'s `marks`, from `68` to `78` — `s1` and `s3` are completely unaffected.
 - Output:
   ```
-  [QuickEats] Rohit Verma's order from Punjabi Tadka - Rs.349.0 - Delivered
+  [Crescent College] Priya Nair scored 91 marks - Grade A
+  [Crescent College] Arjun Rao scored 78 marks - Grade B
+  [Crescent College] Meera Iyer scored 72 marks - Grade C
   ```
-- This is precisely the shape real food delivery backends use: one object per order, holding its own state, with methods that update and report on that state as the order moves through its lifecycle.
+- Notice `s2`'s grade changed from `C` to `B` because `calculate_grade()` re-reads `self.marks` fresh every time it is called — it was never told the old value, so it always reflects the object's current state.
+
+#### Try It Yourself
+
+**Exercise:** Continue working with the `Student` class exactly as defined in Step 4 above.
+
+**Part 1 (easy):** Create one more `Student` object, `s4`, using your own name and a marks value of your choice. Call `describe()` on it and print the result.
+
+**Solution:**
+```python
+s4 = Student("Ananya Gupta", 84)
+print(s4.describe())
+```
+Output:
+```
+[Crescent College] Ananya Gupta scored 84 marks - Grade B
+```
+
+**Part 2 (medium):** Give `s4` 8 bonus marks using `add_bonus_marks()`, then print the description again and check whether the grade changed.
+
+**Solution:**
+```python
+s4.add_bonus_marks(8)
+print(s4.describe())
+```
+Output:
+```
+[Crescent College] Ananya Gupta scored 92 marks - Grade A
+```
+`84 + 8 = 92`, which crosses the `90`-mark boundary in `calculate_grade()`, so the grade changes from `B` to `A`.
+
+**Part 3 (harder):** Put `s1`, `s2`, `s3`, and `s4` into a list, loop over the list printing each student's `describe()`, and while looping, keep track of (and finally print) which student has the highest marks.
+
+**Solution:**
+```python
+students = [s1, s2, s3, s4]
+
+topper = students[0]
+for student in students:
+    print(student.describe())
+    if student.marks > topper.marks:
+        topper = student
+
+print(f"Topper: {topper.name} with {topper.marks} marks")
+```
+Output:
+```
+[Crescent College] Priya Nair scored 91 marks - Grade A
+[Crescent College] Arjun Rao scored 78 marks - Grade B
+[Crescent College] Meera Iyer scored 72 marks - Grade C
+[Crescent College] Ananya Gupta scored 92 marks - Grade A
+Topper: Ananya Gupta with 92 marks
+```
+`topper` starts out pointing at `s1`; each loop iteration compares the current `student.marks` against `topper.marks` and replaces `topper` whenever a higher score is found, so after the loop it points at whichever `Student` object had the highest `marks` — here, `s4`.
 
 ---
 

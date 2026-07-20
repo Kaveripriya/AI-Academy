@@ -33,6 +33,8 @@ In this unit, you will learn the `if` statement, how to add `elif` and `else` fo
 
 A **conditional** is a control structure that runs one block of code or another depending on whether a **boolean expression** — a condition — evaluates to `True` or `False`. In Python, the primary conditional tool is the `if` statement, optionally extended with `elif` (else if) and `else`:
 
+**Example:**
+
 ```python
 temperature = 30
 
@@ -118,6 +120,8 @@ value_if_true if condition else value_if_false
 | `if condition else` | The test, written between the two possible values. | Reads almost like English: "this value if the condition holds, else that value." |
 | `value_if_false` | The value produced when `condition` is `False`. | This is what the whole expression evaluates to on a `False` result. |
 
+**Example:**
+
 ```python
 age = 20
 status = "adult" if age >= 18 else "minor"
@@ -163,84 +167,85 @@ print(status)
 
 ### 3.8 Code Examples
 
-**Basic example** — a single `if` statement:
+The examples below all build **one single scenario** — a food delivery app called **TastyBite** deciding how to handle an order. Each step adds exactly one new conditional idea on top of the last, so by the end you will have seen a plain `if`/`else`, an `elif` chain, a compound condition, nesting, and a ternary expression all working together on the same problem.
+
+**Step 1 — a single `if`/`else`:** is the restaurant even open?
 
 ```python
-temperature = 30
-
-if temperature > 25:
-    print("It is warm.")
-
-print("Done checking.")
-```
-
-*Line-by-line explanation:*
-- `temperature = 30` creates a variable holding an `int`.
-- `if temperature > 25:` evaluates the boolean expression `30 > 25`, which is `True`.
-- `print("It is warm.")` is indented, so it belongs to the `if` block and runs because the condition was `True`.
-- `print("Done checking.")` is not indented, so it is outside the `if` block and always runs, regardless of the condition.
-- Output:
-  ```
-  It is warm.
-  Done checking.
-  ```
-
-**Beginner example** — `if`/`elif`/`else` with a compound condition:
-
-```python
-age = 20
-has_id = True
-
-if age >= 18 and has_id:
-    print("Entry allowed.")
-elif age >= 18 and not has_id:
-    print("Entry denied — carry your ID.")
-else:
-    print("Entry denied — must be 18 or older.")
-```
-
-*Line-by-line explanation:*
-- `age = 20` and `has_id = True` set up two variables of type `int` and `bool`.
-- The first condition `age >= 18 and has_id` requires **both** parts to be `True`. Since `20 >= 18` is `True` and `has_id` is `True`, the whole `and` expression is `True`, so this branch runs.
-- Because the first branch matched, Python never evaluates the `elif` or `else` below it.
-- Output:
-  ```
-  Entry allowed.
-  ```
-
-**Practical example** — nested conditional versus its flattened equivalent:
-
-```python
-logged_in = True
-is_admin = False
-
-# Nested version
-if logged_in:
-    if is_admin:
-        print("Welcome, administrator.")
-    else:
-        print("Welcome, user.")
-else:
-    print("Access denied. Please log in.")
-```
-
-*Line-by-line explanation:*
-- `logged_in` and `is_admin` are both `bool` variables.
-- The outer `if logged_in:` is checked first; since it is `True`, Python enters its block.
-- Inside that block, the inner `if is_admin:` is checked; since `is_admin` is `False`, its `else` runs instead.
-- The outer `else` (`"Access denied..."`) is never reached, because the outer condition was `True`.
-- Output:
-  ```
-  Welcome, user.
-  ```
-- Note that "am I an admin?" is only meaningful once we already know the user is logged in — that dependency is exactly why nesting makes sense here, rather than flattening it into a single compound condition.
-
-**Industry-oriented example** — food delivery order eligibility check (nested conditionals, compound boolean expressions, and a ternary expression together):
-
-```python
-cart_value = 550.0
-is_premium_member = True
 restaurant_open = True
+
+if restaurant_open:
+    print("Welcome to TastyBite!")
+else:
+    print("Restaurant is currently closed.")
+
+print("Thanks for checking.")
+```
+
+*Line-by-line explanation:*
+- `restaurant_open = True` creates a `bool` variable representing one real fact about the restaurant right now.
+- `if restaurant_open:` evaluates that variable directly — a variable that already holds `True`/`False` is itself a valid boolean expression.
+- Because `restaurant_open` is `True`, the `if` block runs and the `else` block is skipped.
+- `print("Thanks for checking.")` is not indented, so it is outside the conditional entirely and always runs, regardless of which branch fired.
+- Output:
+  ```
+  Welcome to TastyBite!
+  Thanks for checking.
+  ```
+
+**Step 2 — an `elif` chain:** classify the cart value into a delivery-fee tier.
+
+```python
+cart_value = 350.0
+
+if cart_value >= 500:
+    delivery_fee = 0.0
+elif cart_value >= 200:
+    delivery_fee = 20.0
+else:
+    delivery_fee = 40.0
+
+print("Delivery fee: Rs.", delivery_fee)
+```
+
+*Line-by-line explanation:*
+- `cart_value = 350.0` holds a `float`, the total value of items in the cart.
+- Conditions are checked **top to bottom**: `cart_value >= 500` is `350.0 >= 500` → `False`, so Python moves on.
+- `elif cart_value >= 200` is `350.0 >= 200` → `True`, so `delivery_fee` is set to `20.0` and every branch after this one is skipped.
+- Output:
+  ```
+  Delivery fee: Rs. 20.0
+  ```
+
+**Step 3 — a compound condition:** a premium member should also get free delivery, even with a smaller cart.
+
+```python
+cart_value = 350.0
+is_premium_member = True
+
+if cart_value >= 500 or is_premium_member:
+    delivery_fee = 0.0
+else:
+    delivery_fee = 40.0
+
+print("Delivery fee: Rs.", delivery_fee)
+```
+
+*Line-by-line explanation:*
+- `is_premium_member = True` adds a second fact the decision now depends on.
+- The compound condition `cart_value >= 500 or is_premium_member` is `True` if **either** part is `True`. Here `350.0 >= 500` is `False`, but `is_premium_member` is `True`, so the whole `or` expression is `True` — only one side needs to hold.
+- `delivery_fee` is set to `0.0`, and the plain `else` (`40.0`) is skipped.
+- Output:
+  ```
+  Delivery fee: Rs. 0.0
+  ```
+
+**Step 4 — nesting:** the fee only matters if the restaurant is open in the first place, so the Step 3 logic now lives inside the Step 1 check.
+
+```python
+restaurant_open = True
+cart_value = 350.0
+is_premium_member = True
 
 if restaurant_open:
     if cart_value >= 500 or is_premium_member:
@@ -250,22 +255,124 @@ if restaurant_open:
     print("Delivery fee: Rs.", delivery_fee)
 else:
     print("Restaurant is currently closed.")
-
-order_label = "Free Delivery" if delivery_fee == 0.0 else "Delivery Charges Apply"
-print(order_label)
 ```
 
 *Line-by-line explanation:*
-- `cart_value`, `is_premium_member`, and `restaurant_open` model the real facts a food delivery app checks before confirming an order.
-- The outer `if restaurant_open:` guards everything else — there is no point calculating a delivery fee for a closed restaurant.
-- Inside it, the compound condition `cart_value >= 500 or is_premium_member` is `True` if **either** the cart crosses the free-delivery threshold **or** the customer is a premium member — here both happen to be `True`, but `or` only needs one.
-- `delivery_fee` is set to `0.0` inside that branch, and the `print()` reports it.
-- After the conditional finishes, the ternary expression `"Free Delivery" if delivery_fee == 0.0 else "Delivery Charges Apply"` produces a label value directly, without needing another full `if`/`else` block.
+- The outer `if restaurant_open:` is checked first — there is no point computing a delivery fee for a closed restaurant.
+- Because `restaurant_open` is `True`, Python enters the outer block and only then evaluates the inner `if cart_value >= 500 or is_premium_member:` from Step 3.
+- The inner condition is `True` (because `is_premium_member` is `True`), so `delivery_fee` becomes `0.0` and the inner `print()` reports it.
+- The outer `else` (`"Restaurant is currently closed."`) is never reached, because the outer condition was already `True`.
+- Output:
+  ```
+  Delivery fee: Rs. 0.0
+  ```
+- Note that "what is the fee?" is only meaningful once we already know the restaurant is open — that dependency is exactly why nesting makes sense here, rather than flattening everything into one compound condition.
+
+**Step 5 — a ternary expression:** turn the numeric fee into a short label for the screen.
+
+```python
+restaurant_open = True
+cart_value = 350.0
+is_premium_member = True
+
+if restaurant_open:
+    if cart_value >= 500 or is_premium_member:
+        delivery_fee = 0.0
+    else:
+        delivery_fee = 40.0
+    print("Delivery fee: Rs.", delivery_fee)
+
+    order_label = "Free Delivery" if delivery_fee == 0.0 else "Delivery Charges Apply"
+    print(order_label)
+else:
+    print("Restaurant is currently closed.")
+```
+
+*Line-by-line explanation:*
+- The first five lines inside `if restaurant_open:` are exactly the nested logic from Step 4, so `delivery_fee` ends up `0.0` for the same reason as before.
+- `order_label = "Free Delivery" if delivery_fee == 0.0 else "Delivery Charges Apply"` is a conditional (ternary) expression: Python evaluates `delivery_fee == 0.0`, finds it `True`, and the whole expression produces the value `"Free Delivery"` — `"Delivery Charges Apply"` is never even looked at. That value is stored in `order_label`, exactly like any ordinary assignment.
+- This ternary line is placed inside the same `if restaurant_open:` block, because `delivery_fee` only exists once the restaurant has been confirmed open.
 - Output:
   ```
   Delivery fee: Rs. 0.0
   Free Delivery
   ```
+  If `cart_value` had been `120.0` and `is_premium_member` had been `False`, `delivery_fee` would be `40.0` instead, and `order_label` would evaluate to `"Delivery Charges Apply"`.
+
+#### Try It Yourself
+
+**Exercise — TastyBite Order Checker:** using the same TastyBite scenario, write the following in order. Try each part yourself before checking the solution.
+
+**Part A (easiest):** Write a single `if`/`else` using `restaurant_open = False`. Print `"Order Now!"` if the restaurant is open, otherwise print `"Come back later."`.
+
+**Solution:**
+
+```python
+restaurant_open = False
+
+if restaurant_open:
+    print("Order Now!")
+else:
+    print("Come back later.")
+```
+
+Expected output:
+```
+Come back later.
+```
+
+**Part B (medium):** Given `cart_value = 180.0` and `is_premium_member = False`, write an `if`/`elif`/`else` chain that sets `delivery_fee` to `0.0` if `cart_value >= 500` **or** `is_premium_member` is `True`, otherwise `20.0` if `cart_value >= 100`, otherwise `40.0`. Print the fee.
+
+**Solution:**
+
+```python
+cart_value = 180.0
+is_premium_member = False
+
+if cart_value >= 500 or is_premium_member:
+    delivery_fee = 0.0
+elif cart_value >= 100:
+    delivery_fee = 20.0
+else:
+    delivery_fee = 40.0
+
+print("Delivery fee: Rs.", delivery_fee)
+```
+
+Expected output:
+```
+Delivery fee: Rs. 20.0
+```
+
+**Part C (hardest):** Combine everything: given `restaurant_open = True`, `cart_value = 620.0`, and `is_premium_member = False`, nest the Part B fee logic inside a check for `restaurant_open`, then add a ternary expression that stores `"Free Delivery"` in `order_label` if `delivery_fee == 0.0`, otherwise `"Delivery Charges Apply"`. Print the fee and the label.
+
+**Solution:**
+
+```python
+restaurant_open = True
+cart_value = 620.0
+is_premium_member = False
+
+if restaurant_open:
+    if cart_value >= 500 or is_premium_member:
+        delivery_fee = 0.0
+    elif cart_value >= 100:
+        delivery_fee = 20.0
+    else:
+        delivery_fee = 40.0
+    print("Delivery fee: Rs.", delivery_fee)
+
+    order_label = "Free Delivery" if delivery_fee == 0.0 else "Delivery Charges Apply"
+    print(order_label)
+else:
+    print("Restaurant is currently closed.")
+```
+
+Expected output:
+```
+Delivery fee: Rs. 0.0
+Free Delivery
+```
 
 ---
 

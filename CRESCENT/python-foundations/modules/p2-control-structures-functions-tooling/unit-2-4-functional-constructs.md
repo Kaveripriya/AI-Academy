@@ -191,104 +191,198 @@ flowchart TD
 
 ### 3.8 Code Examples
 
-**Basic example** — a lambda that squares a number:
+**Scenario: Prakash's online bookstore.** The four steps below are not separate examples — each one builds directly on the code from the step before it, gradually assembling one small order-processing pipeline: a lambda to discount a price, higher-order functions to work across the whole stock list, a decorator to log every order, and a generator to hand out invoice numbers.
+
+**Step 1 — a lambda that discounts one book's price:**
 
 ```python
-square = lambda n: n * n
-print(square(6))
+apply_discount = lambda price: price * 0.9
+print(apply_discount(500))
 ```
 
 *Line-by-line explanation:*
-- `square = lambda n: n * n` — creates an unnamed function that takes one parameter, `n`, and evaluates `n * n`; the variable `square` now refers to that function.
-- `print(square(6))` — calls the lambda with `6`, which evaluates to `36`, and `print()` displays it.
-- Output: `36`.
+- `apply_discount = lambda price: price * 0.9` — creates an unnamed function that takes one parameter, `price`, and evaluates `price * 0.9` (a flat 10% discount); the variable `apply_discount` now refers to that function.
+- `print(apply_discount(500))` — calls the lambda with `500`, which evaluates to `450.0`, and `print()` displays it.
+- Output: `450.0`.
 
-**Beginner example** — higher-order functions with `filter()`, `map()`, and `sorted(key=...)`:
+**Step 2 — higher-order functions apply that lambda across the whole stock list:**
 
 ```python
-numbers = range(1, 11)
-evens = filter(lambda n: n % 2 == 0, numbers)
-doubled = map(lambda n: n * 2, evens)
-print(list(doubled))
+book_prices = [500, 250, 1200, 90, 650]
 
-words = ["python", "ai", "loop", "engineering"]
-print(sorted(words, key=lambda w: len(w)))
+discounted_prices = map(apply_discount, book_prices)
+print(list(discounted_prices))
+
+affordable = filter(lambda price: price < 300, book_prices)
+print(list(affordable))
+
+print(sorted(book_prices, key=lambda price: price))
 ```
 
 *Line-by-line explanation:*
-- `numbers = range(1, 11)` — a `range` object producing the whole numbers 1 through 10.
-- `evens = filter(lambda n: n % 2 == 0, numbers)` — `filter()` is a higher-order function; it calls the lambda once per number and keeps only the ones where `n % 2 == 0` is `True`. The result is a lazy `filter` object, not a list yet.
-- `doubled = map(lambda n: n * 2, evens)` — `map()` applies the lambda to every value that `evens` eventually produces, doubling each one. This too is lazy — nothing has been computed yet.
-- `print(list(doubled))` — wrapping in `list(...)` forces both `filter` and `map` to actually run and produce their values now. Output: `[4, 8, 12, 16, 20]`.
-- `sorted(words, key=lambda w: len(w))` — sorts `words` not alphabetically but by the result of calling the lambda on each word — its length. Output: `['ai', 'loop', 'python', 'engineering']`.
+- `book_prices = [500, 250, 1200, 90, 650]` — the listed price of each book currently in stock.
+- `discounted_prices = map(apply_discount, book_prices)` — `map()` is a higher-order function; it calls `apply_discount` once per price in `book_prices` and collects the results. The result is a lazy `map` object, not a list yet.
+- `print(list(discounted_prices))` — wrapping in `list(...)` forces `map` to actually run. Output: `[450.0, 225.0, 1080.0, 81.0, 585.0]`.
+- `affordable = filter(lambda price: price < 300, book_prices)` — `filter()` calls the lambda once per price and keeps only the ones where `price < 300` is `True`. This is also lazy until forced into a list.
+- `print(list(affordable))` — Output: `[250, 90]`.
+- `sorted(book_prices, key=lambda price: price)` — sorts `book_prices` using the lambda's result — here just the price itself — as the ranking value, lowest first. Output: `[90, 250, 500, 650, 1200]`.
 
-**Practical example** — a `@log_call` decorator applied to a railway fare calculation function:
+**Step 3 — a `@log_order` decorator wraps the function that processes one order:**
 
 ```python
-def log_call(func):
+def log_order(func):
     def wrapper(*args, **kwargs):
-        print(f"Calling {func.__name__} with {args}")
+        print(f"Processing order for a book listed at Rs. {args[0]}")
         result = func(*args, **kwargs)
-        print(f"{func.__name__} returned {result}")
+        print(f"Final payable amount: Rs. {result}")
         return result
     return wrapper
 
-@log_call
-def calculate_fare(base_fare, seats):
-    return base_fare * seats
+@log_order
+def process_book_order(price):
+    return apply_discount(price)
 
-total = calculate_fare(745, 2)
-print("Total payable:", total)
+process_book_order(500)
 ```
 
 *Line-by-line explanation:*
-- `def log_call(func):` — the decorator; it accepts the function it will wrap.
-- `def wrapper(*args, **kwargs):` — the inner replacement function; `*args, **kwargs` let it accept any combination of arguments, so `log_call` works on any function, not just `calculate_fare`.
-- `print(f"Calling {func.__name__} ...")` — logs the call before the real work happens; `func.__name__` reads the original function's name.
-- `result = func(*args, **kwargs)` — actually runs the original `calculate_fare` with whatever arguments were passed in, and saves its result.
-- `print(f"{func.__name__} returned {result}")` — logs the result after the call.
-- `return result` — passes the original return value back out, so callers of `calculate_fare` still get the correct number.
-- `return wrapper` — `log_call` hands back the wrapper function itself, not a call to it.
-- `@log_call` above `def calculate_fare` — equivalent to writing `calculate_fare = log_call(calculate_fare)` right after defining it.
-- `calculate_fare(745, 2)` — this call actually runs `wrapper(745, 2)`, which logs, runs the real calculation (`745 * 2 = 1490`), logs the result, and returns `1490`.
+- `def log_order(func):` — the decorator; it accepts the function it will wrap.
+- `def wrapper(*args, **kwargs):` — the inner replacement function; `*args, **kwargs` let it accept any combination of arguments, so `log_order` works on any function, not just `process_book_order`.
+- `print(f"Processing order for a book listed at Rs. {args[0]}")` — logs the call before the real work happens, reading the original listed price straight out of `args`.
+- `result = func(*args, **kwargs)` — actually runs `process_book_order`, which applies the discount using the lambda from Step 1, and saves the result.
+- `print(f"Final payable amount: Rs. {result}")` — logs the result after the call.
+- `return result` — passes the original return value back out, so callers of `process_book_order` still get the correct number.
+- `return wrapper` — `log_order` hands back the wrapper function itself, not a call to it.
+- `@log_order` above `def process_book_order(price):` — equivalent to writing `process_book_order = log_order(process_book_order)` right after defining it.
+- `process_book_order(500)` — this call actually runs `wrapper(500)`, which logs, runs the real discount calculation (`500 * 0.9 = 450.0`), logs the result, and returns `450.0`.
 - Output:
   ```
-  Calling calculate_fare with (745, 2)
-  calculate_fare returned 1490
-  Total payable: 1490
+  Processing order for a book listed at Rs. 500
+  Final payable amount: Rs. 450.0
   ```
 
-**Industry-oriented example** — a generator streaming UPI transaction IDs for a payments dashboard:
+**Step 4 — a generator hands out invoice numbers as the whole batch of orders is processed:**
 
 ```python
-def transaction_id_generator(prefix, start):
+def invoice_number_generator(start):
     current = start
     while True:
-        yield f"{prefix}{current}"
+        yield f"INV{current}"
         current += 1
 
-ids = transaction_id_generator("UPI2026", 1000)
+invoices = invoice_number_generator(101)
 
-for _ in range(4):
-    print(next(ids))
+for price in sorted(book_prices, key=lambda price: price):
+    invoice_id = next(invoices)
+    print(f"\n{invoice_id}")
+    process_book_order(price)
 ```
 
 *Line-by-line explanation:*
-- `def transaction_id_generator(prefix, start):` — a generator function because its body contains `yield`.
+- `def invoice_number_generator(start):` — a generator function because its body contains `yield`.
 - `current = start` — sets up the running counter, starting from whatever `start` was passed.
-- `while True:` — an infinite loop; this generator could, in theory, produce transaction IDs forever.
-- `yield f"{prefix}{current}"` — builds one transaction ID string and hands it out, then pauses the function exactly here, keeping `current`'s value frozen.
+- `while True:` — an infinite loop; this generator could produce invoice numbers forever.
+- `yield f"INV{current}"` — builds one invoice number string and hands it out, then pauses the function exactly here, keeping `current`'s value frozen.
 - `current += 1` — only runs the *next* time the generator is resumed, right after the last `yield`.
-- `ids = transaction_id_generator("UPI2026", 1000)` — calling the generator function does not run any of its body yet; it only creates a paused generator object.
-- `for _ in range(4): print(next(ids))` — `next(ids)` resumes the generator until it hits `yield`, prints the value it hands back, then the loop asks for the next one three more times. The underscore `_` is used because the loop counter itself is not needed.
+- `invoices = invoice_number_generator(101)` — calling the generator function does not run any of its body yet; it only creates a paused generator object.
+- `for price in sorted(book_prices, key=lambda price: price):` — reuses the same sorting lambda from Step 2 so the cheapest book is processed first.
+- `invoice_id = next(invoices)` — resumes the generator until it hits `yield`, handing back the next invoice number.
+- `process_book_order(price)` — the decorated function from Step 3 runs for each price, logging the order and applying the discount.
 - Output:
   ```
-  UPI20261000
-  UPI20261001
-  UPI20261002
-  UPI20261003
+
+  INV101
+  Processing order for a book listed at Rs. 90
+  Final payable amount: Rs. 81.0
+
+  INV102
+  Processing order for a book listed at Rs. 250
+  Final payable amount: Rs. 225.0
+
+  INV103
+  Processing order for a book listed at Rs. 500
+  Final payable amount: Rs. 450.0
+
+  INV104
+  Processing order for a book listed at Rs. 650
+  Final payable amount: Rs. 585.0
+
+  INV105
+  Processing order for a book listed at Rs. 1200
+  Final payable amount: Rs. 1080.0
   ```
-- Even though `transaction_id_generator` could run forever, only four IDs are ever actually computed — this is lazy evaluation doing exactly what it is meant to do: a real payments system can pull as many IDs as it needs, whenever it needs them, without pre-building millions of unused ones in memory.
+- Even though `invoice_number_generator` could run forever, only five invoice numbers are ever actually computed — one per book actually processed — because nothing ever asks the generator for a sixth.
+
+#### Try It Yourself
+
+**Exercise: Extend Prakash's bookstore pipeline.** Keep using the same `book_prices = [500, 250, 1200, 90, 650]` list from the example above.
+
+**Part 1 (lambda + higher-order function):** Write a lambda called `add_gst` that adds 10% GST to a price (multiply by `1.10`, then `round(..., 2)` so the result is a clean two-decimal number). Use `map()` to apply it to every price in `book_prices`, and print the resulting list.
+
+**Solution:**
+```python
+add_gst = lambda price: round(price * 1.10, 2)
+prices_with_gst = map(add_gst, book_prices)
+print(list(prices_with_gst))
+```
+Expected output:
+```
+[550.0, 275.0, 1320.0, 99.0, 715.0]
+```
+
+**Part 2 (higher-order functions, combined):** Using `filter()`, keep only the books priced at Rs. 200 or more. Then, using `sorted()` with a lambda `key`, print those remaining books in **descending** order of price (most expensive first).
+
+**Solution:**
+```python
+eligible = filter(lambda price: price >= 200, book_prices)
+print(sorted(eligible, key=lambda price: price, reverse=True))
+```
+Expected output:
+```
+[1200, 650, 500, 250]
+```
+
+**Part 3 (decorator + generator, combined):** Write a new function `process_order_with_gst(price)` that returns `add_gst(price)`, and apply the same `@log_order` decorator from Step 3 to it. Write a second generator, `gst_invoice_generator(start)`, identical in structure to `invoice_number_generator` but used with a different starting number. Starting invoice numbers at `201`, process the descending, filtered list from Part 2 through `process_order_with_gst`, printing one invoice number before each order.
+
+**Solution:**
+```python
+@log_order
+def process_order_with_gst(price):
+    return add_gst(price)
+
+def gst_invoice_generator(start):
+    current = start
+    while True:
+        yield f"INV{current}"
+        current += 1
+
+gst_invoices = gst_invoice_generator(201)
+descending_eligible = sorted(filter(lambda price: price >= 200, book_prices), key=lambda price: price, reverse=True)
+
+for price in descending_eligible:
+    invoice_id = next(gst_invoices)
+    print(f"\n{invoice_id}")
+    process_order_with_gst(price)
+```
+Expected output:
+```
+
+INV201
+Processing order for a book listed at Rs. 1200
+Final payable amount: Rs. 1320.0
+
+INV202
+Processing order for a book listed at Rs. 650
+Final payable amount: Rs. 715.0
+
+INV203
+Processing order for a book listed at Rs. 500
+Final payable amount: Rs. 550.0
+
+INV204
+Processing order for a book listed at Rs. 250
+Final payable amount: Rs. 275.0
+```
 
 ---
 

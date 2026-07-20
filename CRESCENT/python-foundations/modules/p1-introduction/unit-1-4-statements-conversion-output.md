@@ -195,95 +195,149 @@ match subject:
 
 ### 3.8 Code Examples
 
-**Basic example** — converting a value between types:
+**Single example** — a campus canteen order receipt, built up in four steps. Each step reuses what the previous step produced, so by the end you have one coherent script that converts text-shaped data, formats it for a receipt, documents it with type hints, and reports an order status with `match`/`case`.
+
+**Step 1 — convert a value between types:**
 
 ```python
-raw_age = "20"
-age = int(raw_age)
-print(age)
-print(type(age))
+raw_quantity = "3"           # quantity typed into the order form, arrives as text
+quantity = int(raw_quantity)
+print(quantity)
+print(type(quantity))
 ```
 
 *Line-by-line explanation:*
-- `raw_age = "20"` — a `str`, even though it looks like a number.
-- `age = int(raw_age)` — parses the digits and produces a new `int` value; `raw_age` itself is unchanged.
-- `print(age)` shows `20`; `print(type(age))` confirms it is now an `int`.
+- `raw_quantity = "3"` — a `str`, even though it looks like a number; this is exactly how a value typed into a form arrives.
+- `quantity = int(raw_quantity)` — parses the digits and produces a new `int` value; `raw_quantity` itself is unchanged.
+- `print(quantity)` shows `3`; `print(type(quantity))` confirms it is now an `int`.
 - Output:
   ```
-  20
+  3
   <class 'int'>
   ```
 
-**Beginner example** — building formatted output with an f-string:
+**Step 2 — display a value with an f-string:**
 
 ```python
-name = "Ada"
-price = 19.5
-print(f"{name} paid Rs.{price:.2f}")
+item = "Samosa"
+price = 15.0
+print(f"{item} costs Rs.{price:.2f} each")
 ```
 
 *Line-by-line explanation:*
-- `name = "Ada"` and `price = 19.5` store a string and a float.
-- The f-string embeds `name` directly and formats `price` with `:.2f`, forcing exactly two decimal places.
+- `item = "Samosa"` and `price = 15.0` store a string and a float.
+- The f-string embeds `item` directly and formats `price` with `:.2f`, forcing exactly two decimal places.
 - Output:
   ```
-  Ada paid Rs.19.50
+  Samosa costs Rs.15.00 each
   ```
 
-**Practical example** — combining a type hint, conversion, arithmetic, and an f-string:
+**Step 3 — add type hints, conversion, and arithmetic to build the full receipt line:**
 
 ```python
-quantity: int = 3
-price_text: str = "45.5"
+item: str = "Samosa"
+price_text: str = "15.0"     # price as it would arrive from the canteen's order API
+quantity: int = 3             # the same quantity converted in Step 1
 
-price = float(price_text)   # convert text -> float
-total = price * quantity    # arithmetic from Unit 1.3
+price = float(price_text)     # convert text -> float
+total = price * quantity      # arithmetic from Unit 1.3
 
-print(f"Total: Rs.{total:.2f} for {quantity:d} items")
+print(f"{item:>10}: {quantity:d} x Rs.{price:.2f} = Rs.{total:.2f}")
 ```
 
 *Line-by-line explanation:*
-- `quantity: int = 3` — a type hint documenting that `quantity` should always hold an `int`.
-- `price_text: str = "45.5"` — simulates a value that arrived as text, as real input usually does.
+- `item: str = "Samosa"` — a type-hinted `str` holding the item name.
+- `price_text: str = "15.0"` — the unit price, deliberately kept as text to mirror how it would arrive from a real order API.
+- `quantity: int = 3` — a type-hinted `int`; the same value produced by `int(raw_quantity)` in Step 1.
 - `price = float(price_text)` converts the text to a usable number before any math is attempted.
 - `total = price * quantity` computes the amount using ordinary multiplication.
-- The final f-string formats `total` to two decimals and `quantity` as a plain integer.
+- The f-string prints four pieces: `{item:>10}` right-aligns the item name in a 10-character field, `{quantity:d}` shows the count as a plain integer, and `{price:.2f}` / `{total:.2f}` pin both money values to two decimal places.
 - Output:
   ```
-  Total: Rs.136.50 for 3 items
+      Samosa: 3 x Rs.15.00 = Rs.45.00
   ```
 
-**Industry-oriented example** — a UPI payment confirmation using conversion, f-strings, and `match`/`case`:
+**Step 4 — use `match`/`case` to report the order status:**
 
 ```python
-amount_text: str = "1499.00"   # arrives as text from the payment gateway
-amount: float = float(amount_text)
-status = "SUCCESS"
+order_status = "PREPARING"
 
-print(f"Amount debited: Rs.{amount:.2f}")
-
-match status:
-    case "SUCCESS":
-        print("Payment completed. Money credited to merchant.")
-    case "PENDING":
-        print("Payment is being processed. Please wait.")
-    case "FAILED":
-        print("Payment failed. Amount will be refunded.")
+match order_status:
+    case "PLACED":
+        print("Order received by the canteen.")
+    case "PREPARING":
+        print("Your order is being prepared.")
+    case "READY":
+        print("Order ready for pickup!")
     case _:
-        print("Unknown status. Contact support.")
+        print("Status unavailable. Please check with the counter.")
 ```
 
 *Line-by-line explanation:*
-- `amount_text: str = "1499.00"` — a type-hinted variable holding the raw text value exactly as a payment gateway API would return it.
-- `amount: float = float(amount_text)` converts the text into a usable `float`, hinted to confirm the intended type.
-- `status = "SUCCESS"` holds one of a fixed set of outcomes a real payment system reports.
-- The f-string prints the debited amount to two decimals, the standard way money is shown to a user.
-- `match status:` compares `status` against each `case` in order; since it equals `"SUCCESS"`, that block runs and the rest — including the wildcard `case _:` — are skipped.
+- `order_status = "PREPARING"` holds one of a fixed set of statuses a real canteen ordering system would report.
+- `match order_status:` compares `order_status` against each `case` in order; since it equals `"PREPARING"`, that block runs and the rest — including the wildcard `case _:` — are skipped.
 - Output:
   ```
-  Amount debited: Rs.1499.00
-  Payment completed. Money credited to merchant.
+  Your order is being prepared.
   ```
+
+#### Try It Yourself
+
+**Exercise: extend the canteen receipt for a second item — cold coffee.**
+
+**Part 1 (Easy):** A customer entered the quantity for cold coffee as `"2"` on the order form. Convert `raw_coffee_qty = "2"` to an `int`, store it in `coffee_qty`, and print both the value and its type.
+
+**Solution:**
+```python
+raw_coffee_qty = "2"
+coffee_qty = int(raw_coffee_qty)
+print(coffee_qty)
+print(type(coffee_qty))
+```
+Expected output:
+```
+2
+<class 'int'>
+```
+
+**Part 2 (Medium):** The cold coffee's price arrives as text, `"35.0"`. Using type hints, convert it to a `float`, compute the total for `coffee_qty` cups, and print a formatted line in the same style used for the samosa in Step 3.
+
+**Solution:**
+```python
+item: str = "Coffee"
+price_text: str = "35.0"
+quantity: int = coffee_qty   # from Part 1
+
+price = float(price_text)
+total = price * quantity
+
+print(f"{item:>10}: {quantity:d} x Rs.{price:.2f} = Rs.{total:.2f}")
+```
+Expected output:
+```
+    Coffee: 2 x Rs.35.00 = Rs.70.00
+```
+
+**Part 3 (Harder):** Add a `match`/`case` block for `payment_mode`, which can be `"CASH"`, `"UPI"`, or `"CARD"`. Print a suitable confirmation message for each, plus a wildcard case for anything else. Test it with `payment_mode = "UPI"`.
+
+**Solution:**
+```python
+payment_mode = "UPI"
+
+match payment_mode:
+    case "CASH":
+        print("Please pay at the counter.")
+    case "UPI":
+        print("Scan the QR code to complete payment.")
+    case "CARD":
+        print("Please tap your card on the reader.")
+    case _:
+        print("Payment mode not recognized. Ask the counter staff.")
+```
+Expected output:
+```
+Scan the QR code to complete payment.
+```
 
 ---
 

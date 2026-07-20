@@ -222,51 +222,9 @@ Rohit
 
 ### 3.9 Code Examples
 
-**Basic example** — the default output, then a class-defined `__repr__`:
+One running example — a UPI `Wallet` — builds up every feature in this unit, one at a time, instead of jumping between unrelated classes. Each step adds one dunder method to the same class.
 
-```python
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f"Point(x={self.x}, y={self.y})"
-
-p = Point(3, 4)
-print(p)
-```
-
-*Line-by-line explanation:*
-- `class Point:` starts a new class with two attributes, `x` and `y`, set in `__init__` exactly as in Unit 4.1.
-- `def __repr__(self):` defines the dunder method Python calls for a developer-facing description.
-- `return f"Point(x={self.x}, y={self.y})"` builds and returns a string that looks like the code needed to recreate this exact object.
-- `p = Point(3, 4)` creates one `Point` instance.
-- `print(p)` — since `__str__` is not defined, Python falls back to `__repr__`. Output: `Point(x=3, y=4)`.
-
-**Beginner example** — implementing `__eq__` so equality checks data, not identity:
-
-```python
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __eq__(self, other):
-        return isinstance(other, Point) and self.x == other.x and self.y == other.y
-
-p1 = Point(3, 4)
-p2 = Point(3, 4)
-print(p1 == p2)
-```
-
-*Line-by-line explanation:*
-- `def __eq__(self, other):` defines what `==` should do whenever the left-hand side is a `Point`.
-- `isinstance(other, Point)` is checked first — `and` short-circuits left to right, so if `other` is not even a `Point`, the expression returns `False` immediately without ever touching `other.x`, which might not exist.
-- `self.x == other.x and self.y == other.y` compares both coordinates; only if both match is the overall result `True`.
-- `p1 == p2` calls `p1.__eq__(p2)` implicitly. Since both points hold the same coordinates, output: `True` — even though `p1` and `p2` are two separate objects in memory.
-
-**Practical example** — operator overloading with `__add__`, combining two UPI wallet balances:
+**Step 1: `__repr__` and `__str__` — controlling how a `Wallet` prints**
 
 ```python
 class Wallet:
@@ -274,55 +232,209 @@ class Wallet:
         self.owner_name = owner_name
         self.balance = balance
 
-    def __add__(self, other):
-        combined_balance = self.balance + other.balance
-        return Wallet(f"{self.owner_name} + {other.owner_name}", combined_balance)
+    def __repr__(self):
+        return f"Wallet(owner_name={self.owner_name!r}, balance={self.balance})"
 
     def __str__(self):
         return f"{self.owner_name}'s wallet: Rs. {self.balance:.2f}"
 
-main_wallet = Wallet("Rohit", 500.0)
+wallet_1 = Wallet("Rohit", 500.0)
+print(wallet_1)
+print(repr(wallet_1))
+```
+
+*Line-by-line explanation:*
+- `class Wallet:` starts a new class with two attributes, `owner_name` and `balance`, set in `__init__` exactly as in Unit 4.1.
+- `def __repr__(self):` defines the developer-facing description; `{self.owner_name!r}` uses the `!r` conversion to show the string with quotes, exactly as it would appear in code.
+- `def __str__(self):` defines the friendlier, end-user-facing description, formatting `balance` to two decimal places since this represents money.
+- `wallet_1 = Wallet("Rohit", 500.0)` creates one `Wallet` instance.
+- `print(wallet_1)` calls `__str__` since it is defined. `repr(wallet_1)` calls `__repr__` directly. Output:
+```
+Rohit's wallet: Rs. 500.00
+Wallet(owner_name='Rohit', balance=500.0)
+```
+
+**Step 2: `__eq__` — comparing two wallets by data, not identity**
+
+```python
+class Wallet:
+    def __init__(self, owner_name, balance):
+        self.owner_name = owner_name
+        self.balance = balance
+
+    def __repr__(self):
+        return f"Wallet(owner_name={self.owner_name!r}, balance={self.balance})"
+
+    def __str__(self):
+        return f"{self.owner_name}'s wallet: Rs. {self.balance:.2f}"
+
+    def __eq__(self, other):
+        return isinstance(other, Wallet) and self.owner_name == other.owner_name and self.balance == other.balance
+
+wallet_1 = Wallet("Rohit", 500.0)
+wallet_2 = Wallet("Rohit", 500.0)
+print(wallet_1 == wallet_2)
+```
+
+*Line-by-line explanation:*
+- `def __eq__(self, other):` defines what `==` should do whenever the left-hand side is a `Wallet`.
+- `isinstance(other, Wallet)` is checked first — `and` short-circuits left to right, so if `other` is not even a `Wallet`, the expression returns `False` immediately without ever touching `other.owner_name`, which might not exist.
+- `self.owner_name == other.owner_name and self.balance == other.balance` compares both fields; only if both match is the overall result `True`.
+- `wallet_1 == wallet_2` calls `wallet_1.__eq__(wallet_2)` implicitly. Since both wallets hold the same data, output: `True` — even though `wallet_1` and `wallet_2` are two separate objects in memory.
+
+**Step 3: `__add__` — combining two wallets with `+`**
+
+```python
+class Wallet:
+    def __init__(self, owner_name, balance):
+        self.owner_name = owner_name
+        self.balance = balance
+
+    def __repr__(self):
+        return f"Wallet(owner_name={self.owner_name!r}, balance={self.balance})"
+
+    def __str__(self):
+        return f"{self.owner_name}'s wallet: Rs. {self.balance:.2f}"
+
+    def __eq__(self, other):
+        return isinstance(other, Wallet) and self.owner_name == other.owner_name and self.balance == other.balance
+
+    def __add__(self, other):
+        combined_balance = self.balance + other.balance
+        return Wallet(f"{self.owner_name} + {other.owner_name}", combined_balance)
+
+wallet_1 = Wallet("Rohit", 500.0)
 cashback_wallet = Wallet("Rohit-Cashback", 45.50)
 
-total_wallet = main_wallet + cashback_wallet
+total_wallet = wallet_1 + cashback_wallet
 print(total_wallet)
 ```
 
 *Line-by-line explanation:*
 - `def __add__(self, other):` defines what `+` should do whenever the left-hand operand is a `Wallet` — this is operator overloading in action.
 - `combined_balance = self.balance + other.balance` adds the two plain `float` balances using ordinary numeric `+` — this line does not overload anything, it just uses `+` on numbers as usual.
-- `return Wallet(...)` builds and returns a brand-new `Wallet`, rather than modifying `main_wallet` in place — matching the rule that `+` should produce a new value.
-- `def __str__(self):` gives this class a human-readable form, distinct from any `__repr__` (none is defined here, so debugging output would still fall back to the default).
-- `main_wallet + cashback_wallet` calls `main_wallet.__add__(cashback_wallet)` implicitly, producing a new combined `Wallet`.
-- `print(total_wallet)` calls `__str__`. Output: `Rohit + Rohit-Cashback's wallet: Rs. 545.50`.
+- `return Wallet(...)` builds and returns a brand-new `Wallet`, rather than modifying `wallet_1` in place — matching the rule that `+` should produce a new value.
+- `total_wallet = wallet_1 + cashback_wallet` calls `wallet_1.__add__(cashback_wallet)` implicitly, producing a new combined `Wallet`.
+- `print(total_wallet)` calls `__str__` on the result. Output: `Rohit + Rohit-Cashback's wallet: Rs. 545.50`.
 
-**Industry-oriented example** — a `@dataclass` for a railway e-ticket, generated automatically:
+**Step 4: the same `Wallet`, rewritten as a `@dataclass`**
+
+`Wallet` is mostly data (`owner_name`, `balance`) with a little custom behaviour (`__str__`, `__add__`) layered on top. `@dataclass` can generate the data-only parts — `__init__`, `__repr__`, `__eq__` — while `__str__` and `__add__` are still written by hand, exactly as the comparison table in section 3.4 predicts:
 
 ```python
 from dataclasses import dataclass
 
 @dataclass
-class Ticket:
-    passenger_name: str
-    pnr_number: str
-    seat_number: str
-    fare: float
-    is_confirmed: bool = False
+class Wallet:
+    owner_name: str
+    balance: float
 
-ticket_1 = Ticket("Priya Nair", "PNR20260720A1", "B2-45", 745.50, True)
-ticket_2 = Ticket("Priya Nair", "PNR20260720A1", "B2-45", 745.50, True)
+    def __str__(self):
+        return f"{self.owner_name}'s wallet: Rs. {self.balance:.2f}"
 
-print(ticket_1)
-print(ticket_1 == ticket_2)
+    def __add__(self, other):
+        return Wallet(f"{self.owner_name} + {other.owner_name}", self.balance + other.balance)
+
+wallet_1 = Wallet("Rohit", 500.0)
+wallet_2 = Wallet("Rohit", 500.0)
+cashback_wallet = Wallet("Rohit-Cashback", 45.50)
+
+print(wallet_1)
+print(repr(wallet_1))
+print(wallet_1 == wallet_2)
+print(wallet_1 + cashback_wallet)
 ```
 
 *Line-by-line explanation:*
-- `@dataclass` turns the class below it into a dataclass — `__init__`, `__repr__`, and `__eq__` are all generated from the fields listed.
-- `passenger_name: str`, `pnr_number: str`, `seat_number: str`, `fare: float` are four required fields, each with a type hint — every one of these must be supplied when creating a `Ticket`.
-- `is_confirmed: bool = False` is a field with a default value; since it comes *last*, this is legal — a required field could not follow it.
-- `ticket_1 = Ticket(...)` calls the generated `__init__` with five positional values, in the exact order the fields were declared.
-- `print(ticket_1)` shows the generated `__repr__` output, since `@dataclass` never generates a `__str__`: `Ticket(passenger_name='Priya Nair', pnr_number='PNR20260720A1', seat_number='B2-45', fare=745.5, is_confirmed=True)`.
-- `ticket_1 == ticket_2` uses the generated `__eq__`, which compares every field. Since both tickets hold identical data, output: `True` — precisely the industry pattern of confirming "same booking" without caring whether they are literally the same object in memory.
+- `@dataclass` turns the class below it into a dataclass — `__init__`, `__repr__`, and `__eq__` are all generated from the two type-hinted fields, `owner_name: str` and `balance: float`, replacing the hand-written versions from Steps 1–2.
+- `def __str__(self):` and `def __add__(self, other):` are still written by hand inside the dataclass body — `@dataclass` never generates `__str__`, and it has no idea what "adding" two wallets should mean, so both stay exactly as in Step 3. A dataclass is still an ordinary class underneath the decorator; you can always add plain methods to it.
+- `wallet_1 = Wallet("Rohit", 500.0)` calls the generated `__init__`.
+- `print(wallet_1)` calls the hand-written `__str__`; `repr(wallet_1)` calls the generated `__repr__`; `wallet_1 == wallet_2` calls the generated `__eq__`; `wallet_1 + cashback_wallet` calls the hand-written `__add__`. Output:
+```
+Rohit's wallet: Rs. 500.00
+Wallet(owner_name='Rohit', balance=500.0)
+True
+Rohit + Rohit-Cashback's wallet: Rs. 545.50
+```
+
+#### Try It Yourself
+
+Using the final `@dataclass` version of `Wallet` from Step 4 as your starting point, complete the following three parts.
+
+**Part 1 (straightforward):** Create `priya_wallet = Wallet("Priya", 200.0)` and `bonus_wallet = Wallet("Priya-Bonus", 15.75)`. Add them together with `+` and `print()` the result.
+
+**Solution:**
+
+```python
+priya_wallet = Wallet("Priya", 200.0)
+bonus_wallet = Wallet("Priya-Bonus", 15.75)
+
+combined_wallet = priya_wallet + bonus_wallet
+print(combined_wallet)
+```
+
+Expected output:
+
+```
+Priya + Priya-Bonus's wallet: Rs. 215.75
+```
+
+**Part 2 (moderate):** Create `wallet_a = Wallet("Priya", 200.0)` and `wallet_b = Wallet("Priya", 200.0)` — two separate objects holding identical data. Print `wallet_a == wallet_b` and `wallet_a is wallet_b`, and be ready to explain in one sentence why the two results differ.
+
+**Solution:**
+
+```python
+wallet_a = Wallet("Priya", 200.0)
+wallet_b = Wallet("Priya", 200.0)
+
+print(wallet_a == wallet_b)
+print(wallet_a is wallet_b)
+```
+
+Expected output:
+
+```
+True
+False
+```
+
+`==` calls the dataclass-generated `__eq__`, which compares data — both wallets hold the same `owner_name` and `balance`, so it is `True`. `is` checks identity — whether both names refer to the exact same object in memory — and since `wallet_a` and `wallet_b` were built from two separate `Wallet(...)` calls, it is `False`.
+
+**Part 3 (challenging):** Add a `__sub__` method to `Wallet`, following the same pattern as `__add__`, so that `wallet_1 - spent_wallet` returns a new `Wallet` with the same `owner_name` as `wallet_1` and a `balance` reduced by `spent_wallet`'s balance. Test it with `wallet_1 = Wallet("Rohit", 500.0)` and `spent_wallet = Wallet("Rohit-Spent", 120.0)`.
+
+**Solution:**
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Wallet:
+    owner_name: str
+    balance: float
+
+    def __str__(self):
+        return f"{self.owner_name}'s wallet: Rs. {self.balance:.2f}"
+
+    def __add__(self, other):
+        return Wallet(f"{self.owner_name} + {other.owner_name}", self.balance + other.balance)
+
+    def __sub__(self, other):
+        return Wallet(self.owner_name, self.balance - other.balance)
+
+wallet_1 = Wallet("Rohit", 500.0)
+spent_wallet = Wallet("Rohit-Spent", 120.0)
+
+remaining_wallet = wallet_1 - spent_wallet
+print(remaining_wallet)
+```
+
+Expected output:
+
+```
+Rohit's wallet: Rs. 380.00
+```
+
+`__sub__` is the dunder method Python calls for `-`, following exactly the same pattern as `__add__`: it builds and returns a brand-new `Wallet` rather than changing `wallet_1` in place, keeping `owner_name` from `self` and subtracting `other.balance` from `self.balance` (`500.0 - 120.0 = 380.0`).
 
 ---
 

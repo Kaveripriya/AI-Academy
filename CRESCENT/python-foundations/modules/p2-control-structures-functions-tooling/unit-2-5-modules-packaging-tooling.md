@@ -164,94 +164,180 @@ flowchart LR
 
 ### 3.8 Code Examples
 
-**Basic example** — importing one standard library module:
+The examples below are not separate — they are one continuous walkthrough. You are building **`pricing.py`**, a small pricing module for a campus store's checkout counter, and taking it through every stage a real Python project passes through: writing the module, importing standard library help, isolating dependencies with `pip` and a virtual environment, managing that same dependency the professional way with Poetry, and finally proving the module works with a Pytest test.
+
+**Stage 1 — Write the module, using both import forms**
+
+Save the following into a file named `pricing.py`:
 
 ```python
+# pricing.py
 import math
-
-print(math.sqrt(64))
-```
-
-*Line-by-line explanation:*
-- `import math` loads the entire `math` module — part of the standard library, so nothing needs to be installed first.
-- `math.sqrt(64)` reaches into `math` with a dot and calls its `sqrt()` function on `64`.
-- Output: `8.0`.
-
-**Beginner example** — two standard library modules, using `from ... import` and `as`:
-
-```python
 from datetime import date
-import random as rnd
 
-print(date.today())
-print(rnd.randint(1, 100))
-```
 
-*Line-by-line explanation:*
-- `from datetime import date` pulls only the `date` object out of the `datetime` module, so it can be used directly as `date`, with no dot back to `datetime`.
-- `import random as rnd` loads the whole `random` module but renames it `rnd` for the rest of the file.
-- `date.today()` returns today's date; `rnd.randint(1, 100)` returns a random whole number between `1` and `100`, inclusive.
-- Output (the random number will differ every run):
-  ```
-  2026-07-20
-  57
-  ```
-
-**Practical example** — writing your own module and importing it like any other:
-
-Save the following into a file named `discount.py`:
-
-```python
-# discount.py
 def apply_discount(price, percent_off):
-    discount_amount = price * (percent_off / 100)
-    return price - discount_amount
+    discounted = price - (price * percent_off / 100)
+    return math.floor(discounted * 100) / 100
+
+
+def calculation_date():
+    return date.today()
 ```
 
 Then, in a separate file saved in the same folder, named `main.py`:
 
 ```python
 # main.py
-import discount
+import pricing
 
-final_price = discount.apply_discount(1000.0, 20)
-print(final_price)
+print(pricing.apply_discount(1000.0, 20))
+print(pricing.calculation_date())
 ```
 
 *Line-by-line explanation:*
-- `discount.py` defines one function, `apply_discount()`, that takes a `price` and a `percent_off`, and returns the reduced price. There is nothing special about this file — the moment it exists, Python treats it as a module.
-- `import discount` in `main.py` works exactly like `import math` — the only difference is that the Python team wrote `math` years ago, and you wrote `discount.py` two minutes ago.
-- `discount.apply_discount(1000.0, 20)` calls the function through the module name, and the returned value is stored in `final_price`.
-- Output: `800.0`.
+- `import math` loads the whole `math` module — part of the standard library, so nothing needs to be installed first; it is reached afterward with a dot, as in `math.floor(...)`.
+- `from datetime import date` pulls only the `date` object out of the `datetime` module, so it can be used directly as `date`, with no dot back to `datetime`.
+- `apply_discount()` computes the discounted price, then uses `math.floor()` to cut it off at two decimal places instead of leaving a long, unrealistic decimal — ordinary business logic a checkout counter would run.
+- `calculation_date()` returns today's date using `date.today()`, so every calculation can be stamped with when it happened.
+- `pricing.py` has nothing special about it — the moment this file exists, Python treats it as a module, exactly like `math` or `datetime`, just one you wrote yourself two minutes ago instead of the Python team writing it years ago.
+- `import pricing` in `main.py` loads that module; `pricing.apply_discount(1000.0, 20)` and `pricing.calculation_date()` reach into it with a dot, the same way `math.floor()` did above.
+- Output:
+  ```
+  800.0
+  2026-07-20
+  ```
 
-**Industry-oriented example** — an e-commerce module, `pip`-installed formatting, and a Pytest test:
+**Stage 2 — Isolate the project with `pip` and a virtual environment**
+
+Suppose the store now wants currency formatted properly, which means installing a third-party package. Before installing anything, create and activate a virtual environment so this project's packages stay separate from every other project on the machine:
 
 ```bash
+python -m venv venv
+venv\Scripts\activate
 pip install babel==2.14.0
 ```
 
-```python
-# pricing.py
-def calculate_total(item_price, quantity, gst_percent):
-    subtotal = item_price * quantity
-    gst_amount = subtotal * (gst_percent / 100)
-    return subtotal + gst_amount
+*What each command does:*
+- `python -m venv venv` creates a new, empty virtual environment in a folder named `venv` — no packages installed into it yet, just an isolated space reserved for this project.
+- `venv\Scripts\activate` activates it (on Mac/Linux this is `source venv/bin/activate` instead), so every `pip install` run afterward lands inside this project's private folder, not the system-wide Python.
+- `pip install babel==2.14.0` downloads `babel` — a widely used package for formatting currency and dates — from PyPI and installs it into the now-active virtual environment. Pinning the exact version (`==2.14.0`) means this project always gets that exact behaviour, never a surprise from a newer release. (This install stands on its own here to demonstrate the pinning and isolation steps; `pricing.py` does not import `babel`, since the goal of this walkthrough is the workflow itself, not `babel`'s formatting features.)
+- Expected terminal output (abbreviated) after the install: `Successfully installed babel-2.14.0`.
 
+**Stage 3 — Manage the same dependency the Poetry way**
 
-def test_calculate_total():
-    assert calculate_total(500.0, 2, 18) == 1180.0
-    assert calculate_total(100.0, 1, 0) == 100.0
+Poetry does the venv-creation and the version-pinning of Stage 2 together, in one integrated tool:
+
+```bash
+poetry new pricing_project
+poetry add babel==2.14.0
 ```
+
+*What each command does:*
+- `poetry new pricing_project` creates a new project folder called `pricing_project`, already containing a `pyproject.toml` file — Poetry's dependency file — with no manual `venv` step required.
+- `poetry add babel==2.14.0` installs `babel` at that exact pinned version, records it automatically in `pyproject.toml` and `poetry.lock`, and installs it into a virtual environment Poetry manages for you behind the scenes — the same end result as Stage 2's three commands, done as one step that also remembers the version for next time.
+
+**Stage 4 — Prove the module works with a Pytest test**
+
+Add a test function to `pricing.py`, right below `apply_discount()`:
+
+```python
+# pricing.py (continued)
+def test_apply_discount():
+    assert apply_discount(1000.0, 20) == 800.0
+    assert apply_discount(500.0, 0) == 500.0
+```
+
+Then, from a terminal, in the same folder:
 
 ```bash
 pytest pricing.py
 ```
 
 *Line-by-line explanation:*
-- `pip install babel==2.14.0` shows a real dependency pinned to an exact version — `babel` is a widely used package for formatting currency and dates for different locales; pinning it means this project always gets that exact behaviour, never a surprise from a newer release. This install command stands on its own here to demonstrate the pinning step; `pricing.py` below does not import `babel`, since the goal of this example is the module-plus-test workflow, not `babel`'s formatting features.
-- `calculate_total()` is ordinary business logic an e-commerce checkout page would run: multiply price by quantity for the subtotal, then add GST (Goods and Services Tax) on top.
-- `test_calculate_total()` is a Pytest test function — its name starts with `test_`, so Pytest finds it automatically. Each `assert` line is a claim: for a given input, the function must return an exact expected output.
-- Running `pytest pricing.py` from a terminal executes `test_calculate_total()` and reports `1 passed` if every `assert` holds, or exactly which `assert` failed if the logic is ever broken later — the same check a real checkout service would run before every deployment.
+- `test_apply_discount()` is a Pytest test function — its name starts with `test_`, so Pytest discovers and runs it automatically, with no extra configuration.
+- The first `assert` checks a normal 20%-off case: `apply_discount(1000.0, 20)` must equal `800.0`.
+- The second `assert` checks a zero-discount edge case, confirming the function correctly returns the price unchanged rather than behaving unexpectedly.
+- Running `pytest pricing.py` executes `test_apply_discount()` and checks every `assert` inside it.
+- Expected output:
+  ```
+  ========================= test session starts =========================
+  collected 1 item
+
+  pricing.py .                                                      [100%]
+
+  ========================== 1 passed in 0.01s ===========================
+  ```
+- Pytest reports `1 passed` because every `assert` held. If a future change to `apply_discount()` ever produced a wrong result, the first `assert` that no longer holds would immediately turn this into a reported failure, pointing straight at the broken line — before a real customer ever saw a wrong total.
+
+#### Try It Yourself
+
+The campus store now wants to add a flat service tax on top of the discounted price. Using the same `pricing.py` module from the walkthrough above:
+
+**Part 1 (Beginner):** Add a new function, `apply_tax(price, tax_percent)`, to `pricing.py` that returns `price` increased by `tax_percent`. In `main.py`, import `pricing` and print the result of `pricing.apply_tax(800.0, 5)`.
+
+**Solution:**
+```python
+# pricing.py (add this function)
+def apply_tax(price, tax_percent):
+    return price + (price * tax_percent / 100)
+```
+```python
+# main.py
+import pricing
+
+print(pricing.apply_tax(800.0, 5))
+```
+Expected output:
+```
+840.0
+```
+`apply_tax(800.0, 5)` adds 5% of `800.0` (which is `40.0`) back onto the price, giving `840.0`.
+
+**Part 2 (Intermediate):** Write a Pytest test function, `test_apply_tax()`, inside `pricing.py`, with at least two `assert` statements — one normal case and one edge case where `tax_percent` is `0`. Run it with `pytest pricing.py` and state what you expect to see.
+
+**Solution:**
+```python
+# pricing.py (add this function)
+def test_apply_tax():
+    assert apply_tax(800.0, 5) == 840.0
+    assert apply_tax(500.0, 0) == 500.0
+```
+Running `pytest pricing.py` now discovers **two** test functions (`test_apply_discount()` and `test_apply_tax()`) and reports:
+```
+========================= test session starts =========================
+collected 2 items
+
+pricing.py ..                                                     [100%]
+
+========================== 2 passed in 0.01s ===========================
+```
+Both dots represent one passing test each — Pytest ran every `assert` in both functions and none of them failed.
+
+**Part 3 (Advanced):** Write one more function, `final_price(price, percent_off, tax_percent)`, that applies the discount first and then the tax on top of the discounted amount (reusing `apply_discount()` and `apply_tax()` instead of retyping their logic). Write `test_final_price()` to check it, then run `pytest pricing.py` one last time.
+
+**Solution:**
+```python
+# pricing.py (add this function)
+def final_price(price, percent_off, tax_percent):
+    discounted = apply_discount(price, percent_off)
+    return apply_tax(discounted, tax_percent)
+
+
+def test_final_price():
+    assert final_price(1000.0, 20, 5) == 840.0
+    assert final_price(500.0, 0, 0) == 500.0
+```
+Running `pytest pricing.py` now collects three test functions and reports:
+```
+========================= test session starts =========================
+collected 3 items
+
+pricing.py ...                                                    [100%]
+
+========================== 3 passed in 0.01s ===========================
+```
+`final_price(1000.0, 20, 5)` first calls `apply_discount(1000.0, 20)`, giving `800.0`, then calls `apply_tax(800.0, 5)` on that result, giving `840.0` — the same value the first `assert` expects. Reusing `apply_discount()` and `apply_tax()` instead of retyping the arithmetic is exactly the kind of reuse modules exist for in the first place.
 
 ---
 

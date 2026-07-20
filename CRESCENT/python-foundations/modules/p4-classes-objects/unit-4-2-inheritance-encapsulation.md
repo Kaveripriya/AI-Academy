@@ -173,132 +173,14 @@ This diagram shows a realistic banking hierarchy: `SavingsAccount` extends `Bank
 
 ### 3.8 Code Examples
 
-**Basic example** — single-level inheritance with overriding:
-
-```python
-class Animal:
-    def __init__(self, name):
-        self.name = name
-
-    def speak(self):
-        return f"{self.name} makes a sound."
-
-
-class Dog(Animal):
-    def speak(self):
-        return f"{self.name} barks."
-
-
-a = Animal("Generic Animal")
-d = Dog("Tommy")
-print(a.speak())
-print(d.speak())
-```
-
-*Line-by-line explanation:*
-- `class Animal:` defines the superclass with an `__init__` that stores `name`, and a `speak()` method.
-- `class Dog(Animal):` declares `Dog` as a subclass of `Animal` — it inherits `__init__` automatically, since it doesn't define its own.
-- `def speak(self):` inside `Dog` **overrides** `Animal`'s version — Python finds `Dog`'s own `speak()` first and never looks further up.
-- `d = Dog("Tommy")` runs `Animal.__init__` (inherited, not overridden) to set `self.name = "Tommy"`.
-- Output:
-  ```
-  Generic Animal makes a sound.
-  Tommy barks.
-  ```
-
-**Beginner example** — extending `__init__` with `super()`:
-
-```python
-class Vehicle:
-    def __init__(self, brand, speed):
-        self.brand = brand
-        self.speed = speed
-
-    def describe(self):
-        return f"{self.brand} moving at {self.speed} km/h"
-
-
-class Car(Vehicle):
-    def __init__(self, brand, speed, fuel_type):
-        super().__init__(brand, speed)
-        self.fuel_type = fuel_type
-
-    def describe(self):
-        base = super().describe()
-        return f"{base}, running on {self.fuel_type}"
-
-
-c = Car("Tata", 90, "Diesel")
-print(c.describe())
-```
-
-*Line-by-line explanation:*
-- `class Car(Vehicle):` makes `Car` a subclass of `Vehicle`.
-- `super().__init__(brand, speed)` calls `Vehicle.__init__`, setting `self.brand` and `self.speed` — without retyping that logic.
-- `self.fuel_type = fuel_type` adds the one new attribute that only `Car` needs.
-- `describe()` on `Car` **extends** `Vehicle`'s version: `super().describe()` gets `Vehicle`'s string first, then `Car` appends its own detail — this is extending, not plain overriding.
-- Output: `Tata moving at 90 km/h, running on Diesel`
-
-**Practical example** — multi-level inheritance (three classes deep):
-
-```python
-class Person:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-    def introduce(self):
-        return f"I am {self.name}, {self.age} years old."
-
-
-class Employee(Person):
-    def __init__(self, name, age, employee_id):
-        super().__init__(name, age)
-        self.employee_id = employee_id
-
-    def introduce(self):
-        base = super().introduce()
-        return f"{base} My employee ID is {self.employee_id}."
-
-
-class Manager(Employee):
-    def __init__(self, name, age, employee_id, team_size):
-        super().__init__(name, age, employee_id)
-        self.team_size = team_size
-
-    def introduce(self):
-        base = super().introduce()
-        return f"{base} I manage a team of {self.team_size}."
-
-
-m = Manager("Priya Sharma", 34, "EMP2026101", 8)
-print(m.introduce())
-print(isinstance(m, Person))
-print(isinstance(m, Employee))
-print(Manager.__mro__)
-```
-
-*Line-by-line explanation:*
-- Three classes chain in a straight line: `Person` → `Employee` → `Manager` — this is **multi-level inheritance**, not multiple inheritance, because each class has exactly one direct parent.
-- Each subclass's `__init__` calls `super().__init__(...)` first, passing along only the fields the level above needs, then adds its own new field (`employee_id`, then `team_size`).
-- Each `introduce()` calls `super().introduce()` first and appends its own sentence — the final string is assembled one level at a time, all the way from `Person` up to `Manager`.
-- `isinstance(m, Person)` and `isinstance(m, Employee)` both report `True`, because `Manager.__mro__` includes every ancestor in the chain, not just the immediate parent.
-- Output:
-  ```
-  I am Priya Sharma, 34 years old. My employee ID is EMP2026101. I manage a team of 8.
-  True
-  True
-  (<class '__main__.Manager'>, <class '__main__.Employee'>, <class '__main__.Person'>, <class 'object'>)
-  ```
-
-**Industry-oriented example** — banking hierarchy with encapsulation and multiple inheritance:
+One consolidated example builds up an entire `BankAccount` hierarchy, adding one concept at a time — single-level inheritance with `super()`, then multi-level inheritance, then multiple inheritance with MRO, and finally the encapsulation naming conventions used throughout.
 
 ```python
 class BankAccount:
     def __init__(self, account_holder, balance):
         self.account_holder = account_holder
         self._balance = balance        # protected: internal bookkeeping
-        self.__pin = "0000"            # private: name-mangled
+        self.__pin = "1234"            # private: name-mangled
 
     def deposit(self, amount):
         self._balance += amount
@@ -308,6 +190,7 @@ class BankAccount:
         return f"{self.account_holder}'s balance: Rs. {self._balance}"
 
 
+# --- Part 1: single-level inheritance with super() ---
 class SavingsAccount(BankAccount):
     def __init__(self, account_holder, balance, interest_rate):
         super().__init__(account_holder, balance)
@@ -319,6 +202,18 @@ class SavingsAccount(BankAccount):
         return self._balance
 
 
+# --- Part 2: multi-level inheritance ---
+class MinorSavingsAccount(SavingsAccount):
+    def __init__(self, account_holder, balance, interest_rate, guardian_name):
+        super().__init__(account_holder, balance, interest_rate)
+        self.guardian_name = guardian_name
+
+    def show_balance(self):
+        base = super().show_balance()
+        return f"{base} (guardian: {self.guardian_name})"
+
+
+# --- Part 3: multiple inheritance and MRO ---
 class SMSAlertMixin:
     def describe(self):
         return "Sends SMS alerts on every transaction"
@@ -328,37 +223,149 @@ class PremiumSavingsAccount(SavingsAccount, SMSAlertMixin):
     pass
 
 
-acc = PremiumSavingsAccount("Rohit Verma", 50000, 4)
-acc.add_interest()
-print(acc.show_balance())
-print(acc.describe())
-print(acc._balance)                      # works — protected, only a convention
-print(acc._BankAccount__pin)             # works — mangled name, still reachable
+sa = SavingsAccount("Rohit Verma", 50000, 4)
+sa.add_interest()
+print(sa.show_balance())
+
+minor = MinorSavingsAccount("Aditi Rao", 10000, 3, "Sunita Rao")
+minor.add_interest()
+print(minor.show_balance())
+print(isinstance(minor, BankAccount))
+
+premium = PremiumSavingsAccount("Karan Mehta", 75000, 5)
+premium.add_interest()
+print(premium.describe())
 print(PremiumSavingsAccount.__mro__)
+
+# --- Part 4: encapsulation naming conventions ---
+print(sa._balance)                 # works — protected, only a convention
+print(sa._BankAccount__pin)        # works — mangled name, still reachable
 ```
 
 *Line-by-line explanation:*
-- `BankAccount` stores `_balance` with a single underscore (protected: internal, but reachable) and `__pin` with a double underscore (triggers name mangling to `_BankAccount__pin`).
-- `SavingsAccount(BankAccount)` extends `BankAccount` through single inheritance, calling `super().__init__(...)` to set up the base account, then adding `interest_rate`.
-- `SMSAlertMixin` is an independent class with no relation to `BankAccount` — it exists purely to add one extra piece of behavior.
-- `class PremiumSavingsAccount(SavingsAccount, SMSAlertMixin):` uses **multiple inheritance** to combine both — `PremiumSavingsAccount` gets everything from `SavingsAccount` (and, through it, `BankAccount`) plus `describe()` from `SMSAlertMixin`.
-- `acc._balance` works from outside the class — proving the protected underscore is convention, not enforcement.
-- `acc._BankAccount__pin` works too — proving the "private" double underscore only rewrote the name, it did not truly hide it.
-- `PremiumSavingsAccount.__mro__` shows the exact search order Python computed: `PremiumSavingsAccount`, `SavingsAccount`, `BankAccount`, `SMSAlertMixin`, `object` — `BankAccount` is fully resolved before Python ever reaches `SMSAlertMixin`.
-- Output:
-  ```
-  Rohit Verma's balance: Rs. 52000.0
-  Sends SMS alerts on every transaction
-  52000.0
-  0000
-  (<class '__main__.PremiumSavingsAccount'>, <class '__main__.SavingsAccount'>, <class '__main__.BankAccount'>, <class '__main__.SMSAlertMixin'>, <class 'object'>)
-  ```
+
+**Part 1 — single-level inheritance with `super()`:**
+- `BankAccount` is the superclass. It stores `_balance` with a single leading underscore (protected — internal bookkeeping, but still reachable from outside) and `__pin` with a double leading underscore (triggers name mangling to `_BankAccount__pin`).
+- `class SavingsAccount(BankAccount):` declares `SavingsAccount` as a subclass of `BankAccount`.
+- `super().__init__(account_holder, balance)` calls `BankAccount.__init__` to set up `account_holder` and `_balance`, without retyping that logic; `SavingsAccount` then adds only its own new attribute, `interest_rate`.
+- `sa.add_interest()` reads and updates the inherited `_balance` directly, since `SavingsAccount` has full access to it.
+
+**Part 2 — multi-level inheritance:**
+- `class MinorSavingsAccount(SavingsAccount):` extends `SavingsAccount`, which itself extends `BankAccount` — a three-class chain, `BankAccount` → `SavingsAccount` → `MinorSavingsAccount`.
+- `super().__init__(account_holder, balance, interest_rate)` calls `SavingsAccount.__init__`, which in turn calls `BankAccount.__init__` — one `super()` call per level, each handing off to the level above it.
+- `show_balance()` is overridden in `MinorSavingsAccount`, but it calls `super().show_balance()` first to reuse `BankAccount`'s formatted string, then appends the guardian detail — this is **extending**, not replacing.
+- `isinstance(minor, BankAccount)` returns `True` because `BankAccount` appears in `MinorSavingsAccount`'s MRO, even though it isn't the *direct* parent.
+
+**Part 3 — multiple inheritance and MRO:**
+- `SMSAlertMixin` is an independent class, unrelated to `BankAccount`, that exists purely to add one reusable piece of behavior — a **mixin**.
+- `class PremiumSavingsAccount(SavingsAccount, SMSAlertMixin):` uses **multiple inheritance** to combine both at once — `PremiumSavingsAccount` gets everything from `SavingsAccount` (and, through it, `BankAccount`) plus `describe()` from `SMSAlertMixin`. Since it defines no `__init__` of its own, Python uses `SavingsAccount.__init__` automatically.
+- `PremiumSavingsAccount.__mro__` shows the exact order Python searches: `PremiumSavingsAccount`, `SavingsAccount`, `BankAccount`, `SMSAlertMixin`, `object` — `BankAccount` is fully resolved before Python ever reaches `SMSAlertMixin`, because `SavingsAccount`'s whole chain is searched first.
+
+**Part 4 — encapsulation naming conventions:**
+- `sa._balance` is read directly from outside the class and still works — proving the single underscore is a *convention*, not an enforced rule.
+- `sa._BankAccount__pin` also works — this is the mangled name Python actually rewrote `self.__pin` to, proving the "private" double underscore only renamed the attribute; it did not truly hide it.
+
+*Expected output:*
+```
+Rohit Verma's balance: Rs. 52000.0
+Aditi Rao's balance: Rs. 10300.0 (guardian: Sunita Rao)
+True
+Sends SMS alerts on every transaction
+(<class '__main__.PremiumSavingsAccount'>, <class '__main__.SavingsAccount'>, <class '__main__.BankAccount'>, <class '__main__.SMSAlertMixin'>, <class 'object'>)
+52000.0
+1234
+```
+
+#### Try It Yourself
+
+Using the same `BankAccount` hierarchy, extend it in a new direction — a **current account** for everyday spending.
+
+**Part 1 (single-level inheritance):** Create a class `CurrentAccount(BankAccount)` whose `__init__` takes `account_holder`, `balance`, and `overdraft_limit`, calling `super().__init__()` to set up the base account before storing `overdraft_limit`. Add a method `withdraw(amount)` that subtracts `amount` from `_balance`, but only if the result would not go below `-overdraft_limit`. Test it by creating `CurrentAccount("Neha Kapoor", 5000, 2000)`, withdrawing `6000`, and printing `show_balance()`.
+
+**Solution:**
+```python
+class CurrentAccount(BankAccount):
+    def __init__(self, account_holder, balance, overdraft_limit):
+        super().__init__(account_holder, balance)
+        self.overdraft_limit = overdraft_limit
+
+    def withdraw(self, amount):
+        if self._balance - amount >= -self.overdraft_limit:
+            self._balance -= amount
+        return self._balance
+
+
+ca = CurrentAccount("Neha Kapoor", 5000, 2000)
+ca.withdraw(6000)
+print(ca.show_balance())
+```
+Expected output:
+```
+Neha Kapoor's balance: Rs. -1000
+```
+`5000 - 6000 = -1000`, which is still `>= -2000` (the overdraft limit), so the withdrawal is allowed and `_balance` goes negative.
+
+**Part 2 (multi-level inheritance):** Create `StudentCurrentAccount(CurrentAccount)` whose `__init__` adds a `college_name` attribute, calling `super().__init__()` for the rest. Override `show_balance()` to call `super().show_balance()` and append `" (student at {college_name})"`. Test with `StudentCurrentAccount("Ishaan Bose", 3000, 1000, "IIT Delhi")`, withdraw `500`, then print `show_balance()`, `isinstance(sca, BankAccount)`, and `StudentCurrentAccount.__mro__`.
+
+**Solution:**
+```python
+class StudentCurrentAccount(CurrentAccount):
+    def __init__(self, account_holder, balance, overdraft_limit, college_name):
+        super().__init__(account_holder, balance, overdraft_limit)
+        self.college_name = college_name
+
+    def show_balance(self):
+        base = super().show_balance()
+        return f"{base} (student at {self.college_name})"
+
+
+sca = StudentCurrentAccount("Ishaan Bose", 3000, 1000, "IIT Delhi")
+sca.withdraw(500)
+print(sca.show_balance())
+print(isinstance(sca, BankAccount))
+print(StudentCurrentAccount.__mro__)
+```
+Expected output:
+```
+Ishaan Bose's balance: Rs. 2500 (student at IIT Delhi)
+True
+(<class '__main__.StudentCurrentAccount'>, <class '__main__.CurrentAccount'>, <class '__main__.BankAccount'>, <class 'object'>)
+```
+`StudentCurrentAccount` → `CurrentAccount` → `BankAccount` is a three-level chain, so `isinstance` reports `True` and the MRO lists all three classes plus `object`.
+
+**Part 3 (multiple inheritance, MRO, and encapsulation):** Create a mixin `LoyaltyPointsMixin` with a method `award_points()` that returns `"100 loyalty points credited"`. Create `EliteCurrentAccount(CurrentAccount, LoyaltyPointsMixin)` with an empty body. Create `EliteCurrentAccount("Sanya Iyer", 20000, 5000)`, then print `award_points()`, `EliteCurrentAccount.__mro__`, `_balance`, and the mangled `__pin` attribute from outside the class.
+
+**Solution:**
+```python
+class LoyaltyPointsMixin:
+    def award_points(self):
+        return "100 loyalty points credited"
+
+
+class EliteCurrentAccount(CurrentAccount, LoyaltyPointsMixin):
+    pass
+
+
+elite = EliteCurrentAccount("Sanya Iyer", 20000, 5000)
+print(elite.award_points())
+print(EliteCurrentAccount.__mro__)
+print(elite._balance)
+print(elite._BankAccount__pin)
+```
+Expected output:
+```
+100 loyalty points credited
+(<class '__main__.EliteCurrentAccount'>, <class '__main__.CurrentAccount'>, <class '__main__.BankAccount'>, <class '__main__.LoyaltyPointsMixin'>, <class 'object'>)
+20000
+1234
+```
+`EliteCurrentAccount` defines no `__init__` of its own, so `CurrentAccount.__init__` runs automatically. The MRO shows `CurrentAccount` and `BankAccount` fully resolved before `LoyaltyPointsMixin` is reached. Finally, `_balance` and the mangled `_BankAccount__pin` are both readable from outside the class — a last reminder that Python's encapsulation is convention, not enforcement.
 
 ---
 
 ## 4. Real-World Application
 
-- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern in §3.8's industry example.
+- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern built up in §3.8's code example.
 - **UPI / Payment Systems:** A payment gateway might have a base `PaymentMethod` class, extended by `UPIPayment`, `CardPayment`, and `NetBankingPayment`, each overriding a `process()` method with its own validation logic while sharing common logging and retry behavior.
 - **E-commerce:** A `Product` base class is extended by `ElectronicsProduct` and `GroceryProduct`, each adding fields like `warranty_period` or `expiry_date`, while both inherit shared pricing and discount logic.
 - **Food Delivery:** A `DeliveryPartner` base class is extended by `BikePartner` and `CarPartner`; combining a partner class with an independent `RatingMixin` through multiple inheritance is a realistic use of the MRO concept from §3.4.

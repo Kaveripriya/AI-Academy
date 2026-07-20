@@ -329,39 +329,66 @@ flowchart LR
 
 ### 3.12 Code Examples
 
-**Basic example** — defining and calling a function with no parameters:
+**Fresh Bites food delivery app — building one bill calculator step by step**
+
+Fresh Bites is a food delivery app. Instead of four unrelated examples, the code below builds a single piece of Fresh Bites' billing logic in stages — starting from a function that does nothing but print, and ending with a function that calls itself.
+
+**Step 1 — a function with no parameters:**
 
 ```python
-def welcome():
-    print("Welcome to Python Foundations!")
+def show_welcome_banner():
+    print("Welcome to Fresh Bites!")
 
-welcome()
+show_welcome_banner()
 ```
 
 *Line-by-line explanation:*
-- `def welcome():` defines a function named `welcome` that takes no parameters.
-- `print("Welcome to Python Foundations!")` is the function's entire body — one statement that runs whenever `welcome` is called.
-- `welcome()` is the actual call. Nothing happened until this line ran.
-- Output: `Welcome to Python Foundations!`
+- `def show_welcome_banner():` defines a function that takes no input at all — the parentheses are empty.
+- `print("Welcome to Fresh Bites!")` is the entire body — one statement that runs every time the function is called.
+- `show_welcome_banner()` is the call. Nothing appeared on screen until this line ran.
+- Output: `Welcome to Fresh Bites!`
 
-**Beginner example** — a parameter and a `return` value, computing a student's total marks:
+**Step 2 — adding a parameter and a `return` value:**
 
 ```python
-def add_marks(marks1, marks2):
-    return marks1 + marks2
+def item_cost(price, quantity):
+    return price * quantity
 
-total = add_marks(78, 85)
-print(total)
+subtotal = item_cost(150, 2)
+print(subtotal)
 ```
 
 *Line-by-line explanation:*
-- `def add_marks(marks1, marks2):` declares two parameters — placeholders for the two marks that will be supplied later.
-- `return marks1 + marks2` computes the sum and immediately hands it back to the caller; the function ends here.
-- `add_marks(78, 85)` calls the function with `78` and `85` as positional arguments, matched to `marks1` and `marks2` in that order.
-- `total = ...` stores the returned value under the name `total`.
-- `print(total)` displays the stored value. Output: `163`.
+- `def item_cost(price, quantity):` declares two parameters — placeholders for the price of one item and how many of it were ordered.
+- `return price * quantity` computes the cost of that line item and hands it straight back to the caller; the function ends here.
+- `item_cost(150, 2)` calls the function with `150` and `2` as positional arguments, matched to `price` and `quantity` in that order.
+- `subtotal = ...` stores the returned value, instead of it disappearing the way a `print()` inside the function would.
+- `print(subtotal)` displays the stored value. Output: `300`.
 
-**Practical example** — positional, default, keyword arguments, and `*args` together in a food delivery bill calculator:
+**Step 3 — a default argument, so the delivery fee becomes optional:**
+
+```python
+def calculate_bill(item_total, delivery_fee=30):
+    return item_total + delivery_fee
+
+print(calculate_bill(300))
+print(calculate_bill(300, 40))
+print(calculate_bill(item_total=300, delivery_fee=20))
+```
+
+*Line-by-line explanation:*
+- `delivery_fee=30` gives the second parameter a fallback value, so callers may leave it out entirely.
+- `calculate_bill(300)` supplies only `item_total`; Python fills in `delivery_fee` with its default, `30`, giving `300 + 30 = 330`.
+- `calculate_bill(300, 40)` supplies both positionally, overriding the default: `300 + 40 = 340`.
+- `calculate_bill(item_total=300, delivery_fee=20)` supplies both as keyword arguments, so order does not matter: `300 + 20 = 320`.
+- Output:
+  ```
+  330
+  340
+  320
+  ```
+
+**Step 4 — `*args`, so the bill can absorb any number of extra charges:**
 
 ```python
 def calculate_bill(item_total, delivery_fee=30, *extra_charges):
@@ -371,61 +398,94 @@ def calculate_bill(item_total, delivery_fee=30, *extra_charges):
         total = total + charge
     return total
 
-print(calculate_bill(500))
-print(calculate_bill(500, 40))
-print(calculate_bill(500, 40, 10, 5))
-print(calculate_bill(item_total=500, delivery_fee=25))
+print(calculate_bill(300))
+print(calculate_bill(300, 40, 10, 5))
 ```
 
 *Line-by-line explanation:*
-- `item_total` is a required positional parameter — every call must supply it.
-- `delivery_fee=30` is a default argument — callers may omit it, and `30` is used instead.
-- `*extra_charges` collects any further positional arguments (a packaging fee, a surge charge, and so on) so the function accepts however many the caller passes.
-- `calculate_bill(500)` uses the default delivery fee and no extra charges: `500 + 30 = 530`.
-- `calculate_bill(500, 40)` overrides the delivery fee: `500 + 40 = 540`.
-- `calculate_bill(500, 40, 10, 5)` adds two extra charges collected into `extra_charges`: `500 + 40 + 10 + 5 = 555`.
-- `calculate_bill(item_total=500, delivery_fee=25)` uses keyword arguments, so order does not matter: `500 + 25 = 525`.
+- `*extra_charges` collects any further positional arguments — a packaging fee, a surge charge, a small-order fee — under one name, however many the caller passes.
+- The docstring states in one sentence what the function returns.
+- `for charge in extra_charges:` walks through whatever was collected, exactly like the `for` loops from Unit 2.2, adding each one to `total`.
+- `calculate_bill(300)` passes no extra charges at all, so `extra_charges` is empty and the loop body never runs: `300 + 30 = 330`.
+- `calculate_bill(300, 40, 10, 5)` passes two extra charges, collected into `extra_charges` as `10` and `5`: `300 + 40 + 10 + 5 = 355`.
 - Output:
   ```
-  530
-  540
-  555
-  525
+  330
+  355
   ```
 
-**Industry-oriented example** — recursion, scope, and a docstring together, calculating a bank fixed-deposit maturity value:
+**Recursion coda — the same app, one recursive function:**
+
+Fresh Bites also raises its weekly subscription price by a fixed percentage every time it renews. That is naturally recursive: this week's price is last week's price, grown by one hike.
 
 ```python
-interest_calculations_done = 0   # global counter
+def renewal_price(base_price, hike_percent, weeks):
+    """Return the subscription price after compounding a weekly hike over `weeks` weeks."""
+    if weeks == 0:                        # base case
+        return base_price
+    price_so_far = renewal_price(base_price, hike_percent, weeks - 1)   # recursive case
+    return price_so_far + (price_so_far * hike_percent / 100)
 
-def compound_interest(principal, rate, years):
-    """Return the maturity value of a fixed deposit compounded annually for `years` years."""
-    global interest_calculations_done
-    interest_calculations_done = interest_calculations_done + 1
-
-    if years == 0:                                  # base case
-        return principal
-    grown_so_far = compound_interest(principal, rate, years - 1)   # recursive case
-    return grown_so_far + (grown_so_far * rate / 100)
-
-maturity = compound_interest(10000, 8, 3)
-print("Maturity value:", round(maturity, 2))
-print("Calculations performed:", interest_calculations_done)
+print(round(renewal_price(200, 10, 3), 2))
 ```
 
 *Line-by-line explanation:*
-- `interest_calculations_done = 0` is a global variable, created outside any function, tracking how many times the function has run in total.
-- `def compound_interest(principal, rate, years):` takes the deposit amount, the annual interest rate, and the number of years to compound.
-- The docstring states exactly what the function returns, in one sentence.
-- `global interest_calculations_done` tells Python that the next assignment to this name should update the global variable, not create a new local one.
-- `if years == 0: return principal` is the base case — with zero years left, no more interest is added; the deposit is simply returned as-is.
-- `grown_so_far = compound_interest(principal, rate, years - 1)` is the recursive case — it asks "what was the value with one fewer year to grow?" before adding this year's interest on top.
-- `compound_interest(10000, 8, 3)` starts the recursion at 3 years and unwinds down to the base case at 0 years, then back up, adding 8% interest at each level.
-- Output:
-  ```
-  Maturity value: 12597.12
-  Calculations performed: 4
-  ```
+- `if weeks == 0: return base_price` is the base case — with zero weeks left to compound, the price is exactly the starting price, and recursion stops.
+- `price_so_far = renewal_price(base_price, hike_percent, weeks - 1)` is the recursive case — it asks "what was the price with one fewer week of compounding?" before adding this week's hike on top.
+- `renewal_price(200, 10, 3)` starts at 3 weeks and unwinds down to the base case at 0 weeks, then back up, adding a 10% hike at each level.
+- Output: `266.2`
+
+#### Try It Yourself
+
+**Fresh Bites — extend the billing logic yourself**
+
+1. **(Warm-up)** Write and call a no-parameter function `daily_special()` that prints `Today's special: Paneer Wrap at Rs. 120`.
+2. **(Core)** Write a function `order_total(item_price, quantity, packing_fee=10)` that returns `item_price * quantity + packing_fee`. Call it once supplying only `item_price` and `quantity`, and once overriding `packing_fee` to `15` with a keyword argument. Print both results.
+3. **(Challenge — recursion)** Fresh Bites' orders grow by one extra order each day: 1 order on day 1, 2 more on day 2, 3 more on day 3, and so on. Write a recursive function `orders_placed(day)`, with a docstring, that returns the running total of orders processed from day 1 through `day`. Call `orders_placed(4)` and print the result.
+
+**Solution — Part 1:**
+
+```python
+def daily_special():
+    print("Today's special: Paneer Wrap at Rs. 120")
+
+daily_special()
+```
+
+Output: `Today's special: Paneer Wrap at Rs. 120`
+
+**Solution — Part 2:**
+
+```python
+def order_total(item_price, quantity, packing_fee=10):
+    return item_price * quantity + packing_fee
+
+print(order_total(120, 2))
+print(order_total(120, 2, packing_fee=15))
+```
+
+Output:
+```
+250
+255
+```
+(`120 * 2 + 10 = 250`; `120 * 2 + 15 = 255`.)
+
+**Solution — Part 3:**
+
+```python
+def orders_placed(day):
+    """Return the running total of orders processed from day 1 through `day`, where day n processes n orders that day."""
+    if day == 1:                          # base case
+        return 1
+    return day + orders_placed(day - 1)   # recursive case
+
+print(orders_placed(4))
+```
+
+Output: `10`
+
+(`orders_placed(1) = 1`; `orders_placed(2) = 2 + 1 = 3`; `orders_placed(3) = 3 + 3 = 6`; `orders_placed(4) = 4 + 6 = 10`.)
 
 ---
 

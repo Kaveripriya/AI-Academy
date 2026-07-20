@@ -223,54 +223,57 @@ Three inputs collapse to two distinct, normalized email addresses — the lower-
 
 ### 3.10 Code Examples
 
-**Basic example** — creating a set and testing membership:
+**Scenario: Comparing two students' course enrollments**
+
+Priya and Rohan are two students comparing the courses they are enrolled in this semester. The example below builds up gradually in one scenario — first creating their sets and checking membership, then updating Priya's enrollment, then comparing the two students' courses with all four set operations, and finally cleaning up a messy workshop sign-up sheet with a set comprehension.
+
+**Step 1 — Create the sets and test membership**
 
 ```python
-fruits = {"apple", "banana", "mango"}
-print(fruits)
-print("banana" in fruits)
+priya_courses = {"Python", "DBMS", "Networks"}
+rohan_courses = {"DBMS", "AI", "Cloud Computing"}
+
+print(priya_courses)
+print("AI" in priya_courses)
+print("DBMS" in priya_courses)
 ```
 
 *Line-by-line explanation:*
-- `fruits = {"apple", "banana", "mango"}` — creates a set literal with three distinct strings.
-- `print(fruits)` — displays the set; the printed order may not match the order typed in.
-- `"banana" in fruits` — checks membership and returns `True`, since `"banana"` is present.
+- `priya_courses` and `rohan_courses` are two set literals, each holding the distinct course names one student is enrolled in.
+- `print(priya_courses)` displays the set; the printed order may not match the order typed in.
+- `"AI" in priya_courses` checks membership and returns `False`, since Priya is not enrolled in AI.
+- `"DBMS" in priya_courses` returns `True`, since `"DBMS"` is present.
 - Output:
   ```
-  {'apple', 'banana', 'mango'}
+  {'Python', 'DBMS', 'Networks'}
+  False
   True
   ```
 
-**Beginner example** — de-duplicating a contact list of phone numbers, with mutation:
+**Step 2 — Mutation: update Priya's enrollment**
+
+Priya drops Networks and adds AI to her course list:
 
 ```python
-raw_numbers = ["9876543210", "9123456789", "9876543210", "9988776655"]
-unique_numbers = set(raw_numbers)
+priya_courses.add("AI")
+priya_courses.discard("Networks")
+priya_courses.discard("Statistics")   # not enrolled, but no error
 
-unique_numbers.add("9000011122")
-unique_numbers.discard("9123456789")
-
-print(unique_numbers)
-print("Total distinct numbers:", len(unique_numbers))
+print(priya_courses)
 ```
 
 *Line-by-line explanation:*
-- `raw_numbers` is a list where `"9876543210"` was saved twice, perhaps because the same contact was added from two different apps.
-- `set(raw_numbers)` builds a set from the list — the repeated number collapses to a single entry automatically.
-- `unique_numbers.add(...)` inserts a new number; `unique_numbers.discard(...)` removes one safely, doing nothing if it were already absent.
-- `len(unique_numbers)` counts how many distinct numbers remain.
+- `priya_courses.add("AI")` inserts `"AI"` into the set.
+- `priya_courses.discard("Networks")` removes `"Networks"`, which was present.
+- `priya_courses.discard("Statistics")` does nothing, since `"Statistics"` was never in the set — `discard()` never raises an error for a missing value.
 - Output:
   ```
-  {'9876543210', '9988776655', '9000011122'}
-  Total distinct numbers: 3
+  {'Python', 'DBMS', 'AI'}
   ```
 
-**Practical example** — finding common and unique courses between two students:
+**Step 3 — Compare the two students with all four set operations**
 
 ```python
-priya_courses = {"Python", "DBMS", "AI", "Networks"}
-rohan_courses = {"DBMS", "AI", "Cloud Computing"}
-
 common = priya_courses & rohan_courses
 only_priya = priya_courses - rohan_courses
 all_courses = priya_courses | rohan_courses
@@ -283,56 +286,92 @@ print("Taken by exactly one student:", exactly_one)
 ```
 
 *Line-by-line explanation:*
-- `priya_courses` and `rohan_courses` are two sets representing each student's enrolled subjects.
-- `priya_courses & rohan_courses` (**intersection**) keeps only the subjects both students share.
-- `priya_courses - rohan_courses` (**difference**) keeps subjects Priya takes that Rohan does not.
-- `priya_courses | rohan_courses` (**union**) combines both lists of subjects with no repeats.
-- `priya_courses ^ rohan_courses` (**symmetric difference**) keeps subjects taken by only one of the two students.
+- `priya_courses & rohan_courses` (**intersection**) keeps only the courses both students share.
+- `priya_courses - rohan_courses` (**difference**) keeps courses Priya takes that Rohan does not.
+- `priya_courses | rohan_courses` (**union**) combines both students' courses with no repeats.
+- `priya_courses ^ rohan_courses` (**symmetric difference**) keeps courses taken by only one of the two students.
 - Output:
   ```
   Common courses: {'DBMS', 'AI'}
-  Only Priya: {'Python', 'Networks'}
-  All courses (combined): {'Python', 'DBMS', 'AI', 'Networks', 'Cloud Computing'}
-  Taken by exactly one student: {'Python', 'Networks', 'Cloud Computing'}
+  Only Priya: {'Python'}
+  All courses (combined): {'Python', 'DBMS', 'AI', 'Cloud Computing'}
+  Taken by exactly one student: {'Python', 'Cloud Computing'}
   ```
 
-**Industry-oriented example** — food delivery service-area comparison:
+**Step 4 — Set comprehension: cleaning a messy sign-up sheet**
+
+Both students are also interested in a weekend workshop. The sign-up sheet has repeats and inconsistent capitalization, exactly as it might arrive from a Google Form:
 
 ```python
-zomato_style_pincodes = {"560001", "560002", "560034", "560045"}
-swiggy_style_pincodes = {"560002", "560034", "560099"}
+interested_raw = ["ai", "AI", "Cloud Computing", "cloud computing", "DBMS"]
+interested_clean = {course.lower() for course in interested_raw}
 
-served_by_both = zomato_style_pincodes & swiggy_style_pincodes
-served_by_either = zomato_style_pincodes | swiggy_style_pincodes
-only_app_a = zomato_style_pincodes - swiggy_style_pincodes
-
-incoming_orders = ["North Indian", "south indian", "North Indian", "Chinese", "chinese"]
-distinct_cuisines = {cuisine.lower() for cuisine in incoming_orders}
-
-check_pincode = "560034"
-print("Serviceable by both apps:", check_pincode in served_by_both)
-print("Common pincodes:", served_by_both)
-print("Any app serves:", served_by_either)
-print("Only App A serves:", only_app_a)
-print("Distinct cuisines ordered:", distinct_cuisines)
+print(interested_clean)
+print("cloud computing" in interested_clean)
 ```
 
 *Line-by-line explanation:*
-- Two sets model the delivery pincodes covered by two competing food delivery apps.
-- `served_by_both` (**intersection**) finds the overlap — pincodes where a customer could choose either app.
-- `served_by_either` (**union**) represents the full combined service area across both apps.
-- `only_app_a` (**difference**) represents pincodes exclusive to the first app.
-- `incoming_orders` is a raw list of cuisine tags with inconsistent capitalization and repeats, exactly as it might arrive from an order log.
-- `distinct_cuisines` is a **set comprehension** that lower-cases every cuisine name while building the set, so `"North Indian"` and `"north indian"` collapse into a single entry.
-- `check_pincode in served_by_both` is a fast membership test — this is the same operation a real backend would run thousands of times per second to decide whether both apps can serve a given address.
+- `interested_raw` is a raw list where the same course is typed with different capitalization and repeated.
+- `{course.lower() for course in interested_raw}` is a **set comprehension**: it lower-cases every course name and builds a set at the same time, so `"ai"`/`"AI"` and `"Cloud Computing"`/`"cloud computing"` each collapse into a single entry.
+- `"cloud computing" in interested_clean` is a membership test on the cleaned set.
 - Output:
   ```
-  Serviceable by both apps: True
-  Common pincodes: {'560002', '560034'}
-  Any app serves: {'560001', '560002', '560034', '560045', '560099'}
-  Only App A serves: {'560001', '560045'}
-  Distinct cuisines ordered: {'north indian', 'south indian', 'chinese'}
+  {'ai', 'cloud computing', 'dbms'}
+  True
   ```
+
+#### Try It Yourself
+
+A third student, Kabir, wants to be added to this comparison.
+
+1. Create a set `kabir_courses` containing `"Python"`, `"AI"`, and `"Networks"`. Check whether `"DBMS"` is in `kabir_courses`, and whether `"AI"` is in `kabir_courses`.
+2. Kabir switches out one course: add `"Machine Learning"` to `kabir_courses` and discard `"Networks"`. Print the updated set.
+3. Using `priya_courses` and `rohan_courses` from Step 3 above (`{'Python', 'DBMS', 'AI'}` and `{'DBMS', 'AI', 'Cloud Computing'}`) together with the updated `kabir_courses`, find (a) the course(s) common to **all three** students, and (b) the course(s) that **only Kabir** takes (not Priya's and not Rohan's).
+
+**Solution (Part 1):**
+
+```python
+kabir_courses = {"Python", "AI", "Networks"}
+print("DBMS" in kabir_courses)
+print("AI" in kabir_courses)
+```
+
+Output:
+```
+False
+True
+```
+
+**Solution (Part 2):**
+
+```python
+kabir_courses.add("Machine Learning")
+kabir_courses.discard("Networks")
+print(kabir_courses)
+```
+
+Output:
+```
+{'Python', 'AI', 'Machine Learning'}
+```
+
+**Solution (Part 3):**
+
+```python
+common_all_three = priya_courses & rohan_courses & kabir_courses
+only_kabir = kabir_courses - (priya_courses | rohan_courses)
+
+print("Common to all three:", common_all_three)
+print("Only Kabir takes:", only_kabir)
+```
+
+Output:
+```
+Common to all three: {'AI'}
+Only Kabir takes: {'Machine Learning'}
+```
+
+Chaining `&` twice finds the course present in every one of the three sets, and combining `|` (to build "everyone else's courses") with `-` finds what remains unique to Kabir alone — the same operations from Step 3, just applied to a third set.
 
 ---
 

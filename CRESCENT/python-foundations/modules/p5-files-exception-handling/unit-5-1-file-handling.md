@@ -186,94 +186,155 @@ with open("student.json", "r") as file:
 
 ### 3.8 Code Examples
 
-**Basic example** — writing one line to a file, then reading it back:
+The three examples below are not separate — they follow one continuous scenario, a railway booking backend, and build up in difficulty: first a plain-text confirmation note, then a day's bookings read from a CSV export, then one passenger's full record saved and reloaded as JSON. This is precisely the mix of file formats a real booking system touches every single day.
+
+**Stage 1 — a plain-text booking note, written and read back with `with open()`:**
 
 ```python
-with open("notes.txt", "w") as file:
-    file.write("Python file handling notes\n")
+with open("booking_note.txt", "w") as file:
+    file.write("Booking confirmed for Priya Nair, PNR 4521067890\n")
 
-with open("notes.txt", "r") as file:
+with open("booking_note.txt", "r") as file:
     content = file.read()
     print(content)
 ```
 
 *Line-by-line explanation:*
-- `with open("notes.txt", "w") as file:` opens `notes.txt` in write mode, creating it if it does not exist, and binds the file object to `file`.
+- `with open("booking_note.txt", "w") as file:` opens `booking_note.txt` in write mode, creating it if it does not exist, and binds the file object to `file`.
 - `file.write(...)` writes the given string into the file; the `\n` is added explicitly, since `write()` never adds one automatically.
 - The block ends, and `with` closes the file automatically, flushing the write to disk.
 - The second `with` block reopens the same file in read mode; `file.read()` returns the entire contents as one string.
-- Output: `Python file handling notes`, followed by one blank line — `content` still carries the `\n` written earlier, and `print()` adds its own newline on top of it.
+- Output: `Booking confirmed for Priya Nair, PNR 4521067890`, followed by one blank line — `content` still carries the `\n` written earlier, and `print()` adds its own newline on top of it.
 
-**Beginner example** — reading a file line by line with `for`:
-
-```python
-with open("notes.txt", "r") as file:
-    for line in file:
-        print(line.strip())
-```
-
-*Line-by-line explanation:*
-- A file object is **iterable**, so `for line in file:` hands over one line at a time without ever loading the whole file into memory at once — the same lazy, one-at-a-time behaviour you saw with generators in Module P2.
-- `line.strip()` removes the trailing `\n` that each line keeps, so `print()` doesn't add a second blank line on top of it.
-- Output: `Python file handling notes`
-
-**Practical example** — reading a CSV of student marks and computing Pass/Fail:
+**Stage 2 — reading a whole day's bookings from a CSV export:**
 
 ```python
 import csv
 
-with open("marks.csv", "r", newline="") as file:
-    reader = csv.reader(file)
-    header = next(reader)          # reads and discards the header row
+with open("bookings.csv", "r", newline="") as file:
+    reader = csv.DictReader(file)          # each row → a dict keyed by header
     for row in reader:
-        name, marks = row[0], int(row[1])
-        result = "Pass" if marks >= 40 else "Fail"
-        print(f"{name}: {result}")
+        seats = int(row["Seats"])          # every CSV value arrives as a string
+        status = "Confirmed" if seats >= 2 else "Waitlisted"
+        print(f"{row['Passenger']}: {status}")
 ```
 
 *Line-by-line explanation:*
 - `import csv` loads Python's built-in module for reading and writing CSV files.
-- `open("marks.csv", "r", newline="")` opens the file for reading; `newline=""` lets the `csv` module manage line endings itself, as its documentation recommends.
-- `csv.reader(file)` wraps the file object so it yields each row as a list of strings.
-- `next(reader)` pulls exactly one row off the front — the header — before the loop starts, so the loop below only ever sees real data rows.
-- Inside the loop, `row[0]` is the name (already a string) and `int(row[1])` converts the marks column from string to integer, since every CSV value arrives as text.
-- The conditional expression assigns `"Pass"` or `"Fail"` based on a 40-mark cutoff, and the f-string prints both together.
-- With a file containing `Priya,78`, `Rohan,32`, and `Arjun,55` under a `Name,Marks` header, the output is:
+- `open("bookings.csv", "r", newline="")` opens the file for reading; `newline=""` lets the `csv` module manage line endings itself, as its documentation recommends.
+- `csv.DictReader(file)` wraps the file object so it yields each row as a dictionary keyed by the header — here, `"Passenger"` and `"Seats"` — automatically consuming the header row to build those keys, unlike plain `csv.reader()`.
+- `int(row["Seats"])` converts the seats column from string to integer, since every CSV value arrives as text regardless of what it looks like.
+- The conditional expression assigns `"Confirmed"` when 2 or more seats are booked, and `"Waitlisted"` otherwise.
+- With `bookings.csv` containing a `Passenger,Seats` header followed by `Priya Nair,2`, `Arjun Rao,0`, and `Meera Iyer,3`, the output is:
   ```
-  Priya: Pass
-  Rohan: Fail
-  Arjun: Pass
+  Priya Nair: Confirmed
+  Arjun Rao: Waitlisted
+  Meera Iyer: Confirmed
   ```
 
-**Industry-oriented example** — logging and re-reading UPI transactions as JSON:
+**Stage 3 — saving one passenger's full booking as JSON, then reading it back:**
 
 ```python
 import json
 
-transaction = {
-    "transaction_id": "UPI2026071900123",
-    "payer": "Rohit Verma",
-    "amount": 499.00,
-    "status": "SUCCESS"
+booking = {
+    "pnr": "4521067890",
+    "passenger": "Priya Nair",
+    "seats": 2,
+    "status": "Confirmed"
 }
 
-with open("upi_log.json", "w") as file:
-    json.dump(transaction, file, indent=2)
+with open("booking_4521067890.json", "w") as file:
+    json.dump(booking, file, indent=2)
 
-with open("upi_log.json", "r") as file:
+with open("booking_4521067890.json", "r") as file:
     data = json.load(file)
-    print(f"{data['payer']} paid Rs.{data['amount']} — {data['status']}")
+    print(f"PNR {data['pnr']}: {data['passenger']} — {data['status']} ({data['seats']} seats)")
 ```
 
 *Line-by-line explanation:*
 - `import json` loads Python's built-in module for reading and writing JSON data.
-- `transaction` is an ordinary Python dictionary — exactly the shape a UPI backend service would build after a payment completes.
-- `json.dump(transaction, file, indent=2)` **serializes** the dictionary into JSON text and writes it into `upi_log.json`, indented for readability.
+- `booking` is an ordinary Python dictionary — exactly the shape a booking backend would build once Priya Nair's ticket is confirmed, combining the PNR from Stage 1 with the seat count and status computed in Stage 2.
+- `json.dump(booking, file, indent=2)` **serializes** the dictionary into JSON text and writes it into `booking_4521067890.json`, indented for readability.
 - The second `with` block reopens the same file for reading; `json.load(file)` **deserializes** the JSON text back into a Python dictionary, `data`.
-- Because JSON preserves types, `data["amount"]` comes back as the float `499.0`, not the string `"499.00"` — unlike CSV, where every value would have arrived as text.
+- Because JSON preserves real types, `data["seats"]` comes back as the integer `2`, not the string `"2"` — unlike the CSV row in Stage 2, where the same value would have arrived as text.
 - The f-string reads named keys out of `data` and prints a one-line confirmation.
-- Output: `Rohit Verma paid Rs.499.0 — SUCCESS`
-- This is precisely the pattern behind a real UPI app's "export transaction history" feature, and behind any backend logging every payment attempt to disk for audit purposes.
+- Output: `PNR 4521067890: Priya Nair — Confirmed (2 seats)`
+
+#### Try It Yourself
+
+**Exercise — extending the booking system for a new passenger, Arjun Rao (PNR 7788990011, 3 seats booked):**
+
+**Part 1 (easy):** Write a text file named `arjun_note.txt` containing the line `Booking confirmed for Arjun Rao, PNR 7788990011`, then open it again and print its contents.
+
+**Solution:**
+```python
+with open("arjun_note.txt", "w") as file:
+    file.write("Booking confirmed for Arjun Rao, PNR 7788990011\n")
+
+with open("arjun_note.txt", "r") as file:
+    print(file.read())
+```
+Expected output:
+```
+Booking confirmed for Arjun Rao, PNR 7788990011
+
+```
+(The trailing blank line appears because the file's own `\n` is followed by `print()`'s own newline.)
+
+**Part 2 (medium):** You are given `waitlist.csv`, containing:
+```
+Passenger,Seats
+Arjun Rao,3
+Kavya Menon,1
+Suresh Babu,0
+```
+Using `csv.DictReader`, print each passenger's name together with `"Confirmed"` (2 or more seats) or `"Waitlisted"` (fewer than 2 seats).
+
+**Solution:**
+```python
+import csv
+
+with open("waitlist.csv", "r", newline="") as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        seats = int(row["Seats"])
+        status = "Confirmed" if seats >= 2 else "Waitlisted"
+        print(f"{row['Passenger']}: {status}")
+```
+Expected output:
+```
+Arjun Rao: Confirmed
+Kavya Menon: Waitlisted
+Suresh Babu: Waitlisted
+```
+
+**Part 3 (harder):** Build a dictionary for Arjun Rao's booking with keys `"pnr"`, `"passenger"`, `"seats"`, `"status"`, and one new key, `"coach"`, set to `"B4"`. Save it as `arjun_booking.json` using `json.dump(..., indent=2)`, then read it back with `json.load()` and print: `PNR 7788990011: Arjun Rao — Confirmed (3 seats, Coach B4)`.
+
+**Solution:**
+```python
+import json
+
+booking = {
+    "pnr": "7788990011",
+    "passenger": "Arjun Rao",
+    "seats": 3,
+    "status": "Confirmed",
+    "coach": "B4"
+}
+
+with open("arjun_booking.json", "w") as file:
+    json.dump(booking, file, indent=2)
+
+with open("arjun_booking.json", "r") as file:
+    data = json.load(file)
+    print(f"PNR {data['pnr']}: {data['passenger']} — {data['status']} "
+          f"({data['seats']} seats, Coach {data['coach']})")
+```
+Expected output:
+```
+PNR 7788990011: Arjun Rao — Confirmed (3 seats, Coach B4)
+```
 
 ---
 

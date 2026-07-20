@@ -328,83 +328,175 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 
 ### 3.15 Code Examples
 
-**Basic example** — creating a list and inspecting it:
+The following single, running example follows a class teacher tracking the marks of a 5-student Python quiz, one operation at a time — using every core list skill from this unit inside one coherent scenario, instead of several disconnected snippets.
+
+**Step 1 — Create the list and inspect it:**
 
 ```python
-scores = [78, 85, 92, 66, 74]
-print(scores)
-print(type(scores))
-print(len(scores))
+marks = [78, 85, 92, 66, 74]
+print(marks)          # [78, 85, 92, 66, 74]
+print(type(marks))    # <class 'list'>
+print(len(marks))     # 5
 ```
 
 *Line-by-line explanation:*
-- `scores = [78, 85, 92, 66, 74]` creates a list of five integers and binds it to the name `scores`.
-- `print(scores)` displays the whole list exactly as written: `[78, 85, 92, 66, 74]`.
-- `print(type(scores))` confirms the type is `<class 'list'>`.
-- `print(len(scores))` reports the element count: `5`.
+- `marks = [78, 85, 92, 66, 74]` creates a list of five quiz scores, one per student, in entry order.
+- `print(marks)` displays the whole list exactly as written.
+- `print(type(marks))` confirms the type is `<class 'list'>`.
+- `print(len(marks))` reports the element count, `5`.
 
-**Beginner example** — indexing and slicing a list of college subjects:
+**Step 2 — Index and slice the marks:**
 
 ```python
-subjects = ["Maths", "Physics", "Chemistry", "English", "Computer Science"]
-
-print(subjects[0])      # Maths — first subject
-print(subjects[-1])     # Computer Science — last subject
-print(subjects[1:4])    # ['Physics', 'Chemistry', 'English']
-print(subjects[::2])    # ['Maths', 'Chemistry', 'Computer Science']
+print(marks[0])       # 78 — first student's mark
+print(marks[-1])      # 74 — last student's mark
+print(marks[1:4])     # [85, 92, 66] — students 2 through 4
+print(marks[::2])     # [78, 92, 74] — every alternate mark
 ```
 
 *Line-by-line explanation:*
-- `subjects[0]` reaches the first element using positive indexing.
-- `subjects[-1]` reaches the last element using negative indexing, without needing `len(subjects) - 1`.
-- `subjects[1:4]` slices from index `1` up to, but excluding, index `4`, giving three subjects.
-- `subjects[::2]` uses a step of `2` with default start and stop, picking every alternate subject.
+- `marks[0]` uses positive indexing to reach the first student's mark.
+- `marks[-1]` uses negative indexing to reach the last mark directly, without computing `len(marks) - 1`.
+- `marks[1:4]` slices from index `1` up to, but excluding, index `4`, returning three marks as a brand-new list.
+- `marks[::2]` uses a step of `2` with default start and stop, picking every alternate mark; the original `marks` is untouched by either slice.
 
-**Practical example** — managing a to-do list with methods and a comprehension:
+**Step 3 — Fix a mis-entered mark (mutability):**
 
 ```python
-tasks = ["Submit assignment", "Attend seminar", "Revise Unit 3.1"]
-
-tasks.append("Practice list comprehensions")
-tasks.remove("Attend seminar")
-tasks.sort()
-
-short_tasks = [t for t in tasks if len(t) < 20]
-
-print("Tasks:", tasks)
-print("Short tasks:", short_tasks)
+marks[3] = 70          # student 4's mark was mis-entered as 66; the real mark is 70
+print(marks)           # [78, 85, 92, 70, 74]
 ```
 
 *Line-by-line explanation:*
-- `tasks.append(...)` adds a fourth task at the end, in place.
-- `tasks.remove("Attend seminar")` deletes that exact task, shifting later items left.
-- `tasks.sort()` reorders the remaining tasks alphabetically, in place, returning `None` (its return value is not used here).
-- `short_tasks = [t for t in tasks if len(t) < 20]` is a list comprehension: for each task `t` in `tasks`, keep it only `if len(t) < 20`, producing a new filtered list without touching `tasks` itself.
-- The two `print()` calls show the updated task list and the filtered short-task list separately.
+- `marks[3] = 70` replaces the element at index `3` in place — no new list is created, which is only possible because a list is **mutable**.
+- `print(marks)` confirms the correction is now part of `marks` itself.
 
-**Industry-oriented example** — a railway booking system tracking passengers on one PNR:
+**Step 4 — Add and remove entries with methods:**
 
 ```python
-# Each inner list is one passenger: [name, age, seat_number]
-passengers = [
-    ["Ananya Sharma", 29, "S4-21"],
-    ["Vikram Rao", 34, "S4-22"],
-    ["Meera Iyer", 8, "S4-23"],
+marks.append(88)    # a 6th student's mark arrives late
+marks.remove(78)     # the first student was disqualified for malpractice
+print(marks)          # [85, 92, 70, 74, 88]
+```
+
+*Line-by-line explanation:*
+- `marks.append(88)` adds the late student's mark as a single new element at the end, in place.
+- `marks.remove(78)` deletes the first element equal to `78` — the disqualified student's mark — shifting the remaining elements left, also in place.
+- Both methods change `marks` directly and return `None`, so neither result is assigned back to `marks`.
+
+**Step 5 — Sort the marks:**
+
+```python
+marks.sort()
+print(marks)   # [70, 74, 85, 88, 92]
+```
+
+*Line-by-line explanation:*
+- `marks.sort()` reorders `marks` in place in ascending order and returns `None`; writing `marks = marks.sort()` here would wipe out the list, which is why the result is never reassigned.
+- `print(marks)` shows the five remaining marks now ranked lowest to highest.
+
+**Step 6 — Store names alongside marks (a nested list):**
+
+```python
+students = [
+    ["Aarav", 70],
+    ["Diya", 74],
+    ["Kabir", 85],
+    ["Ishaan", 88],
+    ["Meera", 92],
 ]
 
-for passenger in passengers:
-    name, age, seat = passenger
-    print(f"{name} (age {age}) — Seat {seat}")
-
-adult_names = [p[0] for p in passengers if p[1] >= 12]
-print("Passengers needing a full adult fare:", adult_names)
+for student in students:
+    name, mark = student
+    print(f"{name}: {mark}")
 ```
 
 *Line-by-line explanation:*
-- `passengers` is a **nested list**: the outer list holds one PNR's passengers, and each inner list holds one passenger's `[name, age, seat_number]`.
-- `for passenger in passengers:` walks through each inner list in turn; `name, age, seat = passenger` unpacks the three values of that inner list into three separate names in one step.
-- The `f-string` inside `print()` builds a readable line for each passenger using those three unpacked values.
-- `adult_names = [p[0] for p in passengers if p[1] >= 12]` is a list comprehension over a nested list: for each inner list `p`, the condition `p[1] >= 12` checks the age (index `1`), and `p[0]` (the name, index `0`) is collected only for passengers who qualify for full adult fare — exactly the kind of row-filtering logic a real railway booking backend performs.
+- `students` is a **nested list**: the outer list holds one class's students, and each inner list holds one student's `[name, mark]`, already matching the sorted order from Step 5.
+- `for student in students:` walks through each inner list in turn; `name, mark = student` unpacks the two values of that inner list into two separate names in one step.
+- The `f-string` inside `print()` builds one readable line per student from those unpacked values.
+
+**Step 7 — Filter the toppers with a list comprehension:**
+
+```python
+toppers = [s[0] for s in students if s[1] >= 85]
+print("Students who scored 85 or above:", toppers)
+```
+
+*Line-by-line explanation:*
+- `for s in students` walks through each `[name, mark]` inner list.
+- `if s[1] >= 85` keeps only students whose mark (index `1`) is `85` or above, silently dropping the rest.
+- `s[0]` (the name, index `0`) is the expression collected for each student who passes the condition, producing a brand-new list without touching `students` itself.
+
+*Expected output (all seven steps, in order):*
+```
+[78, 85, 92, 66, 74]
+<class 'list'>
+5
+78
+74
+[85, 92, 66]
+[78, 92, 74]
+[78, 85, 92, 70, 74]
+[85, 92, 70, 74, 88]
+[70, 74, 85, 88, 92]
+Aarav: 70
+Diya: 74
+Kabir: 85
+Ishaan: 88
+Meera: 92
+Students who scored 85 or above: ['Kabir', 'Ishaan', 'Meera']
+```
+
+#### Try It Yourself
+
+Using the same class-marks scenario, a new quiz has just been graded: `marks = [55, 90, 40, 85, 60]`.
+
+1. Sort `marks` in ascending order and print the highest mark using indexing.
+2. A late entrant's mark of `95` needs to be added, and the lowest scorer's mark of `40` must be removed (that student did not attend). Update `marks` accordingly and print it.
+3. Using a list comprehension, build a new list called `passers` containing only the marks that are `60` or above, and print how many students passed using `len()`.
+
+**Solution — Part 1:**
+
+```python
+marks = [55, 90, 40, 85, 60]
+marks.sort()
+print(marks)
+print("Highest mark:", marks[-1])
+```
+
+*Expected output:*
+```
+[40, 55, 60, 85, 90]
+Highest mark: 90
+```
+
+**Solution — Part 2:**
+
+```python
+marks.append(95)
+marks.remove(40)
+print(marks)
+```
+
+*Expected output:*
+```
+[55, 60, 85, 90, 95]
+```
+
+**Solution — Part 3:**
+
+```python
+passers = [m for m in marks if m >= 60]
+print(passers)
+print("Number of students who passed:", len(passers))
+```
+
+*Expected output:*
+```
+[60, 85, 90, 95]
+Number of students who passed: 4
+```
 
 ---
 
