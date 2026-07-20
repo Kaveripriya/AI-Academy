@@ -1,6 +1,8 @@
-# Lists
+﻿# Lists
 
 ---
+
+[← Previous: 2.5 Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: 3.2 Tuples →](unit-3-2-tuples.md)
 
 ## 1. Learning Objectives
 
@@ -512,6 +514,8 @@ Coming next: tuples — a collection that looks similar to a list but makes the 
 - [Python 3 Documentation — List Comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions)
 - [Real Python — Lists and Tuples in Python](https://realpython.com/python-lists-tuples/)
 - [W3Schools — Python Lists](https://www.w3schools.com/python/python_lists.asp)
+
+[← Previous: 2.5 Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: 3.2 Tuples →](unit-3-2-tuples.md)
 
 ---
 

@@ -1,6 +1,8 @@
-# Portfolio & Diagnostic
+﻿# Portfolio & Diagnostic
 
 ---
+
+[← Previous: 6.1 Version Control Basics](unit-6-1-version-control-basics.md) | [Go back to TOC](../../README.md)
 
 ## 1. Learning Objectives
 
@@ -264,6 +266,8 @@ Coming next: Congratulations on completing Python Foundations (Part A) — next 
 - [GitHub Docs — Managing Your Profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)
 - [Real Python — Build a Python Portfolio Project](https://realpython.com/intermediate-python-project-ideas/)
 - [GitHub Docs — About GitHub Classroom](https://docs.github.com/en/education/manage-coursework-with-github-classroom/get-started-with-github-classroom/about-github-classroom)
+
+[← Previous: 6.1 Version Control Basics](unit-6-1-version-control-basics.md) | [Go back to TOC](../../README.md)
 
 ---
 

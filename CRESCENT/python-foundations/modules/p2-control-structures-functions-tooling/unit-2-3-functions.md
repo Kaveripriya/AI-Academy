@@ -1,6 +1,8 @@
-# Functions
+﻿# Functions
 
 ---
+
+[← Previous: 2.2 Loops](unit-2-2-loops.md) | [Go back to TOC](../../README.md) | [Next: 2.4 Functional Constructs →](unit-2-4-functional-constructs.md)
 
 ## 1. Learning Objectives
 
@@ -532,6 +534,8 @@ Coming next: functional constructs — building on the functions you just learne
 - [Real Python — Defining Your Own Python Function](https://realpython.com/defining-your-own-python-function/)
 - [Real Python — Thinking Recursively in Python](https://realpython.com/python-recursion/)
 - [W3Schools — Python Functions](https://www.w3schools.com/python/python_functions.asp)
+
+[← Previous: 2.2 Loops](unit-2-2-loops.md) | [Go back to TOC](../../README.md) | [Next: 2.4 Functional Constructs →](unit-2-4-functional-constructs.md)
 
 ---
 

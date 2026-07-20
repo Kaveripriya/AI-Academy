@@ -1,6 +1,8 @@
-# Operators & Expressions
+﻿# Operators & Expressions
 
 ---
+
+[← Previous: 1.2 Variables, Identifiers & Types](unit-1-2-variables-identifiers-types.md) | [Go back to TOC](../../README.md) | [Next: 1.4 Statements, Conversion & Output →](unit-1-4-statements-conversion-output.md)
 
 ## 1. Learning Objectives
 
@@ -422,6 +424,8 @@ Coming next: statements, type conversion, and formatted output — how to take t
 - [Python 3 Documentation — Built-in Types (Truth Value Testing)](https://docs.python.org/3/library/stdtypes.html#truth-value-testing)
 - [Real Python — Operators and Expressions in Python](https://realpython.com/python-operators-expressions/)
 - [W3Schools — Python Operators](https://www.w3schools.com/python/python_operators.asp)
+
+[← Previous: 1.2 Variables, Identifiers & Types](unit-1-2-variables-identifiers-types.md) | [Go back to TOC](../../README.md) | [Next: 1.4 Statements, Conversion & Output →](unit-1-4-statements-conversion-output.md)
 
 ---
 

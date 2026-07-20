@@ -1,6 +1,8 @@
-# Statements, Conversion & Output
+﻿# Statements, Conversion & Output
 
 ---
+
+[← Previous: 1.3 Operators & Expressions](unit-1-3-operators-expressions.md) | [Go back to TOC](../../README.md) | [Next: 2.1 Conditionals →](../p2-control-structures-functions-tooling/unit-2-1-conditionals.md)
 
 ## 1. Learning Objectives
 
@@ -438,6 +440,8 @@ Coming next: Unit 2.1 — Conditionals, where your programs make their first rea
 - [PEP 8 — Style Guide for Python Code](https://peps.python.org/pep-0008/)
 - [Real Python — Python's F-String for String Interpolation and Formatting](https://realpython.com/python-f-strings/)
 - [W3Schools — Python Casting (Type Conversion)](https://www.w3schools.com/python/python_casting.asp)
+
+[← Previous: 1.3 Operators & Expressions](unit-1-3-operators-expressions.md) | [Go back to TOC](../../README.md) | [Next: 2.1 Conditionals →](../p2-control-structures-functions-tooling/unit-2-1-conditionals.md)
 
 ---
 

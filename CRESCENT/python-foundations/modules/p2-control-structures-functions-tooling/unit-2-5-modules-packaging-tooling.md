@@ -1,6 +1,8 @@
-# Modules, Packaging & Professional Tooling
+﻿# Modules, Packaging & Professional Tooling
 
 ---
+
+[← Previous: 2.4 Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next: 3.1 Lists →](../p3-data-structures/unit-3-1-lists.md)
 
 ## 1. Learning Objectives
 
@@ -363,6 +365,8 @@ Coming next: how Python stores collections of values in order, using your first 
 - [Pytest Documentation — Getting Started](https://docs.pytest.org/en/stable/getting-started.html)
 - [Real Python — Python Modules and Packages: An Introduction](https://realpython.com/python-modules-packages/)
 - [W3Schools — Python Modules](https://www.w3schools.com/python/python_modules.asp)
+
+[← Previous: 2.4 Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next: 3.1 Lists →](../p3-data-structures/unit-3-1-lists.md)
 
 ---
 

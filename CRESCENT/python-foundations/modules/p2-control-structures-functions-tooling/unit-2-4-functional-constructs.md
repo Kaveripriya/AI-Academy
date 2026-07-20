@@ -1,6 +1,8 @@
-# Functional Constructs
+﻿# Functional Constructs
 
 ---
+
+[← Previous: 2.3 Functions](unit-2-3-functions.md) | [Go back to TOC](../../README.md) | [Next: 2.5 Modules, Packaging & Professional Tooling →](unit-2-5-modules-packaging-tooling.md)
 
 ## 1. Learning Objectives
 
@@ -432,6 +434,8 @@ Coming next: Unit 2.5 — Modules, Packaging & Professional Tooling.
 - [Real Python — Primer on Python Decorators](https://realpython.com/primer-on-python-decorators/)
 - [Real Python — Introduction to Python Generators](https://realpython.com/introduction-to-python-generators/)
 - [W3Schools — Python Lambda](https://www.w3schools.com/python/python_lambda.asp)
+
+[← Previous: 2.3 Functions](unit-2-3-functions.md) | [Go back to TOC](../../README.md) | [Next: 2.5 Modules, Packaging & Professional Tooling →](unit-2-5-modules-packaging-tooling.md)
 
 ---
 

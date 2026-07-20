@@ -1,6 +1,8 @@
-# Case Study — Building a Robust File Reader
+﻿# Case Study — Building a Robust File Reader
 
 ---
+
+[← Previous: 5.2 Errors & Exceptions](unit-5-2-errors-exceptions.md) | [Go back to TOC](../../README.md) | [Next: 6.1 Version Control Basics →](../p6-git-github-portfolio/unit-6-1-version-control-basics.md)
 
 ## 1. Learning Objectives
 
@@ -387,6 +389,8 @@ Coming next: Unit 6.1 — Version Control Basics, the start of Module P6, where 
 - [Real Python — Reading and Writing CSV Files in Python](https://realpython.com/python-csv/)
 - [Real Python — Python Exceptions: An Introduction](https://realpython.com/python-exceptions/)
 - [W3Schools — Python Try Except](https://www.w3schools.com/python/python_try_except.asp)
+
+[← Previous: 5.2 Errors & Exceptions](unit-5-2-errors-exceptions.md) | [Go back to TOC](../../README.md) | [Next: 6.1 Version Control Basics →](../p6-git-github-portfolio/unit-6-1-version-control-basics.md)
 
 ---
 

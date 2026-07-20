@@ -1,6 +1,8 @@
-# Iterators, Generators & Collections
+﻿# Iterators, Generators & Collections
 
 ---
+
+[← Previous: 3.4 Dictionaries](unit-3-4-dictionaries.md) | [Go back to TOC](../../README.md) | [Next: 4.1 Object-Oriented Foundations →](../p4-classes-objects/unit-4-1-object-oriented-foundations.md)
 
 ## 1. Learning Objectives
 
@@ -396,6 +398,8 @@ Coming next: Unit 4.1 — Object-Oriented Foundations, where Module P4 begins or
 - [Real Python — How to Use Generators and yield in Python](https://realpython.com/introduction-to-python-generators/)
 - [Real Python — Python's collections: A Buffet of Specialized Data Types](https://realpython.com/python-collections-module/)
 - [W3Schools — Python Iterators](https://www.w3schools.com/python/python_iterators.asp)
+
+[← Previous: 3.4 Dictionaries](unit-3-4-dictionaries.md) | [Go back to TOC](../../README.md) | [Next: 4.1 Object-Oriented Foundations →](../p4-classes-objects/unit-4-1-object-oriented-foundations.md)
 
 ---
 

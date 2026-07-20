@@ -1,6 +1,8 @@
-# Inheritance & Encapsulation
+﻿# Inheritance & Encapsulation
 
 ---
+
+[← Previous: 4.1 Object-Oriented Foundations](unit-4-1-object-oriented-foundations.md) | [Go back to TOC](../../README.md) | [Next: 4.3 Special Methods & Dataclasses →](unit-4-3-special-methods-dataclasses.md)
 
 ## 1. Learning Objectives
 
@@ -479,6 +481,8 @@ Coming next: special methods and dataclasses — controlling how your objects ar
 - [Real Python — Supercharge Your Classes With Python `super()`](https://realpython.com/python-super/)
 - [Real Python — Inheritance and Composition: A Python OOP Guide](https://realpython.com/inheritance-composition-python/)
 - [W3Schools — Python Inheritance](https://www.w3schools.com/python/python_inheritance.asp)
+
+[← Previous: 4.1 Object-Oriented Foundations](unit-4-1-object-oriented-foundations.md) | [Go back to TOC](../../README.md) | [Next: 4.3 Special Methods & Dataclasses →](unit-4-3-special-methods-dataclasses.md)
 
 ---
 

@@ -1,6 +1,8 @@
-# The Python Environment
+﻿# The Python Environment
 
 ---
+
+[Go back to TOC](../../README.md) | [Next: 1.2 Variables, Identifiers & Types →](unit-1-2-variables-identifiers-types.md)
 
 ## 1. Learning Objectives
 
@@ -348,6 +350,8 @@ Coming next: the building blocks of the language itself — storing values and d
 - [Real Python — Interacting With Python](https://realpython.com/interacting-with-python/)
 - [W3Schools — Python Introduction](https://www.w3schools.com/python/python_intro.asp)
 - [Google Colab — Welcome Notebook (Official)](https://colab.research.google.com/notebooks/intro.ipynb)
+
+[Go back to TOC](../../README.md) | [Next: 1.2 Variables, Identifiers & Types →](unit-1-2-variables-identifiers-types.md)
 
 ---
 

@@ -1,6 +1,8 @@
-# Variables, Identifiers & Types
+﻿# Variables, Identifiers & Types
 
 ---
+
+[← Previous: 1.1 The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next: 1.3 Operators & Expressions →](unit-1-3-operators-expressions.md)
 
 ## 1. Learning Objectives
 
@@ -327,6 +329,8 @@ Coming next: operators and expressions — how you combine and compare the value
 - [PEP 8 — Style Guide for Python Code (Naming Conventions)](https://peps.python.org/pep-0008/#naming-conventions)
 - [Real Python — Variables in Python](https://realpython.com/python-variables/)
 - [W3Schools — Python Variables](https://www.w3schools.com/python/python_variables.asp)
+
+[← Previous: 1.1 The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next: 1.3 Operators & Expressions →](unit-1-3-operators-expressions.md)
 
 ---
 

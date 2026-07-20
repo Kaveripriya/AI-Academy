@@ -1,6 +1,8 @@
-# Object-Oriented Foundations
+﻿# Object-Oriented Foundations
 
 ---
+
+[← Previous: 3.5 Iterators, Generators & Collections](../p3-data-structures/unit-3-5-iterators-generators-collections.md) | [Go back to TOC](../../README.md) | [Next: 4.2 Inheritance & Encapsulation →](unit-4-2-inheritance-encapsulation.md)
 
 ## 1. Learning Objectives
 
@@ -415,6 +417,8 @@ Coming next: inheritance and encapsulation — extending one class's behaviour i
 - [Python 3 Documentation — Built-in Types](https://docs.python.org/3/library/stdtypes.html)
 - [Real Python — Object-Oriented Programming (OOP) in Python 3](https://realpython.com/python3-object-oriented-programming/)
 - [W3Schools — Python Classes/Objects](https://www.w3schools.com/python/python_classes.asp)
+
+[← Previous: 3.5 Iterators, Generators & Collections](../p3-data-structures/unit-3-5-iterators-generators-collections.md) | [Go back to TOC](../../README.md) | [Next: 4.2 Inheritance & Encapsulation →](unit-4-2-inheritance-encapsulation.md)
 
 ---
 

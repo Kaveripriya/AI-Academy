@@ -1,6 +1,8 @@
-# Errors & Exceptions
+﻿# Errors & Exceptions
 
 ---
+
+[← Previous: 5.1 File Handling](unit-5-1-file-handling.md) | [Go back to TOC](../../README.md) | [Next: 5.3 Case Study →](unit-5-3-case-study.md)
 
 ## 1. Learning Objectives
 
@@ -476,6 +478,8 @@ Coming next: Unit 5.3 — Case Study, which pulls file handling and exception ha
 - [Python 3 Documentation — Built-in Exceptions](https://docs.python.org/3/library/exceptions.html)
 - [Real Python — Python Exceptions: An Introduction](https://realpython.com/python-exceptions/)
 - [W3Schools — Python Try Except](https://www.w3schools.com/python/python_try_except.asp)
+
+[← Previous: 5.1 File Handling](unit-5-1-file-handling.md) | [Go back to TOC](../../README.md) | [Next: 5.3 Case Study →](unit-5-3-case-study.md)
 
 ---
 

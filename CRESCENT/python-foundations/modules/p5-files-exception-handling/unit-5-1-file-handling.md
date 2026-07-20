@@ -1,6 +1,8 @@
-# File Handling
+﻿# File Handling
 
 ---
+
+[← Previous: 4.3 Special Methods & Dataclasses](../p4-classes-objects/unit-4-3-special-methods-dataclasses.md) | [Go back to TOC](../../README.md) | [Next: 5.2 Errors & Exceptions →](unit-5-2-errors-exceptions.md)
 
 ## 1. Learning Objectives
 
@@ -404,6 +406,8 @@ Coming next: Unit 5.2 — Errors & Exceptions, where you will learn `try`/`excep
 - [Python 3 Documentation — `json` Module](https://docs.python.org/3/library/json.html)
 - [Real Python — Reading and Writing Files in Python](https://realpython.com/read-write-files-python/)
 - [W3Schools — Python File Handling](https://www.w3schools.com/python/python_file_handling.asp)
+
+[← Previous: 4.3 Special Methods & Dataclasses](../p4-classes-objects/unit-4-3-special-methods-dataclasses.md) | [Go back to TOC](../../README.md) | [Next: 5.2 Errors & Exceptions →](unit-5-2-errors-exceptions.md)
 
 ---
 

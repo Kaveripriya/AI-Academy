@@ -1,6 +1,8 @@
-# Dictionaries
+﻿# Dictionaries
 
 ---
+
+[← Previous: 3.3 Sets](unit-3-3-sets.md) | [Go back to TOC](../../README.md) | [Next: 3.5 Iterators, Generators & Collections →](unit-3-5-iterators-generators-collections.md)
 
 ## 1. Learning Objectives
 
@@ -383,6 +385,8 @@ Coming next: Unit 3.5 — Iterators, Generators & Collections, where you will lo
 - [Python 3 Documentation — Mapping Types (`dict`)](https://docs.python.org/3/library/stdtypes.html#mapping-types-dict)
 - [Real Python — Dictionaries in Python](https://realpython.com/python-dicts/)
 - [W3Schools — Python Dictionaries](https://www.w3schools.com/python/python_dictionaries.asp)
+
+[← Previous: 3.3 Sets](unit-3-3-sets.md) | [Go back to TOC](../../README.md) | [Next: 3.5 Iterators, Generators & Collections →](unit-3-5-iterators-generators-collections.md)
 
 ---
 

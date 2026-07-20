@@ -1,6 +1,8 @@
-# Sets
+﻿# Sets
 
 ---
+
+[← Previous: 3.2 Tuples](unit-3-2-tuples.md) | [Go back to TOC](../../README.md) | [Next: 3.4 Dictionaries →](unit-3-4-dictionaries.md)
 
 ## 1. Learning Objectives
 
@@ -446,6 +448,8 @@ Coming next: Unit 3.4 — Dictionaries, a structure that pairs every value with 
 - [The Python Tutorial — Data Structures: Sets](https://docs.python.org/3/tutorial/datastructures.html#sets)
 - [Real Python — Sets in Python](https://realpython.com/python-sets/)
 - [W3Schools — Python Sets](https://www.w3schools.com/python/python_sets.asp)
+
+[← Previous: 3.2 Tuples](unit-3-2-tuples.md) | [Go back to TOC](../../README.md) | [Next: 3.4 Dictionaries →](unit-3-4-dictionaries.md)
 
 ---
 

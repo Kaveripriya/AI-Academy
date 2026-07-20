@@ -1,6 +1,8 @@
-# Conditionals
+﻿# Conditionals
 
 ---
+
+[← Previous: 1.4 Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: 2.2 Loops →](unit-2-2-loops.md)
 
 ## 1. Learning Objectives
 
@@ -359,6 +361,8 @@ Coming next: Unit 2.2 — Loops, where you will learn how Python repeats a block
 - [Python 3 Documentation — Conditional Expressions](https://docs.python.org/3/reference/expressions.html#conditional-expressions)
 - [Real Python — Conditional Statements in Python](https://realpython.com/python-conditional-statements/)
 - [W3Schools — Python If...Else](https://www.w3schools.com/python/python_conditions.asp)
+
+[← Previous: 1.4 Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: 2.2 Loops →](unit-2-2-loops.md)
 
 ---
 

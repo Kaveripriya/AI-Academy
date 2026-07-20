@@ -1,6 +1,8 @@
-# Version Control Basics
+﻿# Version Control Basics
 
 ---
+
+[← Previous: 5.3 Case Study](../p5-files-exception-handling/unit-5-3-case-study.md) | [Go back to TOC](../../README.md) | [Next: 6.2 Portfolio & Diagnostic →](unit-6-2-portfolio-diagnostic.md)
 
 ## 1. Learning Objectives
 
@@ -278,6 +280,8 @@ Coming next: Unit 6.2 — Portfolio & Diagnostic, where everything you have buil
 - [GitHub Classroom Documentation](https://docs.github.com/en/education/manage-coursework-with-github-classroom)
 - [Git Official Documentation](https://git-scm.com/doc)
 - [Real Python — Basic Git Commands (Concepts)](https://realpython.com/python-git-github-intro/)
+
+[← Previous: 5.3 Case Study](../p5-files-exception-handling/unit-5-3-case-study.md) | [Go back to TOC](../../README.md) | [Next: 6.2 Portfolio & Diagnostic →](unit-6-2-portfolio-diagnostic.md)
 
 ---
 

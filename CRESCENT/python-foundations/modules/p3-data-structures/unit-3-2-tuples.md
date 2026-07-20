@@ -1,6 +1,8 @@
-# Tuples
+﻿# Tuples
 
 ---
+
+[← Previous: 3.1 Lists](unit-3-1-lists.md) | [Go back to TOC](../../README.md) | [Next: 3.3 Sets →](unit-3-3-sets.md)
 
 ## 1. Learning Objectives
 
@@ -348,6 +350,8 @@ Coming next: Unit 3.3 — Sets, a collection built around a guarantee neither th
 - [Python 3 Documentation — Built-in Types (Sequence Types)](https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range)
 - [Real Python — Python Tuples](https://realpython.com/python-tuple/)
 - [W3Schools — Python Tuples](https://www.w3schools.com/python/python_tuples.asp)
+
+[← Previous: 3.1 Lists](unit-3-1-lists.md) | [Go back to TOC](../../README.md) | [Next: 3.3 Sets →](unit-3-3-sets.md)
 
 ---
 

@@ -1,6 +1,8 @@
-# Loops
+﻿# Loops
 
 ---
+
+[← Previous: 2.1 Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: 2.3 Functions →](unit-2-3-functions.md)
 
 ## 1. Learning Objectives
 
@@ -373,6 +375,8 @@ Coming next: Unit 2.3 — Functions, where you'll learn to package a block of lo
 - [Real Python — Python "while" Loops](https://realpython.com/python-while-loop/)
 - [W3Schools — Python For Loops](https://www.w3schools.com/python/python_for_loops.asp)
 - [W3Schools — Python While Loops](https://www.w3schools.com/python/python_while_loops.asp)
+
+[← Previous: 2.1 Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: 2.3 Functions →](unit-2-3-functions.md)
 
 ---
 
