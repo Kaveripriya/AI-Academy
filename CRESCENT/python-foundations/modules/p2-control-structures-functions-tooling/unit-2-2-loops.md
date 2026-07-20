@@ -141,14 +141,7 @@ for item in sequence:
 - **Forgetting that `zip()` silently truncates** — pairing sequences of different lengths and being surprised that some items from the longer one never appear.
 - **Modifying the loop variable inside a `for` loop** — reassigning the loop variable inside the body has no effect on which item comes next; the `for` loop still advances on its own.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A common fresher interview question: *"What is the difference between `break` and `continue`?"* Answer precisely: `break` exits the loop entirely; `continue` skips only the current iteration and moves to the next one. Confusing the two is one of the fastest ways to lose marks in a coding round.
-- Be ready to explain **why `range(5)` produces five numbers, `0` to `4`, not `1` to `5`** — this exclusive-stop behavior is one of the most frequently tested "gotcha" questions for beginners.
-- Interviewers often ask you to trace through a nested loop by hand and state exactly how many total iterations run — the answer is always (outer iterations) × (inner iterations). Practicing this trace on paper builds real confidence.
-- Know that `while True:` combined with a `break` is a legitimate, common pattern — not a bug — used whenever a loop should run until some event happens rather than for a fixed number of times (for example, retrying a login until it succeeds).
-
-### 3.9 Comparison Table: `for` Loop vs `while` Loop
+### 3.8 Comparison Table: `for` Loop vs `while` Loop
 
 | Aspect | `for` Loop | `while` Loop |
 |---|---|---|
@@ -158,7 +151,7 @@ for item in sequence:
 | Typical use case | "Do this for every item / N times" | "Keep doing this until some event happens" |
 | Needs a manual counter? | No — the loop variable is managed automatically | Often yes, unless the condition depends on something external (like user input) |
 
-### 3.10 Diagram: Loop Control Flow
+### 3.9 Diagram: Loop Control Flow
 
 ```mermaid
 flowchart TD
@@ -174,7 +167,7 @@ flowchart TD
 
 Read this top to bottom: Python checks the condition (or whether the sequence has a next item), runs the body if it's `True`, then checks whether that body hit a `break` (leave immediately) or a `continue` (skip back to the condition check without finishing the rest of the body). Once the condition is `False` or the sequence runs out, the loop exits.
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — a `while` loop counting up:
 
@@ -348,6 +341,15 @@ Roll 5: Attendance stopped - teacher called away.
 ### Step 7: Why the Output Is Produced
 
 Roll `1` and roll `2` are `"Present"`, so both print normally. Roll `3` is `"Absent"`, so `continue` skips it silently — no line prints for roll `3`. Roll `4` is `"Present"` again, so it prints. Roll `5` is `"Left"`, which triggers the `break` — its stop message prints, and the loop ends immediately, which is exactly why roll `6` (which is actually `"Present"` in the data) is never reached or printed. The output shows precisely four lines, in order, matching this trace.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A common fresher interview question: *"What is the difference between `break` and `continue`?"* Answer precisely: `break` exits the loop entirely; `continue` skips only the current iteration and moves to the next one. Confusing the two is one of the fastest ways to lose marks in a coding round.
+- Be ready to explain **why `range(5)` produces five numbers, `0` to `4`, not `1` to `5`** — this exclusive-stop behavior is one of the most frequently tested "gotcha" questions for beginners.
+- Interviewers often ask you to trace through a nested loop by hand and state exactly how many total iterations run — the answer is always (outer iterations) × (inner iterations). Practicing this trace on paper builds real confidence.
+- Know that `while True:` combined with a `break` is a legitimate, common pattern — not a bug — used whenever a loop should run until some event happens rather than for a fixed number of times (for example, retrying a login until it succeeds).
 
 ---
 

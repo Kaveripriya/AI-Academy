@@ -152,13 +152,7 @@ with open("student.json", "r") as file:
 - **Forgetting the CSV header row exists** — the first row read is the header, not data; passing it straight into `int()` or similar crashes with a `ValueError`.
 - **Confusing `load`/`dump` with `loads`/`dumps`** — the plain versions work on files; the ones ending in `s` work on strings already sitting in a variable. Using the wrong pair raises a `TypeError`.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A very common fresher interview question: *"Why is `with open(...)` preferred over calling `open()` and `close()` manually?"* The strongest answer is precise: `with` guarantees `close()` runs even if an exception is raised inside the block, because the context manager's cleanup step executes automatically as control leaves the block — normally or via an error. Manual `close()` has no such guarantee; an error raised before that line simply skips it.
-- Be ready to explain what a **context manager** actually promises: it defines two steps — a setup action that runs when the `with` block is entered, and a cleanup action that is *guaranteed* to run when the block is exited, no matter how it is exited. For a file, "cleanup" means closing it and releasing the operating system's file handle.
-- Interviewers may also ask why file operations can fail at all — a missing file, no permission to write, or a full disk are all realistic failures outside your program's control. Unit 5.2 introduces `try`/`except`, Python's formal mechanism for handling exactly these kinds of failures without crashing; this unit only teaches you to recognize that such failures exist.
-
-### 3.9 Comparison Table: Manual `open()`/`close()` vs `with` Context Manager
+### 3.8 Comparison Table: Manual `open()`/`close()` vs `with` Context Manager
 
 | Aspect | Manual `open()` / `close()` | `with` Context Manager |
 |---|---|---|
@@ -168,7 +162,7 @@ with open("student.json", "r") as file:
 | Risk of a forgotten `close()` | High — easy to forget, especially in longer functions | None — closing is handled by the language itself |
 | Recommended for new code | No | Yes — the standard, expected approach |
 
-### 3.10 Diagram: The File Lifecycle
+### 3.9 Diagram: The File Lifecycle
 
 ```mermaid
 flowchart LR
@@ -177,7 +171,7 @@ flowchart LR
     C --> D["File safely saved<br/>and available to others"]
 ```
 
-### 3.11 Diagram: How `with` Guarantees Cleanup Even on Error
+### 3.10 Diagram: How `with` Guarantees Cleanup Even on Error
 
 ```mermaid
 flowchart TD
@@ -189,7 +183,7 @@ flowchart TD
     CL --> X["Either way, the file is closed<br/>before control leaves the with block"]
 ```
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — writing one line to a file, then reading it back:
 
@@ -379,6 +373,14 @@ Meera Iyer: Confirmed
 ### Step 7: Why the Output Is Produced
 
 In the first attempt, `csv.reader()` has no built-in concept of "header row" versus "data row" — it simply hands over every row in the file, in order, and trusts the calling code to know its own file's shape. Since the very first row read is `['Passenger', 'Seats']`, `int("Seats")` fails immediately, because the text `"Seats"` cannot become a number. In the corrected version, `next(reader)` consumes that header row once, before the loop begins, so every row the `for` loop actually processes is genuine passenger data. `Priya Nair` has 2 seats, meeting the `>= 2` threshold, so she is `Confirmed`; `Arjun Rao` has 0 seats, so he is `Waitlisted`; `Meera Iyer` has 3 seats, so she is `Confirmed`. The lesson generalizes: whenever a CSV read fails on its very first row, check whether that row is a header before checking anything else.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question: *"Why is `with open(...)` preferred over calling `open()` and `close()` manually?"* The strongest answer is precise: `with` guarantees `close()` runs even if an exception is raised inside the block, because the context manager's cleanup step executes automatically as control leaves the block — normally or via an error. Manual `close()` has no such guarantee; an error raised before that line simply skips it.
+- Be ready to explain what a **context manager** actually promises: it defines two steps — a setup action that runs when the `with` block is entered, and a cleanup action that is *guaranteed* to run when the block is exited, no matter how it is exited. For a file, "cleanup" means closing it and releasing the operating system's file handle.
+- Interviewers may also ask why file operations can fail at all — a missing file, no permission to write, or a full disk are all realistic failures outside your program's control. Unit 5.2 introduces `try`/`except`, Python's formal mechanism for handling exactly these kinds of failures without crashing; this unit only teaches you to recognize that such failures exist.
 
 ---
 

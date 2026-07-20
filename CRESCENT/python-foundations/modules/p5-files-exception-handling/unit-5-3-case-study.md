@@ -114,13 +114,7 @@ Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *r
 - **Running summary math (totals, averages) over a collection that mixes valid and invalid rows** — a skipped row that contributed no real number can still silently drag down an average if it's counted in the total.
 - **Assuming a row that converts successfully is automatically valid** — `int("150")` succeeds, but 150 may still break a business rule (like a valid marks range of 0–100) that Python has no way of knowing about on its own.
 
-### 3.8 Important Notes (Interview Insights)
-
-- This exact pattern — read a row, try to process it, catch the failure, log it, move to the next row — is often called **"skip and log"** in real data engineering and data science teams. It is one of the most common patterns in real ETL (extract-transform-load) pipelines, and mentioning it by name in an interview signals that you understand production-quality data handling, not just toy scripts.
-- A common interview question: *"How would you handle a corrupted or malformed row in a large data file without stopping the whole job?"* The expected answer is exactly this unit's pattern — wrap the per-row processing in `try`/`except`, collect successes and failures separately, and report both, rather than an interviewer being satisfied with just "I'd use try/except somewhere."
-- Be ready to explain **why** you'd choose fail-soft over fail-fast in a data pipeline versus a different context (like a financial transaction, where you often *want* fail-fast) — knowing when each approach is appropriate matters more than knowing only one of them.
-
-### 3.9 Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)
+### 3.8 Comparison Table: Fail-Fast vs. Fail-Soft (Graceful Degradation)
 
 | Aspect | Fail-Fast | Fail-Soft (Skip and Log) |
 |---|---|---|
@@ -128,9 +122,9 @@ Every line in that skeleton is syntax from Units 5.1 and 5.2. What makes it a *r
 | What happens to good rows after the bad one | Never processed | Processed normally |
 | Best suited for | A single, critical operation that must not continue with bad data — e.g., validating a single bank transfer before it executes | Batch processing of many independent rows — e.g., loading a CSV of a thousand student records or bookings |
 | Risk if used in the wrong place | Loses all remaining good work over one bad record | Could hide a systemic problem if failures are only logged and never actually reviewed |
-| What this unit builds | The naive first version in §3.11 | The robust version in §3.11, and the worked example in §5 |
+| What this unit builds | The naive first version in §3.10 | The robust version in §3.10, and the worked example in §5 |
 
-### 3.10 Diagram: The Skip-and-Log Flow
+### 3.9 Diagram: The Skip-and-Log Flow
 
 ```mermaid
 flowchart TD
@@ -145,7 +139,7 @@ flowchart TD
 
 *Every row follows this same loop — a failure on one row (the right-hand path) never prevents the next row (looping back to A) from being read.*
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 This unit builds one growing example rather than several unrelated ones — starting from a version that crashes, and improving it step by step into a robust reader.
 
@@ -363,6 +357,14 @@ Invalid bookings (skipped): [['Rohan Verma', ''], ['Arjun Mehta', '-50']]
 ### Step 7: Why the Output Is Produced
 
 Priya's and Meena's rows both convert successfully with `float()` and pass the `fare > 0` check, so both land in `valid_records`. Rohan's row fails at the very first step — `float("")` cannot convert an empty string to a number, so `ValueError` is raised immediately and caught. Arjun's row is different: `float("-50")` succeeds without any error, producing the number `-50.0` — but the very next line, the business-rule check, deliberately raises its own `ValueError` because a negative fare makes no real-world sense. Both failures — one from Python's own conversion, one from your own rule — funnel through the exact same `except ValueError:`, which is why both end up correctly stored in `invalid_records` even though they broke in two completely different ways. Because the `try`/`except` sits inside the loop, the failure on Rohan's row never stops the loop from reaching Arjun's, and the failure on Arjun's row never stops it from reaching Meena's — the program processes all four rows and reports an honest, complete picture of what succeeded and what didn't.
+
+---
+
+### Important Notes (Interview Insights)
+
+- This exact pattern — read a row, try to process it, catch the failure, log it, move to the next row — is often called **"skip and log"** in real data engineering and data science teams. It is one of the most common patterns in real ETL (extract-transform-load) pipelines, and mentioning it by name in an interview signals that you understand production-quality data handling, not just toy scripts.
+- A common interview question: *"How would you handle a corrupted or malformed row in a large data file without stopping the whole job?"* The expected answer is exactly this unit's pattern — wrap the per-row processing in `try`/`except`, collect successes and failures separately, and report both, rather than an interviewer being satisfied with just "I'd use try/except somewhere."
+- Be ready to explain **why** you'd choose fail-soft over fail-fast in a data pipeline versus a different context (like a financial transaction, where you often *want* fail-fast) — knowing when each approach is appropriate matters more than knowing only one of them.
 
 ---
 

@@ -150,7 +150,7 @@ def factorial(n):
 factorial(4)   # 4 * 3 * 2 * 1 = 24
 ```
 
-Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. Section 3.11 below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
+Every call to `factorial` that has not yet reached the base case waits, unfinished, on the **call stack** — the mechanism Python uses internally to track every function call that is still in progress and waiting for a result. Section 3.14 below traces exactly how `factorial(4)` unfolds on the call stack, one frame at a time down and then back up.
 
 If the base case were missing, or written so it could never actually be reached, the function would keep calling itself forever, pushing a fresh frame onto the call stack on every call. Python limits how deep this stack is allowed to grow. Once a program exceeds that limit, Python stops it cleanly and raises a `RecursionError` reporting "maximum recursion depth exceeded" — a controlled failure, not a silent hang or a crashed interpreter.
 
@@ -271,15 +271,7 @@ function_name(argument1, argument2)
 - **Mixing up parameter and argument** — using the two terms interchangeably in an interview is a common giveaway of shaky fundamentals.
 - **Calling a function before it is defined** — Python reads top to bottom, so a call above the matching `def` raises a `NameError`.
 
-### 3.12 Important Notes (Interview Insights)
-
-- Be ready to state the difference precisely: a **parameter** is the name in the function's definition; an **argument** is the value supplied in the call. Interviewers frequently ask this exact question to check fundamentals.
-- A very common interview question: *"What happens when recursion goes too deep?"* Answer confidently: Python raises a `RecursionError` once the call stack exceeds its maximum depth — it is a controlled, catchable error, not a program crash, though in some other languages the equivalent situation is called a "stack overflow."
-- Be able to explain **why `return` matters more than `print()`** inside a function meant to be reused: a returned value can be stored, passed on, or checked by an automated test; a printed value is gone the instant it appears.
-- Know that a docstring is retrievable at runtime through a function's `__doc__` attribute or via the built-in `help()` function — this is what makes it genuinely useful documentation, not just a comment that only a human reading the source will ever see.
-- Understand that recursion and iteration (loops) can solve the exact same class of problems — recursion is a way of expressing a solution, not a way of making it faster.
-
-### 3.13 Comparison Table: Recursion vs. Iteration
+### 3.12 Comparison Table: Recursion vs. Iteration
 
 | Aspect | Recursion | Iteration (loops) |
 |---|---|---|
@@ -290,7 +282,7 @@ function_name(argument1, argument2)
 | Best suited for | Problems naturally defined in terms of a smaller copy of themselves (factorial, tree-shaped data) | Straightforward repetition over a known range or condition |
 | Readability | Can be shorter and closer to the mathematical definition | Often more familiar and easier to trace step by step |
 
-### 3.14 Diagram: Function Call Flow
+### 3.13 Diagram: Function Call Flow
 
 ```mermaid
 flowchart LR
@@ -300,7 +292,7 @@ flowchart LR
     D --> E["Caller receives 12<br/>e.g. print(total(3, 4, 5))"]
 ```
 
-### 3.15 Diagram: Recursion Call Stack — `factorial(4)`
+### 3.14 Diagram: Recursion Call Stack — `factorial(4)`
 
 ```mermaid
 flowchart TB
@@ -333,7 +325,7 @@ flowchart TB
     classDef done fill:#b2f2bb,stroke:#22c55e,stroke-width:2px,color:#1a1a1a
 ```
 
-### 3.16 Code Examples
+### 3.15 Code Examples
 
 **Basic example** — defining and calling a function with no parameters:
 
@@ -508,6 +500,16 @@ digit_sum(10000)
 ### Step 7: Why the Output Is Produced
 
 For `digit_sum(492)`: `492` is not a single digit, so it splits into `2` (last digit) plus `digit_sum(49)`. `49` splits into `9` plus `digit_sum(4)`. `4` is a single digit, so the base case returns `4` directly. Unwinding back up: `9 + 4 = 13`, then `2 + 13 = 15` — matching the expected output. For `digit_sum(7)`, the base case fires immediately since `7 < 10`, returning `7` with no recursive calls at all. For `digit_sum(10000)`, every digit except the leading `1` is `0`, so each recursive step adds `0` until the base case returns `1`, giving a final digit sum of `1`.
+
+---
+
+### Important Notes (Interview Insights)
+
+- Be ready to state the difference precisely: a **parameter** is the name in the function's definition; an **argument** is the value supplied in the call. Interviewers frequently ask this exact question to check fundamentals.
+- A very common interview question: *"What happens when recursion goes too deep?"* Answer confidently: Python raises a `RecursionError` once the call stack exceeds its maximum depth — it is a controlled, catchable error, not a program crash, though in some other languages the equivalent situation is called a "stack overflow."
+- Be able to explain **why `return` matters more than `print()`** inside a function meant to be reused: a returned value can be stored, passed on, or checked by an automated test; a printed value is gone the instant it appears.
+- Know that a docstring is retrievable at runtime through a function's `__doc__` attribute or via the built-in `help()` function — this is what makes it genuinely useful documentation, not just a comment that only a human reading the source will ever see.
+- Understand that recursion and iteration (loops) can solve the exact same class of problems — recursion is a way of expressing a solution, not a way of making it faster.
 
 ---
 

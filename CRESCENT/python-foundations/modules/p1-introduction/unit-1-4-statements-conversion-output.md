@@ -90,38 +90,22 @@ Type conversion, f-strings, type hints, `match`/`case`, and comments each solve 
 |---|---|---|---|
 | `:.2f` | Show a float to 2 decimal places (ideal for money). | `f"{19.5:.2f}"` | `"19.50"` |
 | `:d` | Show an integer in plain decimal form. | `f"{7:d}"` | `"7"` |
-| `:>10` | Right-align the value in a field 10 characters wide. | `f"{'Tea':>10}"` | `"       Tea"` (7 spaces then `Tea`) |
-| `:^15` | Center the value in a field 15 characters wide. | `f"{'Tea':^15}"` | `"      Tea      "` (6 spaces, `Tea`, 6 spaces) |
 
-To see exactly what each specifier does to real values, run all four together:
+To see exactly what each specifier does to a real value, run both together:
 
 ```python
 price = 19.5
 quantity = 7
-item = "Tea"
 
-print(f"{price:.2f}")
-print(f"{quantity:d}")
-print(f"[{item:>10}]")
-print(f"[{item:^15}]")
+print(f"{price:.2f}")   # 19.50
+print(f"{quantity:d}")  # 7
 ```
 
 *Line-by-line explanation:*
 - `f"{price:.2f}"` — `price` is `19.5`; `:.2f` forces exactly two digits after the decimal point, so it prints `19.50`.
 - `f"{quantity:d}"` — `quantity` is the integer `7`; `:d` simply displays it as plain decimal digits, `7`.
-- `f"[{item:>10}]"` — `item` is `"Tea"`, three characters long; `:>10` places it inside an invisible 10-character-wide field and right-aligns it, so 7 spaces are added before it. The square brackets around the f-string are not part of the format specifier — they are only there so you can *see* exactly where the padding spaces are.
-- `f"[{item:^15}]"` — the same idea, but `:^15` centers `"Tea"` inside a 15-character-wide field, splitting the 12 leftover spaces evenly: 6 spaces, then `Tea`, then 6 spaces.
 
-Output (square brackets included so the padding is visible):
-
-```
-19.50
-7
-[       Tea]
-[      Tea      ]
-```
-
-Once you can see the spaces in this one example, every other use of `:.2f`, `:d`, `:>N`, and `:^N` in this unit follows the exact same rule: the letter/symbol says *what* to do (round, pad, align), and the number says *how wide* the field should be.
+Once you can see this in one example, every other use of `:.2f` and `:d` in this unit follows the exact same rule: the letter says *what* to do (round to a fixed number of decimals, or show as a plain whole number), applied to whatever value sits before the colon.
 
 **Type hint syntax:** `name: type = value`
 
@@ -184,13 +168,7 @@ match subject:
 - **Believing a type hint is enforced** — `age: int = "twenty"` runs without error; the hint is documentation, not a guarantee.
 - **Placing `case _:` before other cases** — since matching stops at the first hit, an early wildcard makes every case below it unreachable.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A common fresher interview question: *"What's the difference between implicit and explicit type conversion?"* Be ready to explain that Python performs a small amount of **implicit conversion** automatically (e.g. `3 + 4.0` becomes `7.0`, promoting the `int` to `float`), but never converts between unrelated types like `str` and `int` on its own — that always requires **explicit conversion** using `int()`, `float()`, `str()`, or `bool()`.
-- Interviewers often ask why `int("3.14")` fails but `int(3.14)` works — the answer demonstrates that you understand `int()` parses digit-only text but truncates numeric values, which are two different code paths inside the same function.
-- Knowing that `match`/`case` (introduced in Python 3.10 via PEP 634) exists and recognizing its basic shape is increasingly expected, even at entry level, since modern Python codebases use it in place of long `if`/`elif` chains.
-
-### 3.9 Comparison Tables
+### 3.8 Comparison Tables
 
 **Implicit vs. Explicit Type Conversion**
 
@@ -210,7 +188,7 @@ match subject:
 | Introduced | Python 3.6 (PEP 498) | Python 2.6+ | Original Python string formatting |
 | Recommended for new code | Yes | Acceptable, mostly in older codebases | Avoid in new code |
 
-### 3.10 Diagrams
+### 3.9 Diagrams
 
 **Type Conversion Map** — each arrow is a conversion function, with the behavior worth remembering:
 
@@ -242,7 +220,7 @@ flowchart TD
     D -- No --> F["case _: wildcard runs"]
 ```
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — converting a value between types:
 
@@ -413,6 +391,14 @@ Your order is on the way!
 The receipt line reflects every formatting choice made: `float(price_text)` turned `"249.5"` into `249.5` so multiplication could run at all, giving `total = 499.0`; the f-string's `:.2f` specifiers then displayed both `price` and `total` with exactly two decimals, and `:>18` padded the item name with leading spaces so it lines up in a fixed-width column, exactly as a real receipt would. The second line appears because `match` found `"OUT_FOR_DELIVERY"` equal to the second `case` pattern and ran only that block — the `PLACED`, `DELIVERED`, and wildcard branches never executed, since `match` stops at the first match it finds.
 
 *Common mistake: assuming a value that "looks like a number" already behaves like one. Anything from a form, a file, or an API is text until you convert it yourself — every single time.*
+
+---
+
+### Important Notes (Interview Insights)
+
+- A common fresher interview question: *"What's the difference between implicit and explicit type conversion?"* Be ready to explain that Python performs a small amount of **implicit conversion** automatically (e.g. `3 + 4.0` becomes `7.0`, promoting the `int` to `float`), but never converts between unrelated types like `str` and `int` on its own — that always requires **explicit conversion** using `int()`, `float()`, `str()`, or `bool()`.
+- Interviewers often ask why `int("3.14")` fails but `int(3.14)` works — the answer demonstrates that you understand `int()` parses digit-only text but truncates numeric values, which are two different code paths inside the same function.
+- Knowing that `match`/`case` (introduced in Python 3.10 via PEP 634) exists and recognizing its basic shape is increasingly expected, even at entry level, since modern Python codebases use it in place of long `if`/`elif` chains.
 
 ---
 

@@ -118,15 +118,9 @@ del d[key]                         # delete a key-value pair
 - **Forgetting `.get()` as a safer alternative.** New learners often write `if key in d: value = d[key]` when `value = d.get(key, default)` does the same job in one line and is far less error-prone.
 - **Confusing keys and values while looping.** Writing `for x in d:` gives you the **keys**, not the values — a very common mix-up. If you print `x` expecting a value and see a key instead, this is almost always why.
 - **Trying to use a mutable type as a key.** `d[[1, 2]] = "value"` raises `TypeError: unhashable type: 'list'` — lists cannot be keys because they can change after being stored.
-- **Expecting `sorted(d)` to sort by value.** `sorted(d)` sorts the **keys**; sorting by value requires `sorted(d.items(), key=lambda kv: kv[1])`, covered in §3.13.
+- **Expecting `sorted(d)` to sort by value.** `sorted(d)` sorts the **keys**; sorting by value requires `sorted(d.items(), key=lambda kv: kv[1])`, covered in §3.12.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A very common fresher interview question: *"Why is looking up a value in a dictionary faster than searching for it in a list?"* Answer: a dictionary uses **hashing** to jump almost directly to a key's location, giving roughly **constant-time, O(1)** average lookup — while a list must scan element by element in the worst case, which is **O(n)**. This is exactly why a dictionary, not a list, is the right structure whenever your program's main job is "look this up by its label."
-- Interviewers often probe whether you know **when to use `.get()` versus `[]`**: use `[]` when the key's presence is guaranteed and a missing key genuinely signals a bug you want surfaced immediately; use `.get()` whenever the key is optional or comes from untrusted external input, such as a field that might not exist in an API response.
-- Be ready to explain that a dictionary key must be **hashable**, and that this is precisely why a `list` cannot be a key but a `tuple` can — a detail that connects directly back to Unit 3.2 (Tuples) and Unit 3.3 (Sets), where the same hashability rule applies to set elements.
-
-### 3.9 Comparison Table: List vs Set vs Dict
+### 3.8 Comparison Table: List vs Set vs Dict
 
 | Aspect | List | Set | Dict |
 |---|---|---|---|
@@ -136,7 +130,7 @@ del d[key]                         # delete a key-value pair
 | Written with | `[ ]` | `{ }` / `set()` | `{key: value}` |
 | Typical use case | an ordered sequence of items | unique items, fast membership tests | labelled records, lookup tables, counting |
 
-### 3.10 Diagram: Key-Value Mapping
+### 3.9 Diagram: Key-Value Mapping
 
 ```mermaid
 flowchart LR
@@ -147,7 +141,7 @@ flowchart LR
 
 Each key on the left points to exactly one value on the right — that arrow *is* the dictionary. Look up `"marks"` and you are handed `87` directly; there is no scanning involved.
 
-### 3.11 Diagram: A Nested Dictionary
+### 3.10 Diagram: A Nested Dictionary
 
 ```mermaid
 flowchart TD
@@ -159,7 +153,7 @@ flowchart TD
 
 The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itself a smaller dictionary holding that student's fields. Reaching `"Ananya"` needs two lookups chained together: `students[101]["name"]`.
 
-### 3.12 Built-in Functions and Methods
+### 3.11 Built-in Functions and Methods
 
 | Function / Method | What it does |
 |---|---|
@@ -178,7 +172,7 @@ The outer dictionary's keys (`101`, `102`) are roll numbers; each value is itsel
 
 `keys()`, `values()`, and `items()` each return a **view object**, not a plain list — a view stays "live" and reflects later changes to the dictionary; wrap it in `list(...)` if you need an actual, independent list.
 
-### 3.13 Code Examples
+### 3.12 Code Examples
 
 **Basic example** — creating a dictionary and accessing a value:
 
@@ -360,6 +354,14 @@ The `students` dictionary defined directly in the code above — three students,
 ### Step 7: Why the Output Is Produced
 
 The dictionary comprehension computes one average per student by reading straight out of the nested `marks` dictionary, so no student's data can be mixed up with another's — each roll number's average is calculated only from that same roll number's own marks. `sorted()` then arranges the three `(roll_no, avg)` pairs purely by the average value, highest first, without touching the original `students` or `averages` dictionaries at all — both keep their original insertion order. Meera's average of `91.67` is the highest of the three, so her row prints first; Rohit's `69.67` is the lowest, so his row prints last.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question: *"Why is looking up a value in a dictionary faster than searching for it in a list?"* Answer: a dictionary uses **hashing** to jump almost directly to a key's location, giving roughly **constant-time, O(1)** average lookup — while a list must scan element by element in the worst case, which is **O(n)**. This is exactly why a dictionary, not a list, is the right structure whenever your program's main job is "look this up by its label."
+- Interviewers often probe whether you know **when to use `.get()` versus `[]`**: use `[]` when the key's presence is guaranteed and a missing key genuinely signals a bug you want surfaced immediately; use `.get()` whenever the key is optional or comes from untrusted external input, such as a field that might not exist in an API response.
+- Be ready to explain that a dictionary key must be **hashable**, and that this is precisely why a `list` cannot be a key but a `tuple` can — a detail that connects directly back to Unit 3.2 (Tuples) and Unit 3.3 (Sets), where the same hashability rule applies to set elements.
 
 ---
 

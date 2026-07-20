@@ -110,14 +110,7 @@ The `collections` module exists because three patterns are so common that Python
 - **Creating a `defaultdict` without a factory function, or with the wrong one** — `defaultdict()` with no argument behaves like a plain `dict` and still raises `KeyError`; passing `0` instead of `int` raises a `TypeError`, because the factory must be callable.
 - **Trying to modify a `namedtuple` field like a list element** — `student.marks = 90` raises an `AttributeError`, because a `namedtuple`, like any tuple, is immutable.
 
-### 3.8 Important Notes (Interview Insights)
-
-- **"What is the difference between an iterable and an iterator?"** is one of the most frequently asked Python interview questions at the fresher level. Answer precisely: every iterator is iterable, but not every iterable is an iterator — a list is iterable but is not itself an iterator, because it has no `__next__` of its own and does not track a current position.
-- Be ready to explain that a `for` loop is simply syntax sugar: it calls `iter()` once, then `next()` repeatedly, and stops silently the moment `StopIteration` is raised — no error ever reaches your code.
-- A common follow-up: **"Why use a generator instead of a list?"** The correct answer is memory — a generator computes and yields one value at a time instead of holding the entire sequence in memory up front, which matters enormously once "the entire sequence" could be millions of rows or an unbounded stream.
-- Interviewers often test `Counter` and `defaultdict` with a quick coding question like "count word frequency in a sentence" — recognizing these tools instantly, instead of writing a manual loop, is a strong signal of practical Python fluency.
-
-### 3.9 Comparison Table: Iterable vs Iterator
+### 3.8 Comparison Table: Iterable vs Iterator
 
 | Aspect | Iterable | Iterator |
 |---|---|---|
@@ -127,7 +120,7 @@ The `collections` module exists because three patterns are so common that Python
 | Reusable? | Yes — a fresh iterator is created each time you loop over it | No — exhausts after one full pass |
 | Examples | `list`, `tuple`, `set`, `dict`, `str` | The object returned by `iter(some_list)`, or any generator |
 
-### 3.10 Diagram: The Iterator Protocol
+### 3.9 Diagram: The Iterator Protocol
 
 ```mermaid
 flowchart LR
@@ -138,7 +131,7 @@ flowchart LR
     D -->|No| E["StopIteration raised<br/>for loop stops silently"]
 ```
 
-### 3.11 Diagram: Generator Pause and Resume
+### 3.10 Diagram: Generator Pause and Resume
 
 ```mermaid
 flowchart TD
@@ -149,7 +142,7 @@ flowchart TD
     S5 --> S6["No yield left to reach<br/>→ StopIteration raised"]
 ```
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — the iterator protocol, by hand:
 
@@ -370,6 +363,15 @@ Sara
 ### Step 7: Why the Output Is Produced
 
 `grade_counts` reflects that three records have grade `"A"`, two have `"B"`, and one has `"C"` — `Counter` walked the generator expression once and tallied every grade it received. `by_grade` shows every name correctly bucketed under its grade, built entirely without checking whether a key already existed, because `defaultdict(list)` handled that automatically. The three names `Priya`, `Arjun`, and `Sara` print from the **first** loop over `top_students`, in the same order the generator yielded them. The **second** `for name in top_students:` prints nothing at all — not an error, just silence — because `top_students` is the *same* generator object the first loop already walked to completion; a generator, like any iterator, is a single-pass object, and there is no way to rewind it. Getting the "A" names again would require calling `a_grade_students(records)` a fresh time, or materializing the result once with `list(a_grade_students(records))`.
+
+---
+
+### Important Notes (Interview Insights)
+
+- **"What is the difference between an iterable and an iterator?"** is one of the most frequently asked Python interview questions at the fresher level. Answer precisely: every iterator is iterable, but not every iterable is an iterator — a list is iterable but is not itself an iterator, because it has no `__next__` of its own and does not track a current position.
+- Be ready to explain that a `for` loop is simply syntax sugar: it calls `iter()` once, then `next()` repeatedly, and stops silently the moment `StopIteration` is raised — no error ever reaches your code.
+- A common follow-up: **"Why use a generator instead of a list?"** The correct answer is memory — a generator computes and yields one value at a time instead of holding the entire sequence in memory up front, which matters enormously once "the entire sequence" could be millions of rows or an unbounded stream.
+- Interviewers often test `Counter` and `defaultdict` with a quick coding question like "count word frequency in a sentence" — recognizing these tools instantly, instead of writing a manual loop, is a strong signal of practical Python fluency.
 
 ---
 

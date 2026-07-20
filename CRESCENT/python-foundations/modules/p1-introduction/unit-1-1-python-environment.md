@@ -163,13 +163,7 @@ Let's break this down piece by piece, because as a fresher you must be able to n
 - **Confusing "writing code" with "running code"**: typing a program into a cell does nothing until you actually execute that cell.
 - **Panicking at the first error message** instead of reading it — Python's error messages almost always tell you exactly what went wrong and on which line.
 
-### 3.9 Important Notes (Interview Insights)
-
-- A very common entry-level interview question is: *"Is Python compiled or interpreted?"* The accurate answer: Python source code is first compiled to an intermediate form called **bytecode**, which the Python interpreter then executes. For practical, day-to-day purposes, and for this course, it is fine — and expected — to describe Python as an **interpreted language**, since there is no separate compile step you manage yourself, unlike C or Java.
-- Interviewers often ask you to explain **REPL** — make sure you can expand the acronym (Read-Eval-Print Loop) and explain it in one sentence, not just recite the letters.
-- Knowing *why* Python is popular for AI/ML (readability + ecosystem) is a common conversational interview question, especially for freshers applying to data or AI-adjacent roles.
-
-### 3.10 Comparison Table: Compiled vs Interpreted Languages
+### 3.9 Comparison Table: Compiled vs Interpreted Languages
 
 | Aspect | Compiled Language (e.g., C, Java) | Interpreted Language (e.g., Python) |
 |---|---|---|
@@ -179,7 +173,7 @@ Let's break this down piece by piece, because as a fresher you must be able to n
 | Typical use in this course | Not used | Used throughout, via the Python interpreter in Colab |
 | Beginner-friendliness | Extra setup and translation step | Faster feedback loop, better for learning |
 
-### 3.11 Diagram: How Your Code Becomes Output
+### 3.10 Diagram: How Your Code Becomes Output
 
 ```mermaid
 flowchart LR
@@ -188,7 +182,7 @@ flowchart LR
     C --> D["Output appears<br/>below the cell"]
 ```
 
-### 3.12 Diagram: The REPL / Interactive Mode Loop
+### 3.11 Diagram: The REPL / Interactive Mode Loop
 
 ```mermaid
 flowchart TD
@@ -198,7 +192,7 @@ flowchart TD
     L --> R
 ```
 
-### 3.13 Code Examples
+### 3.12 Code Examples
 
 **Basic example** — the smallest possible program:
 
@@ -326,6 +320,15 @@ Thank you for ordering with us!
 
 Each `print()` call is executed by the interpreter one at a time, in the exact order it appears in the code. Every call produces exactly one line of output, and the interpreter automatically moves to a new line after each `print()`. There is no branching, no repetition, and no calculation involved — the output is simply the four strings, displayed in sequence, exactly as instructed.
 
+---
+
+### Important Notes (Interview Insights)
+
+- A very common entry-level interview question is: *"Is Python compiled or interpreted?"* The accurate answer: Python source code is first compiled to an intermediate form called **bytecode**, which the Python interpreter then executes. For practical, day-to-day purposes, and for this course, it is fine — and expected — to describe Python as an **interpreted language**, since there is no separate compile step you manage yourself, unlike C or Java.
+- Interviewers often ask you to explain **REPL** — make sure you can expand the acronym (Read-Eval-Print Loop) and explain it in one sentence, not just recite the letters.
+- Knowing *why* Python is popular for AI/ML (readability + ecosystem) is a common conversational interview question, especially for freshers applying to data or AI-adjacent roles.
+
+---
 
 ## 6. Key Takeaways
 

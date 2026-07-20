@@ -128,14 +128,7 @@ obj = ClassName(value1, value2)      # instantiation
 - **Forgetting the parentheses when instantiating.** Writing `account = BankAccount` (no parentheses) does not create an object at all — `account` simply refers to the class itself, and calling `account.deposit(100)` later fails because the class has no such bound method to call.
 - **Forgetting the `self.` prefix inside a method.** Writing `balance = balance + amount` instead of `self.balance = self.balance + amount` creates a plain local variable that vanishes when the method ends, leaving the object's real attribute completely unchanged.
 
-### 3.8 Important Notes (Interview Insights)
-
-- *"What is the difference between a class and an object?"* is one of the most frequently asked entry-level interview questions. Answer with the blueprint analogy: a class is the plan (e.g., the architectural drawing of a house); an object is one specific thing built from that plan (an actual house, with its own address and its own residents). You can build many houses from one drawing, each independent of the others — exactly like many objects from one class.
-- Be ready to explain `self` in your own words, since it confuses nearly every fresher at first. `self` is simply the parameter that receives the object a method was called on — `account.deposit(100)` is quietly rewritten by Python into `BankAccount.deposit(account, 100)`, so `self` inside the method body always means "this particular object."
-- Interviewers may also ask when to use a class attribute versus an instance attribute — answer that class attributes are for values shared by every instance, while instance attributes, set through `self` inside `__init__`, are for values that differ per object, which in practice is almost everything you model.
-- You will meet naming conventions that hint at "this attribute is meant to stay internal to the class" (a leading underscore, like `_balance`) in Unit 4.2 — Inheritance & Encapsulation. For now, every attribute you write is openly accessible from outside the class.
-
-### 3.9 Comparison Table: Class vs Object
+### 3.8 Comparison Table: Class vs Object
 
 | Aspect | Class | Object (Instance) |
 |---|---|---|
@@ -146,7 +139,7 @@ obj = ClassName(value1, value2)      # instantiation
 | Example | `Student` (the idea of "a student") | `Student("Priya Nair", 91)` (one real student) |
 | Independence | N/A — there is only one blueprint | Every object's attributes are independent of every other object's |
 
-### 3.10 Diagram: One Class, Many Independent Objects
+### 3.9 Diagram: One Class, Many Independent Objects
 
 ```mermaid
 ---
@@ -180,7 +173,7 @@ flowchart TB
 
 The single `Student` blueprint never holds any real data itself. Every time it is called through `__init__`, a brand-new object is produced with its own independent attributes — changing `student_1`'s `marks` has no effect whatsoever on `student_2`.
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — an empty class, instantiated twice, showing that each object is distinct:
 
@@ -393,6 +386,15 @@ Priya Nair's account at First National: Rs.570
 ### Step 7: Why the Output Is Produced
 
 `balance` starts at `500` inside `__init__`. `deposit(150)` reads `500`, adds `150`, and writes `650` back into `self.balance`. `withdraw(80)` then reads `650`, subtracts `80`, and writes `570` back. `describe()` reads the object's current state at the moment it is called — `owner_name="Priya Nair"`, the shared `bank_name="First National"`, and the final `balance=570` — and returns them combined into one formatted string, which `print()` then displays exactly as returned.
+
+---
+
+### Important Notes (Interview Insights)
+
+- *"What is the difference between a class and an object?"* is one of the most frequently asked entry-level interview questions. Answer with the blueprint analogy: a class is the plan (e.g., the architectural drawing of a house); an object is one specific thing built from that plan (an actual house, with its own address and its own residents). You can build many houses from one drawing, each independent of the others — exactly like many objects from one class.
+- Be ready to explain `self` in your own words, since it confuses nearly every fresher at first. `self` is simply the parameter that receives the object a method was called on — `account.deposit(100)` is quietly rewritten by Python into `BankAccount.deposit(account, 100)`, so `self` inside the method body always means "this particular object."
+- Interviewers may also ask when to use a class attribute versus an instance attribute — answer that class attributes are for values shared by every instance, while instance attributes, set through `self` inside `__init__`, are for values that differ per object, which in practice is almost everything you model.
+- You will meet naming conventions that hint at "this attribute is meant to stay internal to the class" (a leading underscore, like `_balance`) in Unit 4.2 — Inheritance & Encapsulation. For now, every attribute you write is openly accessible from outside the class.
 
 ---
 

@@ -122,14 +122,7 @@ Every professional Python project you touch — in this course and in your caree
 - **Never pinning versions.** Leaving a dependency file to say just `requests` instead of `requests==2.31.0` means "works on my machine today" can silently stop being true on someone else's machine tomorrow, once a newer version changes behaviour.
 - **Writing test functions that don't start with `test_`.** Pytest will not find or run `check_add()` — only `test_add()` — no matter how correct the logic inside it is.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A common fresher interview question: *"Why do we need virtual environments if pip already installs packages?"* Answer with the isolation problem directly: without one, there is exactly one system-wide copy of each package, so two projects that need two different, conflicting versions of the same package cannot both be satisfied at once. A virtual environment gives each project its own private copy, so upgrading one project's dependencies can never silently break another's.
-- Be ready to define a **dependency conflict** in one line: it occurs when two required packages (or two projects sharing one environment) need incompatible versions of the same underlying package at the same time.
-- Interviewers sometimes ask how Python actually *finds* a module during an import. The short, correct answer: Python searches, in order, its built-in modules, then the folders listed in `sys.path` (which includes the current script's folder and the active environment's installed packages) — the first match wins.
-- Know the practical difference between `pip` and **Poetry**: `pip` only installs what you tell it to, one command at a time, and does not track a full dependency file for you by default; Poetry manages the dependency file, the exact locked versions, and the virtual environment together, as one integrated workflow.
-
-### 3.9 Comparison Table: `pip` + `venv` vs Poetry
+### 3.8 Comparison Table: `pip` + `venv` vs Poetry
 
 | Aspect | `pip` + `venv` (manual, two tools) | Poetry (single integrated tool) |
 |---|---|---|
@@ -140,7 +133,7 @@ Every professional Python project you touch — in this course and in your caree
 | Beginner learning curve | Lower — two small, well-known tools | Slightly higher — one tool, more moving parts to learn at once |
 | Common in industry | Still very common, especially in older or smaller projects | Increasingly standard in newer, professionally managed Python projects |
 
-### 3.10 Diagram: How Python Resolves an `import`
+### 3.9 Diagram: How Python Resolves an `import`
 
 ```mermaid
 flowchart TD
@@ -155,7 +148,7 @@ flowchart TD
     H -->|No| J["ModuleNotFoundError"]
 ```
 
-### 3.11 Diagram: A Professional Project's Dependency & Testing Workflow
+### 3.10 Diagram: A Professional Project's Dependency & Testing Workflow
 
 ```mermaid
 flowchart LR
@@ -169,7 +162,7 @@ flowchart LR
     S7 -->|No| S4
 ```
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — importing one standard library module:
 
@@ -336,6 +329,15 @@ fare_calculator.py .                                             [100%]
 ### Step 7: Why the Output Is Produced
 
 Pytest scans `fare_calculator.py`, finds one function whose name matches its `test_*` discovery rule — `test_calculate_fare()` — and runs it. Every `assert` inside that function evaluates to `True`, because `calculate_fare()` computes exactly `base_fare * num_seats` for each of the three inputs tried. Since no `assert` fails, Pytest reports the single test as passed (`1 passed`), with the dot (`.`) representing that one successful test. If a future change to `calculate_fare()` ever produced a wrong result — say, adding a flat fee it should not — the very first `assert` that no longer holds would immediately turn this into a reported failure, pointing straight at the broken line instead of waiting for a passenger to be charged incorrectly.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A common fresher interview question: *"Why do we need virtual environments if pip already installs packages?"* Answer with the isolation problem directly: without one, there is exactly one system-wide copy of each package, so two projects that need two different, conflicting versions of the same package cannot both be satisfied at once. A virtual environment gives each project its own private copy, so upgrading one project's dependencies can never silently break another's.
+- Be ready to define a **dependency conflict** in one line: it occurs when two required packages (or two projects sharing one environment) need incompatible versions of the same underlying package at the same time.
+- Interviewers sometimes ask how Python actually *finds* a module during an import. The short, correct answer: Python searches, in order, its built-in modules, then the folders listed in `sys.path` (which includes the current script's folder and the active environment's installed packages) — the first match wins.
+- Know the practical difference between `pip` and **Poetry**: `pip` only installs what you tell it to, one command at a time, and does not track a full dependency file for you by default; Poetry manages the dependency file, the exact locked versions, and the virtual environment together, as one integrated workflow.
 
 ---
 

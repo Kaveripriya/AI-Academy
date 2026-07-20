@@ -131,14 +131,7 @@ value_if_true if condition else value_if_false
 - **Over-nesting** — stacking three or four levels of nested `if` statements when a single compound condition with `and`/`or` would say the same thing far more clearly.
 - **Overusing the ternary expression** — chaining several ternary expressions together to cover more than two outcomes produces a line that is technically valid but very hard to read; a full `if`/`elif`/`else` chain is the better choice there.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A common fresher interview question: *"What happens if two `elif` conditions are both `True`?"* The correct answer: only the **first** one that is `True` runs — Python never checks the remaining conditions once a match is found.
-- Interviewers often ask you to explain why Python uses **indentation** instead of braces `{ }` to define blocks — be ready to say that indentation is not just a style choice, it is part of Python's grammar, and inconsistent indentation is a compile-time-like error (`IndentationError`), not just a warning.
-- You may be asked to convert a short `if`/`else` into a ternary expression, or vice versa, to check that you understand that a plain `if`/`else` is a **statement** (directs control flow, produces no value), while a conditional expression **produces a value** that can be stored, printed, or passed onward.
-- Be ready to explain when nesting is appropriate versus when it should be flattened: nesting is justified only when the inner decision has its own `else` that doesn't apply to the outer branch's other paths; otherwise, an `and` almost always simplifies the code.
-
-### 3.9 Comparison Table: `if`/`elif`/`else` vs Ternary Expression vs `match`-`case`
+### 3.8 Comparison Table: `if`/`elif`/`else` vs Ternary Expression vs `match`-`case`
 
 | Aspect | `if`/`elif`/`else` | Ternary Expression | `match`-`case` (Unit 1.4) |
 |---|---|---|---|
@@ -147,7 +140,7 @@ value_if_true if condition else value_if_false
 | Readability with many branches | Stays readable even with several `elif` branches | Becomes unreadable if chained for more than two outcomes | Very readable for matching many distinct fixed values |
 | Typical use case | A task priority classifier with several ranges | `status = "adult" if age >= 18 else "minor"` | Matching a menu choice like `"1"`, `"2"`, `"3"` |
 
-### 3.10 Diagram: Decision Flow Through `if`/`elif`/`else`
+### 3.9 Diagram: Decision Flow Through `if`/`elif`/`else`
 
 ```mermaid
 flowchart TD
@@ -161,7 +154,7 @@ flowchart TD
     F --> G
 ```
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — a single `if` statement:
 
@@ -336,6 +329,15 @@ Blocked — resolve dependency first.
 ### Step 7: Why the Output Is Produced
 
 Even though `priority` is `1` — which would normally match the "Urgent" branch — the very first condition checked is `is_blocked`, and it evaluates to `True` because the user typed `"yes"`. Since Python evaluates conditions top to bottom and stops at the first match, the `is_blocked` branch runs and every branch below it, including the priority checks, is skipped entirely. This is exactly why the blocked check must be placed **first**: had the priority checks come before it, an urgent-but-blocked task would have incorrectly printed "Urgent — do it now."
+
+---
+
+### Important Notes (Interview Insights)
+
+- A common fresher interview question: *"What happens if two `elif` conditions are both `True`?"* The correct answer: only the **first** one that is `True` runs — Python never checks the remaining conditions once a match is found.
+- Interviewers often ask you to explain why Python uses **indentation** instead of braces `{ }` to define blocks — be ready to say that indentation is not just a style choice, it is part of Python's grammar, and inconsistent indentation is a compile-time-like error (`IndentationError`), not just a warning.
+- You may be asked to convert a short `if`/`else` into a ternary expression, or vice versa, to check that you understand that a plain `if`/`else` is a **statement** (directs control flow, produces no value), while a conditional expression **produces a value** that can be stored, printed, or passed onward.
+- Be ready to explain when nesting is appropriate versus when it should be flattened: nesting is justified only when the inner decision has its own `else` that doesn't apply to the outer branch's other paths; otherwise, an `and` almost always simplifies the code.
 
 ---
 

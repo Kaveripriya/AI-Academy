@@ -146,15 +146,7 @@ def generator_name(parameters):
 - **Assuming a generator can be looped over twice** — once a `for` loop has fully consumed a generator object, looping over the same object again produces nothing; you need to call the generator function again for a fresh one.
 - **Writing an infinite generator and forgetting a stopping condition in the calling code** — a `while True: yield ...` generator never ends on its own; the `for` loop that consumes it must `break` once it has enough values.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A very common fresher interview question: *"Why not just always use lambda instead of def?"* Answer confidently: a lambda is restricted to a single expression, cannot have a docstring, and is harder to debug because it has no name in a traceback — `def` is the right choice for anything beyond a short, disposable, one-line piece of logic.
-- Be ready to explain the **memory difference between a list and a generator**: a list holding a million computed values sits entirely in memory at once, while a generator produces one value at a time and never holds more than the current value in memory — this is why generators are the standard answer to "how would you process a huge file without running out of memory?"
-- Interviewers often check whether you understand that **`@decorator` is just syntax sugar** for `function = decorator(function)` — being able to write out that equivalent by hand is a strong signal you actually understand decorators rather than having memorized the `@` symbol.
-- When multiple decorators are stacked on one function, they apply **bottom-up**: `@a` above `@b` above `def f()` means `f = a(b(f))` — `b` wraps `f` first, and `a` wraps the result of that.
-- The reason a decorator's `wrapper` can still "see" the original `func` after `decorator_name` has already finished running is called a **closure** — the inner function remembers variables from the outer function's scope even after the outer function has returned.
-
-### 3.9 Comparison Tables
+### 3.8 Comparison Tables
 
 **Regular Function vs. Lambda Function**
 
@@ -177,7 +169,7 @@ def generator_name(parameters):
 | Can be looped over more than once? | Yes, as many times as needed | No — exhausted after one full pass |
 | Created with | `[...]` or `list(...)` | A function containing `yield` |
 
-### 3.10 Diagram: How a Decorator Wraps a Function
+### 3.9 Diagram: How a Decorator Wraps a Function
 
 ```mermaid
 flowchart LR
@@ -187,7 +179,7 @@ flowchart LR
     D --> E["Original result returned<br/>back through wrapper"]
 ```
 
-### 3.11 Diagram: Generator Lazy-Evaluation Flow
+### 3.10 Diagram: Generator Lazy-Evaluation Flow
 
 ```mermaid
 flowchart TD
@@ -199,7 +191,7 @@ flowchart TD
     S5 -->|loop ends or break| S6["Generator stays paused —<br/>rest of the sequence is never computed"]
 ```
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — a lambda that squares a number:
 
@@ -407,6 +399,16 @@ process_order took 0.0XXX seconds
 ### Step 7: Why the Output Is Produced
 
 `sorted_amounts` places `99.0` first and `1499.0` last, because the lambda's key is the identity of each amount, so `sorted()` ranks the list in plain ascending numeric order. `zip()` then walks the generator and the sorted list together, pulling exactly four values from `order_id_generator(1001)` — `1001, 1002, 1003, 1004` — one for every amount in `sorted_amounts`, and stopping there even though the generator would happily keep producing more IDs if asked. For each pair, `process_order` runs first — printing its own "Processing order..." message as its very last step — and only once it returns does the decorator's `wrapper` print the elapsed-time message, because that print statement sits *after* `result = func(*args, **kwargs)` in `wrapper`'s body. That ordering — real work first, timing message second — is exactly what a decorator guarantees: the original function's behaviour is untouched, and the extra behaviour wraps cleanly around it.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question: *"Why not just always use lambda instead of def?"* Answer confidently: a lambda is restricted to a single expression, cannot have a docstring, and is harder to debug because it has no name in a traceback — `def` is the right choice for anything beyond a short, disposable, one-line piece of logic.
+- Be ready to explain the **memory difference between a list and a generator**: a list holding a million computed values sits entirely in memory at once, while a generator produces one value at a time and never holds more than the current value in memory — this is why generators are the standard answer to "how would you process a huge file without running out of memory?"
+- Interviewers often check whether you understand that **`@decorator` is just syntax sugar** for `function = decorator(function)` — being able to write out that equivalent by hand is a strong signal you actually understand decorators rather than having memorized the `@` symbol.
+- When multiple decorators are stacked on one function, they apply **bottom-up**: `@a` above `@b` above `def f()` means `f = a(b(f))` — `b` wraps `f` first, and `a` wraps the result of that.
+- The reason a decorator's `wrapper` can still "see" the original `func` after `decorator_name` has already finished running is called a **closure** — the inner function remembers variables from the outer function's scope even after the outer function has returned.
 
 ---
 

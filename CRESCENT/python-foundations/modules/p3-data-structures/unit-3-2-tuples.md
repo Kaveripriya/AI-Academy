@@ -114,13 +114,7 @@ a, b, c = (10, 20, 30)
 - **Calling `tuple()` with loose arguments** — `tuple(1, 2, 3)` raises a `TypeError`, because `tuple()` takes exactly one iterable, not several separate values.
 - **Assuming immutability applies to everything inside** — a tuple that contains a list (e.g. `record = ("Ada", [90, 85])`) cannot swap out that inner list for a different object, but the inner list itself can still be edited in place — a subtlety worth remembering.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A very common fresher interview question is: *"What is the difference between a list and a tuple?"* Be ready to answer crisply: lists are mutable and use `[]`, tuples are immutable and use `()`; tuples are generally used for fixed, related data, while lists are used for collections that change.
-- An equally common follow-up: *"Why are tuples hashable but lists are not?"* Answer: a value is **hashable** only if it never changes over its lifetime, because Python computes a hash value once and relies on it staying accurate — since a tuple's contents can never change, Python can safely compute a hash for it, allowing a tuple to be used as a dictionary key or stored inside a set. A list can change at any time, so its hash could go stale, which is why Python does not allow lists to be hashed.
-- Interviewers sometimes ask you to prove immutability live: show that `tuple_var[0] = x` raises a `TypeError`, and explain that this happens because a tuple has no `__setitem__` behaviour defined for it — a clean, confident way to demonstrate real understanding rather than a memorised answer.
-
-### 3.9 Comparison Table: List vs Tuple
+### 3.8 Comparison Table: List vs Tuple
 
 | Aspect | List | Tuple |
 |---|---|---|
@@ -131,7 +125,7 @@ a, b, c = (10, 20, 30)
 | Typical use case | A collection that grows, shrinks, or reorders over time | A fixed group of related values, or a function's multiple return values |
 | Performance | Slightly slower to iterate; more memory overhead for the same data | Slightly faster to iterate; lower memory overhead, since Python can optimise fixed-size storage |
 
-### 3.10 Diagram: Tuple Unpacking Flow
+### 3.9 Diagram: Tuple Unpacking Flow
 
 ```mermaid
 flowchart LR
@@ -141,7 +135,7 @@ flowchart LR
     C --> E["name = 'Priya'<br/>age = 21<br/>branch = 'CSE'"]
 ```
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — creating a tuple and accessing its elements:
 
@@ -326,6 +320,14 @@ Updated fare: 1500.0
 ### Step 7: Why the Output Is Produced
 
 The first four lines come directly from unpacking the original tuple and its nested seat tuple — Python binds each variable to the value in the matching position, exactly once. The attempt to write `booking[3] = 1500.00` fails immediately because a tuple has no mechanism to change an existing element — Python raises a `TypeError` before any value can be altered, and the `except` block prints that error instead of letting the program crash. The final line succeeds because the code never tried to edit the old tuple at all — it built a completely new tuple with the updated fare and rebound the name `booking` to point to it, which is the only correct way to "change" a tuple's contents.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question is: *"What is the difference between a list and a tuple?"* Be ready to answer crisply: lists are mutable and use `[]`, tuples are immutable and use `()`; tuples are generally used for fixed, related data, while lists are used for collections that change.
+- An equally common follow-up: *"Why are tuples hashable but lists are not?"* Answer: a value is **hashable** only if it never changes over its lifetime, because Python computes a hash value once and relies on it staying accurate — since a tuple's contents can never change, Python can safely compute a hash for it, allowing a tuple to be used as a dictionary key or stored inside a set. A list can change at any time, so its hash could go stale, which is why Python does not allow lists to be hashed.
+- Interviewers sometimes ask you to prove immutability live: show that `tuple_var[0] = x` raises a `TypeError`, and explain that this happens because a tuple has no `__setitem__` behaviour defined for it — a clean, confident way to demonstrate real understanding rather than a memorised answer.
 
 ---
 

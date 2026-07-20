@@ -147,14 +147,7 @@ class ClassName:
 - **Placing a required field after a defaulted one in a dataclass** — raises a `TypeError` at class-definition time, before the program even runs.
 - **Assuming `+` works automatically between custom objects** — without `__add__` defined, `obj1 + obj2` raises `TypeError: unsupported operand type(s)`, since `object` has no idea what "adding" your class should mean.
 
-### 3.8 Important Notes (Interview Insights)
-
-- *"What is the difference between `__str__` and `__repr__`?"* is one of the most frequently asked Python fresher interview questions. The clean answer: `__str__` is for the end user (readable), `__repr__` is for the developer (unambiguous, ideally re-creatable code); if only `__repr__` is defined, `print()` falls back to it automatically.
-- Interviewers often follow up with *"When would you choose a dataclass over a regular class?"* — the honest answer is: when the class is mainly a container for data with little or no custom behaviour. The moment a class needs validation logic, computed behaviour, or protects an invariant, a hand-written class (or a dataclass with added methods) communicates intent better.
-- Be ready to clarify that Python does not support classic "method overloading" (same method name, different parameter types, resolved at compile time, as in Java). What Python offers instead is **operator overloading** — one dunder method per operator, and your own logic inside it decides how to handle different situations.
-- A dataclass is still an ordinary class underneath the decorator — you can add plain methods to it, and inheritance still works exactly as covered in Unit 4.2, including a subclass with a hand-written `__init__` that calls `super().__init__(...)`.
-
-### 3.9 Comparison Table: `__str__` vs `__repr__`
+### 3.8 Comparison Table: `__str__` vs `__repr__`
 
 | Aspect | `__str__` | `__repr__` |
 |---|---|---|
@@ -164,7 +157,7 @@ class ClassName:
 | If missing | Falls back to `__repr__` (via `object`'s default `__str__`) | No further fallback — defaults to `<ClassName object at 0x...>` |
 | Typical content | `"Priya (Roll No. 101)"` | `"Student(name='Priya', roll_number=101)"` |
 
-### 3.10 Comparison Table: Regular Class vs `@dataclass`
+### 3.9 Comparison Table: Regular Class vs `@dataclass`
 
 | Aspect | Regular (hand-written) Class | `@dataclass` |
 |---|---|---|
@@ -175,7 +168,7 @@ class ClassName:
 | Boilerplate | More typing, more places to introduce bugs | Minimal — a short, type-hinted field list |
 | Extra features | None built in | `frozen=True` for immutability, `order=True` for `<`, `<=`, `>`, `>=` |
 
-### 3.11 Organizing Classes into Modules and Packages
+### 3.10 Organizing Classes into Modules and Packages
 
 A **module** is simply a `.py` file. As a project grows past one or two classes, cramming everything into a single file becomes its own problem — so related classes get grouped into their own modules, and other files reach them with `import`.
 
@@ -205,7 +198,7 @@ Rohit
 
 `from wallet import Wallet` tells Python: locate a module named `wallet` (it finds `wallet.py` in the same directory), run that file once, and bind the name `Wallet` into this file's own namespace. Import the same module a second time from anywhere else in the program, and Python reuses the module object it already built rather than re-running the file. A **library** — a broader term you will hear constantly in the industry — is simply a collection of modules (often distributed as a **package**, a directory of related modules) written to be reused across many projects; the `dataclasses` module you have been importing throughout this unit is itself one small part of Python's own **standard library**, the large collection of modules that ships with Python itself. As a project grows, you might end up with `wallet.py`, `ticket.py`, and `student.py` sitting side by side — or grouped further into a package such as `banking/` containing `account.py` and `transaction.py` together.
 
-### 3.12 Diagram: How `print(obj)` Resolves to a Dunder Method
+### 3.11 Diagram: How `print(obj)` Resolves to a Dunder Method
 
 ```mermaid
 flowchart TD
@@ -216,7 +209,7 @@ flowchart TD
     D -- No --> F["Falls back to object's own default:<br/>ClassName object at 0x..."]
 ```
 
-### 3.13 Diagram: What `@dataclass` Generates
+### 3.12 Diagram: What `@dataclass` Generates
 
 ```mermaid
 flowchart LR
@@ -227,7 +220,7 @@ flowchart LR
     D --> N["Does NOT generate __str__"]
 ```
 
-### 3.14 Code Examples
+### 3.13 Code Examples
 
 **Basic example** — the default output, then a class-defined `__repr__`:
 
@@ -412,6 +405,15 @@ Ananya: Rs. 380.00 available
 ### Step 7: Why the Output Is Produced
 
 `__add__` combines the two balances (`320.0 + 60.0 = 380.0`) and returns a new `Wallet` carrying `self.owner_name` — here, simply `"Ananya"`, since the example did not rename the owner on combination. `print(total_wallet)` then calls `__str__`, which formats that combined balance to two decimal places. Without `__add__` defined at all, the very same `main_wallet + cashback_wallet` expression would have raised a `TypeError`, because `object` — the default every class inherits from — has no built-in idea of what "adding" two custom objects should mean.
+
+---
+
+### Important Notes (Interview Insights)
+
+- *"What is the difference between `__str__` and `__repr__`?"* is one of the most frequently asked Python fresher interview questions. The clean answer: `__str__` is for the end user (readable), `__repr__` is for the developer (unambiguous, ideally re-creatable code); if only `__repr__` is defined, `print()` falls back to it automatically.
+- Interviewers often follow up with *"When would you choose a dataclass over a regular class?"* — the honest answer is: when the class is mainly a container for data with little or no custom behaviour. The moment a class needs validation logic, computed behaviour, or protects an invariant, a hand-written class (or a dataclass with added methods) communicates intent better.
+- Be ready to clarify that Python does not support classic "method overloading" (same method name, different parameter types, resolved at compile time, as in Java). What Python offers instead is **operator overloading** — one dunder method per operator, and your own logic inside it decides how to handle different situations.
+- A dataclass is still an ordinary class underneath the decorator — you can add plain methods to it, and inheritance still works exactly as covered in Unit 4.2, including a subclass with a hand-written `__init__` that calls `super().__init__(...)`.
 
 ---
 

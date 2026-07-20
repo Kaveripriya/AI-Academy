@@ -95,13 +95,7 @@ The Part A diagnostic itself is intentionally narrow in what it demands — but 
 - **Vague folder and file names** — `test1.py`, `final.py`, `stuff/` — that force a reader to open every file just to understand what is there.
 - **Keeping the repository private "until it's finished"** — a portfolio is never really finished; it is meant to be watched growing, not hidden until perfect.
 
-### 3.8 Important Notes (Interview Insights)
-
-- Recruiters and interviewers at Indian IT companies — from large service firms to product startups — routinely check a candidate's GitHub profile before or during screening, especially for freshers with limited work history. A clean, well-documented portfolio is one of the few concrete differentiators a fresher can control.
-- Be ready to explain, in an interview, *what* is in your portfolio and *why* — an interviewer may click into a project and ask you to walk through it live. A repository you cannot explain is worse than no repository at all.
-- Commit history is often checked as evidence of genuine, sustained effort rather than a single last-minute upload — a portfolio built up gradually, over many small commits, reads as more credible than one created in a single sitting the night before an interview.
-
-### 3.9 Comparison Table: Messy vs Well-Organized Portfolio Repository
+### 3.8 Comparison Table: Messy vs Well-Organized Portfolio Repository
 
 | Aspect | Messy Repository | Well-Organized Repository |
 |---|---|---|
@@ -112,7 +106,7 @@ The Part A diagnostic itself is intentionally narrow in what it demands — but 
 | Visibility | Private, or forgotten after creation | Public and actively maintained |
 | Reader's experience | Has to open every file to understand anything | Can predict where something lives from folder/README alone |
 
-### 3.10 Diagram: Portfolio Repository Structure
+### 3.9 Diagram: Portfolio Repository Structure
 
 ```mermaid
 flowchart TD
@@ -123,7 +117,7 @@ flowchart TD
     R --> D["diagnostics/<br/>checkpoint submissions"]
 ```
 
-### 3.11 Diagram: Part A to Part B Flow
+### 3.10 Diagram: Part A to Part B Flow
 
 ```mermaid
 flowchart LR
@@ -134,7 +128,7 @@ flowchart LR
     D -->|Gaps found| A
 ```
 
-### 3.12 Examples
+### 3.11 Examples
 
 **Sample README.md snippet** for a portfolio repository's top level:
 
@@ -215,7 +209,7 @@ Create the repository once, write a specific and honest README, move your best p
 ### Step 4: Explain Each Step
 
 - Steps 1-3 create the permanent repository and its first, visible entry point — the README — using the exact GitHub workflow from Unit 6.1.
-- Step 4 applies the README structure from §3.12: a clear title, a one-line description, and an index of contents, so a visitor understands the repository within seconds.
+- Step 4 applies the README structure from §3.11: a clear title, a one-line description, and an index of contents, so a visitor understands the repository within seconds.
 - Step 5 applies the folder-structure guidance from §3.4 and §3.6 — one project per folder, named for its contents, moved and committed incrementally so the commit history itself shows steady progress.
 - Steps 6-7 produce the actual diagnostic submission described in §3.5 — a small script combining a Python skill (reading and summarizing data) with a Git skill (commit and push).
 - Step 8 completes the process described in §3.1 and §3.3 — the diagnostic is only considered passed once an instructor reviews the real commit on GitHub and gives sign-off.
@@ -242,6 +236,14 @@ Lowest mark: 31
 ### Step 7: Why This Result Matters
 
 This result is the tangible proof that everything taught across Part A — variables, control flow, data structures, functions, classes, file handling, and now Git and GitHub — has come together into something a stranger can actually see and verify. It is also the literal gate into Part B: instructor sign-off on this diagnostic is what confirms your foundation is solid enough for AI Fundamentals to build on directly, without re-teaching Python or Git basics.
+
+---
+
+### Important Notes (Interview Insights)
+
+- Recruiters and interviewers at Indian IT companies — from large service firms to product startups — routinely check a candidate's GitHub profile before or during screening, especially for freshers with limited work history. A clean, well-documented portfolio is one of the few concrete differentiators a fresher can control.
+- Be ready to explain, in an interview, *what* is in your portfolio and *why* — an interviewer may click into a project and ask you to walk through it live. A repository you cannot explain is worse than no repository at all.
+- Commit history is often checked as evidence of genuine, sustained effort rather than a single last-minute upload — a portfolio built up gradually, over many small commits, reads as more credible than one created in a single sitting the night before an interview.
 
 ---
 

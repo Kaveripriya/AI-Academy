@@ -133,15 +133,7 @@ Arithmetic, comparison, and logical operators, together with the rules that gove
 - **Treating the string `"False"` as falsy** — it is a non-empty string, so Python treats it as truthy; only the actual boolean `False` and the specific falsy values are false-ish.
 - **Not realizing short-circuit evaluation can hide bugs** — code on the right-hand side of `and`/`or` that would normally crash (like a division by zero) may never run at all, silently masking a problem you meant to catch.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A very common fresher interview question: *"What is the difference between `/` and `//` in Python?"* Answer confidently: `/` is true division and always returns a `float`; `//` is floor division and rounds down toward negative infinity, returning an `int` when both operands are `int`.
-- Interviewers often ask you to evaluate an expression on paper, such as `2 + 3 * 4` or `-2 ** 2`, purely to check whether you understand operator precedence rather than reading left to right.
-- Be ready to explain **short-circuit evaluation** in your own words — it is a favourite question because it tests whether you understand *why* `False and expensive_function()` never actually calls that function.
-- Interviewers frequently ask what values are "falsy" in Python — the confident answer is the fixed list: `False`, `0`, `0.0`, and `""`; everything else is truthy (and later in the course, empty collections like an empty list or dictionary join this falsy list too).
-- Knowing the difference between `=` (assignment) and `==` (comparison) sounds trivial, but interviewers use it to filter out candidates who have only memorized syntax without understanding what each operator actually does.
-
-### 3.9 Comparison Table: `=` vs `==`
+### 3.8 Comparison Table: `=` vs `==`
 
 | Aspect | `=` (Assignment) | `==` (Equality Comparison) |
 |---|---|---|
@@ -151,7 +143,7 @@ Arithmetic, comparison, and logical operators, together with the rules that gove
 | Where it's used | Only in a statement, to create or update a variable | Inside any expression — conditions, print statements, calculations |
 | Beginner risk | Using it where a question was intended | Using it where a value was meant to be stored |
 
-### 3.10 Diagram: Operator Precedence Ladder
+### 3.9 Diagram: Operator Precedence Ladder
 
 When an expression has more than one operator, Python does not read left to right — it follows a fixed ranking called **operator precedence**. Here is the ladder, highest (evaluated first) at the top:
 
@@ -205,7 +197,7 @@ flowchart TB
 
 A few facts fall out of this ladder. `**` binds *tighter* than unary minus, so `-2 ** 2` gives `-4`, not `4`. Arithmetic runs before comparison, and comparison runs before logic, so `2 + 3 > 4 and 1 < 2` reads as `((2 + 3) > 4) and (1 < 2)`. And when two operators share a precedence level (like `*` and `/`), Python evaluates left to right — **left-associativity** — so `20 / 4 * 2` is `(20 / 4) * 2 = 10.0`, not `2.5`. You don't have to memorize the ladder; any time the order isn't obvious, wrap the part you want done first in parentheses — they always win, cost nothing, and can never turn a correct expression into a wrong one.
 
-### 3.11 Diagram: Short-Circuit Evaluation Flow
+### 3.10 Diagram: Short-Circuit Evaluation Flow
 
 Logical operators stop evaluating the moment the final answer is already known. This diagram shows what Python actually does when it evaluates `A and B` and `A or B`:
 
@@ -220,7 +212,7 @@ flowchart TD
     O2 -->|No| O4["Must check right side<br/>result = value of B"]
 ```
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — arithmetic operators, including the true-division vs floor-division surprise:
 
@@ -403,13 +395,23 @@ Discount eligible: True
 
 ---
 
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question: *"What is the difference between `/` and `//` in Python?"* Answer confidently: `/` is true division and always returns a `float`; `//` is floor division and rounds down toward negative infinity, returning an `int` when both operands are `int`.
+- Interviewers often ask you to evaluate an expression on paper, such as `2 + 3 * 4` or `-2 ** 2`, purely to check whether you understand operator precedence rather than reading left to right.
+- Be ready to explain **short-circuit evaluation** in your own words — it is a favourite question because it tests whether you understand *why* `False and expensive_function()` never actually calls that function.
+- Interviewers frequently ask what values are "falsy" in Python — the confident answer is the fixed list: `False`, `0`, `0.0`, and `""`; everything else is truthy (and later in the course, empty collections like an empty list or dictionary join this falsy list too).
+- Knowing the difference between `=` (assignment) and `==` (comparison) sounds trivial, but interviewers use it to filter out candidates who have only memorized syntax without understanding what each operator actually does.
+
+---
+
 ## 6. Key Takeaways
 
 - An **operator** performs an operation on values (**operands**); an **expression** is any combination of values, variables, and operators that Python reduces to one result.
 - **Arithmetic operators** include `+ - * **`, plus two kinds of division — `/` (true division, always a `float`) and `//` (floor division, rounds toward negative infinity) — and `%` (remainder, whose sign follows the divisor).
 - **Operator precedence** fixes which operator runs first (`**` before unary minus, the `*`/`/`/`//`/`%` family before `+`/`-`, arithmetic before comparison, comparison before logical, and `not` before `and` before `or`); parentheses always override it.
 - **Comparison operators** (`==`, `!=`, `<`, `>`, `<=`, `>=`) each produce a `bool` and can be chained, as in `1 < x < 10`.
-- The single most common beginner bug is confusing `=` (assignment) with `==` (equality comparison) — keep the Section 3.9 comparison table in mind.
+- The single most common beginner bug is confusing `=` (assignment) with `==` (equality comparison) — keep the Section 3.8 comparison table in mind.
 - **Logical operators** `and`, `or`, and `not` combine or invert conditions using **short-circuit evaluation**, skipping the right side the moment the result is already decided.
 - **Truthiness** means every value acts as true or false in a logical context — `False`, `0`, `0.0`, and `""` are falsy; everything else is truthy.
 - Being ready to explain operator precedence, short-circuit evaluation, and truthiness in your own words is common ground for entry-level Python interview questions.

@@ -122,13 +122,7 @@ unique_numbers = set([1, 2, 2, 3, 3, 3])
 - **Trying to put a mutable value (like a list) inside a set** — this raises `TypeError: unhashable type: 'list'`, since a set can only hold immutable, hashable elements.
 - **Using `remove()` on a value that might not exist.** This raises a `KeyError`. Use `discard()` when a missing value should simply be ignored.
 
-### 3.8 Important Notes (Interview Insights)
-
-- A common fresher interview question: *"Why are sets unordered and unindexed?"* A set is built on a **hash table**, the same idea a dictionary uses internally. Elements are stored at positions computed from their hash value, not in the order you typed them, so there is no meaningful "first" or "second" element to index — that is the trade-off a set makes in exchange for very fast membership testing.
-- Another common question: *"When would you use a set instead of a list for de-duplication?"* Answer: whenever the collection is large or membership will be checked repeatedly. Removing duplicates via `list(set(data))` is a single readable line, and checking membership against a set stays fast (roughly constant time) even as the set grows, while checking membership against a list gets slower as the list grows, because Python has to scan it from the start each time.
-- Be ready to state clearly: **a set trades order and duplicates for speed and uniqueness** — that trade-off is the entire reason the data structure exists.
-
-### 3.9 Comparison Table: List vs Set
+### 3.8 Comparison Table: List vs Set
 
 | Aspect | List | Set |
 |---|---|---|
@@ -139,7 +133,7 @@ unique_numbers = set([1, 2, 2, 3, 3, 3])
 | Written with | `[ ]` | `{ }` or `set()` |
 | Typical use case | Ordered data, data with intentional repeats | Uniqueness, membership checks, overlap between collections |
 
-### 3.10 Diagram: Set Operations
+### 3.9 Diagram: Set Operations
 
 ```mermaid
 flowchart TD
@@ -153,7 +147,7 @@ flowchart TD
     B --> S
 ```
 
-### 3.11 Membership Testing and Mutation
+### 3.10 Membership Testing and Mutation
 
 **Membership testing** uses the same `in` operator you already know from lists and strings:
 
@@ -195,7 +189,7 @@ Output:
 
 Default to `discard()` unless a missing value would genuinely be a bug you want Python to flag with an error.
 
-### 3.12 Set Comprehensions
+### 3.11 Set Comprehensions
 
 A **set comprehension** builds a set in one line, using the same idea as a list comprehension but with curly braces instead of square brackets. The result is automatically unordered and de-duplicated:
 
@@ -227,7 +221,7 @@ Output:
 
 Three inputs collapse to two distinct, normalized email addresses — the lower-casing and the de-duplication both happen in the same expression.
 
-### 3.13 Code Examples
+### 3.12 Code Examples
 
 **Basic example** — creating a set and testing membership:
 
@@ -424,6 +418,14 @@ Only Python Basics: {'meera iyer'}
 ### Step 7: Why the Output Is Produced
 
 Lower-casing every name before building each set ensures that `"Meera Iyer"` and `"meera iyer"` are treated as the exact same value, so the set's uniqueness guarantee correctly merges them into one entry instead of counting them as two different students. Once both raw lists are cleaned into `python_students` and `ai_students`, the union combines every distinct name across both sets, the intersection keeps only names appearing in both sets ("arjun rao" and "divya shah" appear in both raw lists), and the difference keeps names present in `python_students` but absent from `ai_students` — which leaves only "meera iyer", since "arjun rao" and "divya shah" are removed because they also appear in `ai_students`.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A common fresher interview question: *"Why are sets unordered and unindexed?"* A set is built on a **hash table**, the same idea a dictionary uses internally. Elements are stored at positions computed from their hash value, not in the order you typed them, so there is no meaningful "first" or "second" element to index — that is the trade-off a set makes in exchange for very fast membership testing.
+- Another common question: *"When would you use a set instead of a list for de-duplication?"* Answer: whenever the collection is large or membership will be checked repeatedly. Removing duplicates via `list(set(data))` is a single readable line, and checking membership against a set stays fast (roughly constant time) even as the set grows, while checking membership against a list gets slower as the list grows, because Python has to scan it from the start each time.
+- Be ready to state clearly: **a set trades order and duplicates for speed and uniqueness** — that trade-off is the entire reason the data structure exists.
 
 ---
 

@@ -313,14 +313,7 @@ Reading this line by line: `for n in nums` walks through `1, 2, 3, 4, 5, 6` one 
 - **Writing `my_list = my_list.sort()`** — this discards the list entirely, because `sort()` returns `None`.
 - **Confusing `append()` with `extend()`** — `my_list.append([1, 2])` adds one nested list as a single element; `my_list.extend([1, 2])` adds `1` and `2` as two separate elements.
 
-### 3.15 Important Notes (Interview Insights)
-
-- A very common fresher interview question: *"Is a Python list mutable or immutable?"* Answer confidently: a list is **mutable** — its contents can change after creation, unlike the tuple you will study in Unit 3.2, which is **immutable** once built.
-- Interviewers frequently probe the **aliasing vs copying** distinction: `b = a` makes `b` a second name for the *same* list object; only `a.copy()` or `a[:]` (a **shallow copy**) creates an independent outer list. Be ready to explain that a shallow copy of a *nested* list still shares its inner lists with the original — a subtlety that trips up many candidates.
-- Be ready to explain why `list.sort()` returns `None` while `sorted()` returns a new list — this single question is asked constantly, and getting it wrong (`x = some_list.sort()`) is one of the most common real bugs in beginner code.
-- Know that list indexing and slicing are O(1) and O(k) respectively in terms of how Python implements them (constant-time element access, and time proportional to the slice length) — interviewers sometimes ask why lists are efficient for this kind of access.
-
-### 3.16 Comparison Table: Python List vs. Array (Other Languages)
+### 3.15 Comparison Table: Python List vs. Array (Other Languages)
 
 Many languages you may encounter later (C, Java, and others) have a data structure called an **array**, which looks similar to a Python list at first glance but behaves quite differently:
 
@@ -333,7 +326,7 @@ Many languages you may encounter later (C, Java, and others) have a data structu
 
 This is why Python lists are often described as more flexible but with some run-time overhead compared to a fixed, single-type array in a statically typed language.
 
-### 3.17 Code Examples
+### 3.16 Code Examples
 
 **Basic example** — creating a list and inspecting it:
 
@@ -489,6 +482,15 @@ Prices with GST: [208.95, 366.45, 628.95, 261.45, 156.45]
 ### Step 7: Why the Output Is Produced
 
 `append(149)` and `remove(99)` change `cart_prices` in place, leaving `[199, 349, 599, 249, 149]` — this is the list shown first. `sorted(cart_prices, reverse=True)` ranks these five values from highest to lowest as `[599, 349, 249, 199, 149]` without altering `cart_prices`, and `[:3]` takes the first three of that ranked list, giving `[599, 349, 249]`, whose sum is `1197`. Finally, the comprehension walks the *updated* `cart_prices` in its original (unsorted) order and multiplies each price by `1.05`, so the GST list lines up position-for-position with `[199, 349, 599, 249, 149]`, not with the sorted ranking — a detail worth noticing, since it shows that sorting for the top-three calculation never touched the underlying cart order used everywhere else.
+
+---
+
+### Important Notes (Interview Insights)
+
+- A very common fresher interview question: *"Is a Python list mutable or immutable?"* Answer confidently: a list is **mutable** — its contents can change after creation, unlike the tuple you will study in Unit 3.2, which is **immutable** once built.
+- Interviewers frequently probe the **aliasing vs copying** distinction: `b = a` makes `b` a second name for the *same* list object; only `a.copy()` or `a[:]` (a **shallow copy**) creates an independent outer list. Be ready to explain that a shallow copy of a *nested* list still shares its inner lists with the original — a subtlety that trips up many candidates.
+- Be ready to explain why `list.sort()` returns `None` while `sorted()` returns a new list — this single question is asked constantly, and getting it wrong (`x = some_list.sort()`) is one of the most common real bugs in beginner code.
+- Know that list indexing and slicing are O(1) and O(k) respectively in terms of how Python implements them (constant-time element access, and time proportional to the slice length) — interviewers sometimes ask why lists are efficient for this kind of access.
 
 ---
 

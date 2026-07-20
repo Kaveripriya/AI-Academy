@@ -105,7 +105,7 @@ class C(A, B):
 - If a subclass does not define its own `__init__`, Python uses the superclass's `__init__` automatically.
 - If a subclass **does** define its own `__init__`, the superclass's `__init__` does **not** run automatically — it must be called explicitly with `super().__init__(...)`.
 - Method lookup always follows the MRO: Python checks the object's own class first, then walks the MRO in order until it finds the method.
-- `super()` always means "the next class in the computed MRO," not literally "my parent class" — this distinction only becomes visible with multiple inheritance (see §3.11).
+- `super()` always means "the next class in the computed MRO," not literally "my parent class" — this distinction only becomes visible with multiple inheritance (see §3.10).
 - A double leading underscore (`__name`) is rewritten by Python, at compile time, to `_ClassName__name`, using the exact name of the class where that line of code is written.
 - `isinstance(obj, Cls)` returns `True` if `Cls` appears anywhere in the object's class's MRO, not only if it is the immediate class.
 
@@ -127,14 +127,7 @@ class C(A, B):
 - **Building unnecessarily deep inheritance chains** just to reuse a couple of methods, when a simpler, flatter design (or composition) would be easier to read and maintain.
 - **Overriding a method without knowing you're overriding it** — accidentally reusing a superclass's method name and silently losing access to its original behavior.
 
-### 3.8 Important Notes (Interview Insights)
-
-- **MRO and `super()` are classic interview topics** for any Python role. Be ready to explain, in your own words, that `super()` does not mean "my direct parent" — it means "the next class in the MRO" — and be able to trace `ClassName.__mro__` for a small diamond-shaped hierarchy on a whiteboard.
-- A very common fresher interview question: *"Does Python have private variables like Java?"* The confident, correct answer: **no** — Python's underscore convention is "convention, not enforcement." A single underscore (`_name`) is a social signal only; a double underscore (`__name`) triggers name mangling, which prevents accidental collisions but can still be bypassed by anyone who knows the mangled name. This is a fundamentally different model from Java's `private` keyword, which the compiler actively enforces.
-- Interviewers often ask you to distinguish **overriding** (replacing a method entirely) from **extending** (calling `super()` to reuse the superclass's version and add to it) — know both terms and be able to demonstrate each with a one-line code example.
-- Be ready to explain why `isinstance()` is generally preferred over checking `type(obj) == SomeClass` — `isinstance()` respects the whole inheritance hierarchy (and MRO), while an exact `type()` comparison does not.
-
-### 3.9 Comparison Table: Single Inheritance vs Multi-Level vs Multiple Inheritance
+### 3.8 Comparison Table: Single Inheritance vs Multi-Level vs Multiple Inheritance
 
 | Aspect | Single Inheritance | Multi-Level Inheritance | Multiple Inheritance |
 |---|---|---|---|
@@ -144,7 +137,7 @@ class C(A, B):
 | Main risk | Very low — straightforward to reason about | Chains that grow too long become hard to trace | The diamond problem — ambiguity about method order, resolved by MRO |
 | Typical use | A specific case of a general class (`SavingsAccount` from `BankAccount`) | Layered specialization (`Employee` → `Manager` → `SeniorManager`) | Combining independent behaviors (mixins) into one class |
 
-### 3.10 Comparison Table: Public vs Protected vs Private Naming Convention
+### 3.9 Comparison Table: Public vs Protected vs Private Naming Convention
 
 | Naming Style | Example | Meaning | Enforced by Python? |
 |---|---|---|---|
@@ -152,7 +145,7 @@ class C(A, B):
 | Protected (`_name`) | `self._balance` | Convention: "internal use — don't rely on this from outside code." | No — purely a social agreement between developers |
 | Private (`__name`) | `self.__pin` | Triggers name mangling to `self._ClassName__pin`, mainly to prevent accidental name collisions across a class hierarchy. | Partially — the original name stops working, but the mangled name is still fully accessible |
 
-### 3.11 Diagram: Class Hierarchy and MRO
+### 3.10 Diagram: Class Hierarchy and MRO
 
 ```mermaid
 flowchart BT
@@ -175,7 +168,7 @@ flowchart BT
 
 This diagram shows a realistic banking hierarchy: `SavingsAccount` extends `BankAccount` through ordinary single inheritance, while `PremiumSavingsAccount` uses **multiple inheritance** to combine `SavingsAccount` with an unrelated `SMSAlertMixin`. Python computes the `__mro__` the moment `PremiumSavingsAccount` is defined — it searches `SavingsAccount`'s own chain fully before moving to `SMSAlertMixin`, which is why `BankAccount` appears before `SMSAlertMixin` in the order, even though `SMSAlertMixin` was written second in the class definition.
 
-### 3.12 Code Examples
+### 3.11 Code Examples
 
 **Basic example** — single-level inheritance with overriding:
 
@@ -362,10 +355,10 @@ print(PremiumSavingsAccount.__mro__)
 
 ## 4. Real-World Application
 
-- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern in §3.12's industry example.
+- **Banking & FinTech:** `SavingsAccount` and `CurrentAccount` both extend a shared `BankAccount` base, reusing `deposit()`/`withdraw()` logic while each adds its own rules (interest, overdraft limits) — exactly the pattern in §3.11's industry example.
 - **UPI / Payment Systems:** A payment gateway might have a base `PaymentMethod` class, extended by `UPIPayment`, `CardPayment`, and `NetBankingPayment`, each overriding a `process()` method with its own validation logic while sharing common logging and retry behavior.
 - **E-commerce:** A `Product` base class is extended by `ElectronicsProduct` and `GroceryProduct`, each adding fields like `warranty_period` or `expiry_date`, while both inherit shared pricing and discount logic.
-- **Food Delivery:** A `DeliveryPartner` base class is extended by `BikePartner` and `CarPartner`; combining a partner class with an independent `RatingMixin` through multiple inheritance is a realistic use of the MRO concept from §3.11.
+- **Food Delivery:** A `DeliveryPartner` base class is extended by `BikePartner` and `CarPartner`; combining a partner class with an independent `RatingMixin` through multiple inheritance is a realistic use of the MRO concept from §3.10.
 - **Healthcare:** A `Patient` base class is extended by `InpatientRecord` and `OutpatientRecord`, each adding fields specific to that kind of visit while sharing common demographic fields through inheritance.
 - **Railway Booking (IRCTC-style systems):** A `Passenger` base class extended by `SeniorCitizenPassenger` or `TatkalBooking`, each overriding fare-calculation logic while reusing shared booking and cancellation methods.
 - **Exception Hierarchies:** Python's own built-in errors form exactly this structure — `ValueError` and `TypeError` both extend `Exception` — and production code routinely extends further, e.g., `InvalidPinError(ValidationError)`, so `isinstance(err, ValidationError)` catches every specific subtype without checking each one by name.
@@ -454,6 +447,15 @@ AttributeError: 'BrokenGraduateStudent' object has no attribute 'marks'
 `gs.name` prints correctly because `super().__init__()` ran and set it. `gs.has_passed()` returns `True` because `GraduateStudent`'s overridden rule (`marks >= 50`) checks `88.0`, which passes easily. `isinstance(gs, Student)` returns `True` because `Student` appears in `GraduateStudent`'s MRO, regardless of the override.
 
 For `broken`, `thesis_topic` prints fine because that assignment genuinely executed. But `has_passed()` needs `self.marks` — and since `Student.__init__` never ran (there was no `super().__init__()` call), that attribute was never created, so Python raises `AttributeError`. This proves that inheriting a *method* only makes it available; the object's actual *data* exists only when `__init__` genuinely runs and sets it.
+
+---
+
+### Important Notes (Interview Insights)
+
+- **MRO and `super()` are classic interview topics** for any Python role. Be ready to explain, in your own words, that `super()` does not mean "my direct parent" — it means "the next class in the MRO" — and be able to trace `ClassName.__mro__` for a small diamond-shaped hierarchy on a whiteboard.
+- A very common fresher interview question: *"Does Python have private variables like Java?"* The confident, correct answer: **no** — Python's underscore convention is "convention, not enforcement." A single underscore (`_name`) is a social signal only; a double underscore (`__name`) triggers name mangling, which prevents accidental collisions but can still be bypassed by anyone who knows the mangled name. This is a fundamentally different model from Java's `private` keyword, which the compiler actively enforces.
+- Interviewers often ask you to distinguish **overriding** (replacing a method entirely) from **extending** (calling `super()` to reuse the superclass's version and add to it) — know both terms and be able to demonstrate each with a one-line code example.
+- Be ready to explain why `isinstance()` is generally preferred over checking `type(obj) == SomeClass` — `isinstance()` respects the whole inheritance hierarchy (and MRO), while an exact `type()` comparison does not.
 
 ---
 

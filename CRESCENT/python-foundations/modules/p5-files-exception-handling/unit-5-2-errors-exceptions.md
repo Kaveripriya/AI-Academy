@@ -185,14 +185,7 @@ graph TD
 - **Listing a parent exception class before a child** in multiple `except` clauses, so the child's specific block never actually executes.
 - **Forgetting that `else` is skipped** entirely the moment any exception occurs, even one caught by a different `except` than expected.
 
-### 3.8 Important Notes (Interview Insights)
-
-- Common interview question: *"What's the difference between an error and an exception?"* Answer confidently: a **syntax error** prevents the program from running at all; a **runtime exception** occurs during execution of otherwise-valid code and can be caught and handled — an error is the broader umbrella term, and an exception is the specific, handleable kind.
-- Common interview question: *"Does `finally` run if `return` is used inside `try`?"* Yes — `finally` runs before the function actually hands back its value, on literally every path out of the block, including an uncaught exception propagating upward.
-- Be ready to explain, with a concrete example, why a bare `except:` is dangerous rather than just reciting "it's bad practice" — interviewers often ask for the actual failure mode: a real bug (like a typo) getting silently reported as expected behaviour.
-- Know that all built-in exceptions descend from `BaseException`, but `Exception` is the practical class you should inherit from for your own custom exceptions — not `BaseException` directly, which also covers things like `SystemExit` and `KeyboardInterrupt` that you almost never want to accidentally catch.
-
-### 3.9 Comparison Table: Common Exception Types
+### 3.8 Comparison Table: Common Exception Types
 
 | Exception | When it happens | Example |
 |---|---|---|
@@ -205,7 +198,7 @@ graph TD
 
 A useful pair to keep straight for interviews: `ValueError` means *right type, wrong content* (`int("cat")` — a string, just not a numeric one); `TypeError` means *wrong type entirely* (`len(5)` — an integer has no length at all).
 
-### 3.10 Diagram: `try` / `except` / `else` / `finally` Control Flow
+### 3.9 Diagram: `try` / `except` / `else` / `finally` Control Flow
 
 ```mermaid
 flowchart TD
@@ -221,7 +214,7 @@ flowchart TD
 ```
 *No matter which path is taken above, `finally` always executes before the block is truly done.*
 
-### 3.11 Code Examples
+### 3.10 Code Examples
 
 **Basic example** — converting text to a number, with one specific `except`:
 
@@ -454,6 +447,15 @@ Attempted: 100 / abc
 ### Step 7: Why the Output Is Produced
 
 The first call converts `"100"` and `"5"` cleanly, divides them with no error, so `else` runs and prints the result — then `finally` logs the attempt. The second call converts both numbers fine, but dividing by `0` raises `ZeroDivisionError`, so that specific `except` runs instead of `else` — and `finally` still logs the attempt afterward. The third call fails at the very first conversion, since `"abc"` isn't a valid integer, raising `ValueError` before `b` or `result` are ever computed — its matching `except` runs, and once again `finally` logs the attempt regardless. In every case, exactly one of `except`/`else` ran, and `finally` ran every single time without exception.
+
+---
+
+### Important Notes (Interview Insights)
+
+- Common interview question: *"What's the difference between an error and an exception?"* Answer confidently: a **syntax error** prevents the program from running at all; a **runtime exception** occurs during execution of otherwise-valid code and can be caught and handled — an error is the broader umbrella term, and an exception is the specific, handleable kind.
+- Common interview question: *"Does `finally` run if `return` is used inside `try`?"* Yes — `finally` runs before the function actually hands back its value, on literally every path out of the block, including an uncaught exception propagating upward.
+- Be ready to explain, with a concrete example, why a bare `except:` is dangerous rather than just reciting "it's bad practice" — interviewers often ask for the actual failure mode: a real bug (like a typo) getting silently reported as expected behaviour.
+- Know that all built-in exceptions descend from `BaseException`, but `Exception` is the practical class you should inherit from for your own custom exceptions — not `BaseException` directly, which also covers things like `SystemExit` and `KeyboardInterrupt` that you almost never want to accidentally catch.
 
 ---
 

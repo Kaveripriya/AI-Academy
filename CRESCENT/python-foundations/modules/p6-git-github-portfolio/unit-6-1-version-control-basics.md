@@ -101,14 +101,7 @@ The key takeaway from this table: on the GitHub web interface, steps 3 through 5
 - **Leaving the default commit message.** GitHub's web editor pre-fills a generic message like `"Update filename.py"` — accepting it without editing it wastes the one part of a commit meant to explain your reasoning.
 - **Confusing Git with GitHub.** Assuming GitHub *is* version control, rather than a website that hosts a Git repository, leads to confusion later when working with local, command-line Git.
 
-### 3.8 Important Notes (Interview Insights)
-
-- Git and GitHub are near-universal expectations for any developer role today, regardless of the company or the stack — expect at least one interview question that assumes you already use them daily.
-- Be ready to clearly explain the difference between Git and GitHub in your own words — this is one of the most common fresher interview questions in this area, and confusing the two is an immediate red flag to an interviewer.
-- Be ready to describe your own commit habits — for example, "I commit each time a small, working piece of a feature is done, and I write a message describing what changed and why" is a strong, concrete answer.
-- Interviewers sometimes ask what a **pull request** is, even at fresher level: it is a proposed set of changes on GitHub, submitted for review before being merged into the main project — you will not create one in this unit, but knowing the term is expected.
-
-### 3.9 Comparison Table: Local Repository vs Remote Repository
+### 3.8 Comparison Table: Local Repository vs Remote Repository
 
 | Aspect | Local Repository | Remote Repository (GitHub) |
 |---|---|---|
@@ -118,7 +111,7 @@ The key takeaway from this table: on the GitHub web interface, steps 3 through 5
 | How this course uses it | Not used directly — this course works through the browser | Used directly for every action: creating files, committing, reviewing history |
 | Typical use later in a career | Where day-to-day editing and committing happens via the git command line | Where work is shared, reviewed, and combined with a team's work |
 
-### 3.10 Diagram: The Edit → Commit → Push Loop (Web Interface)
+### 3.9 Diagram: The Edit → Commit → Push Loop (Web Interface)
 
 ```mermaid
 flowchart LR
@@ -129,7 +122,7 @@ flowchart LR
     E --> F["Visible immediately in the<br/>repository's Commits tab"]
 ```
 
-### 3.11 Diagram: Local Work vs GitHub (Conceptual)
+### 3.10 Diagram: Local Work vs GitHub (Conceptual)
 
 ```mermaid
 flowchart TD
@@ -143,7 +136,7 @@ flowchart TD
     R --> R2["Visible to teammates,<br/>instructors, reviewers"]
 ```
 
-### 3.12 Examples
+### 3.11 Examples
 
 **Example 1 — a bad commit message.**
 
@@ -255,6 +248,15 @@ Clicking the earlier commit shows `average_calculator.py` exactly as it looked r
 ### Step 7: Why This Result Occurs
 
 Each commit is a permanent, independent snapshot — committing again never erases or rewrites an earlier commit, it simply adds a new one on top of the history. Because the two changes were committed separately with distinct messages, the history clearly shows two logical steps in your work rather than one unexplained final state. This is exactly the property that makes it possible, months later, to answer "what did this file look like before the empty-list check was added, and why was that check added at all?"
+
+---
+
+### Important Notes (Interview Insights)
+
+- Git and GitHub are near-universal expectations for any developer role today, regardless of the company or the stack — expect at least one interview question that assumes you already use them daily.
+- Be ready to clearly explain the difference between Git and GitHub in your own words — this is one of the most common fresher interview questions in this area, and confusing the two is an immediate red flag to an interviewer.
+- Be ready to describe your own commit habits — for example, "I commit each time a small, working piece of a feature is done, and I write a message describing what changed and why" is a strong, concrete answer.
+- Interviewers sometimes ask what a **pull request** is, even at fresher level: it is a proposed set of changes on GitHub, submitted for review before being merged into the main project — you will not create one in this unit, but knowing the term is expected.
 
 ---
 
