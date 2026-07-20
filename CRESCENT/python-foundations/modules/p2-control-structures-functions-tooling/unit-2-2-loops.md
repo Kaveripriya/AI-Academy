@@ -83,6 +83,17 @@ while condition:
 | `condition` | Any expression that evaluates to `True` or `False`. | Re-checked before every single iteration, including the first. |
 | Indented block | The loop body. | Runs once per iteration, as long as `condition` is `True`. |
 
+**Diagram: `while` Loop**
+
+```mermaid
+flowchart TD
+    A["Check condition"] -->|True| B["Run loop body"]
+    B --> A
+    A -->|False| C["Exit loop"]
+```
+
+Read this as: Python checks the condition first — if it's `True`, the body runs once, then control goes straight back to re-checking the condition. This repeats for as long as the condition stays `True`. The moment the condition is `False`, the loop exits without running the body again.
+
 **`for` loop:**
 
 ```python
@@ -96,6 +107,17 @@ for item in sequence:
 | `item` | The **loop variable** — your chosen name. | Holds the current item's value during each iteration. |
 | `sequence` | Anything Python can iterate over — a string, `range(...)`, `enumerate(...)`, or `zip(...)`. | Defines what values `item` will take, and how many iterations run. |
 
+**Diagram: `for` Loop**
+
+```mermaid
+flowchart TD
+    A["Take the next item from sequence"] -->|Item available| B["Run loop body with item"]
+    B --> A
+    A -->|No items left| C["Exit loop"]
+```
+
+Read this as: Python pulls one item at a time from `sequence` and runs the body once with that item. This repeats automatically for every item — there is no condition to check yourself. The moment the sequence runs out of items, the loop exits on its own.
+
 **Comparison Table: `for` Loop vs `while` Loop**
 
 | Aspect | `for` Loop | `while` Loop |
@@ -105,22 +127,6 @@ for item in sequence:
 | Risk of infinite loop | None — it always ends when the sequence ends | Real risk if the condition never becomes `False` |
 | Typical use case | "Do this for every item / N times" | "Keep doing this until some event happens" |
 | Needs a manual counter? | No — the loop variable is managed automatically | Often yes, unless the condition depends on something external (like user input) |
-
-**Diagram: Loop Control Flow**
-
-```mermaid
-flowchart TD
-    A["Enter loop"] --> B{"Condition true?<br/>(while test / for has next item)"}
-    B -->|Yes| C["Run loop body"]
-    C --> D{"break?"}
-    D -->|Yes| F["Exit loop"]
-    D -->|No| E{"continue?"}
-    E -->|Yes| B
-    E -->|No| B
-    B -->|No more / False| F
-```
-
-Read this top to bottom: Python checks the condition (or whether the sequence has a next item), runs the body if it's `True`, then checks whether that body hit a `break` (leave immediately) or a `continue` (skip back to the condition check without finishing the rest of the body). Once the condition is `False` or the sequence runs out, the loop exits.
 
 **`range()`, `enumerate()`, `zip()`:**
 
