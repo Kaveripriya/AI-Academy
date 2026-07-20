@@ -47,7 +47,13 @@ This unit introduces the four building blocks every later OOP concept in this co
 
 ### 3.1 Definition
 
-An **abstract data type (ADT)** describes a "thing" purely by what it *is* (its data) and what it *can do* (its behaviour), without worrying yet about how that is implemented in code. A `Student` is an ADT the moment you can say: it has a name and marks (its **state**), and it can compute a grade (its **behaviour**).
+An **Abstract Data Type (ADT)** describes **what an object is** and **what it can do**, without explaining **how it is implemented**.
+For example, consider a **Student**.
+- **Data (Attributes):** Name, Roll Number, Marks
+- **Behavior (Methods):** Calculate grade, Display details
+At this stage, we only describe the student and its actions. We do **not** write the Python code yet.
+
+> **Simple Idea:** An **ADT** focuses on **what** an object contains and **what** it can do, not **how** it is implemented.
 
 A **class** is how Python lets you implement an ADT: a blueprint that defines what attributes and methods every object built from it will have. An **object**, also called an **instance**, is one specific thing created from that blueprint, holding its own actual values. A class alone builds nothing — it only describes the shape; you must create an object from it before you have anything you can use:
 
