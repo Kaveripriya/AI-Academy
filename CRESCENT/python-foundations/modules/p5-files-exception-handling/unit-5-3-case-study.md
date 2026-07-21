@@ -59,12 +59,27 @@ A robust file reader is **not a new Python feature**. It is simply a good way of
 By using these together, you can build programs that are more reliable and can handle real-world data without crashing.
 
 ### 3.2 Why This Concept Exists
+A simple file reader assumes that **every row in a file is correct**. It expects the correct number of columns, the correct data type, and valid values.
 
-A naive reader assumes every row in a file is well-formed — the right number of columns, the right data type in each column, values that make sense. That assumption is almost always wrong the moment data comes from outside your own program: a person typed it, a different system exported it, a sensor recorded it. Somewhere in a file of a thousand rows, a few will be broken.
+In real life, data files often contain mistakes such as missing values or incorrect data.
 
-If your reader crashes on the first broken row, you lose two things at once: the 995 good rows you never got to process, and any record of what was wrong with the 5 bad ones (since the program died before it could report anything). Neither outcome is acceptable in a real system. A payroll system that stops processing salaries because one employee's row has a typo, or a training pipeline that halts an entire model run because one line of a dataset is malformed, is a system that isn't ready for production.
+#### Example
+Consider the following CSV file:
 
-**Graceful degradation** — continuing to do useful work even when part of the input is broken — is the standard professional response. This unit exists to turn that idea from a phrase you've heard into a program you can write.
+| Roll No | Name | Marks |
+|---------|------|------:|
+| 101 | Asha | 85 |
+| 102 | Ravi | 92 |
+| 103 | Meena | eighty |
+| 104 | Kiran | 78 |
+
+If the program tries to convert **"eighty"** into a number, it will crash and stop reading the file. As a result, **Kiran's** correct data is never processed.
+A better approach is to use **`try/except`**. The program:
+- Processes valid rows.
+- Skips rows with errors.
+- Continues reading the rest of the file.
+- Reports the skipped rows at the end.
+This approach is called **graceful degradation**. It allows the program to continue working even when some rows contain errors.
 
 ### 3.3 Key Terminology
 
