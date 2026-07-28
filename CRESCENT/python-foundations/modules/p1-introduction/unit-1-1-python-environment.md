@@ -50,7 +50,7 @@ There are two ways a computer can turn your code into something that actually ru
 | | Compiled (C, Java) | Interpreted (Python) |
 |---|---|---|
 | When it's translated | All at once, before running | Line by line, while running |
-| Extra file created? | Yes (`.exe`, `.class`) | No |
+| Extra file created? | Yes (`.exe`, `.class`) | Yes, but hidden — a `.pyc` bytecode cache, usually in `__pycache__` |
 | Test a quick change | Recompile first | Just run it again |
 
 Python is called an **interpreted language**. In reality, Python first turns your code into something called **bytecode**, and then runs that — but for everyday use it's fine to just say "Python is interpreted."
