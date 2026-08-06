@@ -1,4 +1,4 @@
-### 1.4 Statements, Conversion & Output
+# 1.4 Statements, Conversion & Output
 
 ---
 
@@ -38,7 +38,7 @@ Two shortcuts worth knowing:
 
 ```python
 a = b = 5          # chained assignment: both a and b become 5
-x, y = 1, 2        # tuple unpacking: x=1, y=2
+x, y = 1, 2        # unpacking: x=1, y=2
 
 x, y = y, x        # swap: no temporary variable needed
 ```
