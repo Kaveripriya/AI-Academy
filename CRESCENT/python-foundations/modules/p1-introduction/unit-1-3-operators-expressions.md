@@ -1,10 +1,9 @@
-﻿# Operators & Expressions
+﻿### 1.3 Operators & Expressions
 
 ---
 
 [← Previous: 1.2 Variables, Identifiers & Types](unit-1-2-variables-identifiers-types.md) | [Go back to TOC](../../README.md) | [Next: 1.4 Statements, Conversion & Output →](unit-1-4-statements-conversion-output.md)
 
-# 1.3 Operators & Expressions
 
 ---
 
