@@ -1,11 +1,12 @@
-﻿# 2.5 Modules, Packaging & Professional Tooling
+﻿#  Modules, Packaging & Professional Tooling
 
 ---
 
-[← Previous: 2.4 Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next: 3.1 Lists →](../p3-data-structures/unit-3-1-lists.md)
+[← Previous: Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next: Lists →](../p3-data-structures/unit-3-1-lists.md)
 
 
 ---
+
 
 ## Why Modules?
 
@@ -218,9 +219,9 @@ But `pytest` itself, discovering and running test files automatically, is a loca
 
 ## Try it Yourself
 
-**(a)** Import `random` and print 5 random numbers between `1` and `100`, using a loop from Unit 2.2.
+**(a)** Import `random` and print 5 random numbers between `1` and `100`, using a loop from the Loops unit.
 
-**(b)** Using `math`, write a function `circle_area(radius)` that returns the area of a circle (`math.pi * radius ** 2`), with type hints from Unit 2.3.
+**(b)** Using `math`, write a function `circle_area(radius)` that returns the area of a circle (`math.pi * radius ** 2`), with type hints from the Functions unit.
 
 **(c)** Using `datetime`, print the current year and figure out (using ordinary subtraction) how many years until 2050.
 
@@ -279,7 +280,7 @@ A: It automatically finds every function starting with `test_` in your project a
 - [Real Python — Python Modules and Packages: An Introduction](https://realpython.com/python-modules-packages/)
 - [W3Schools — Python Modules](https://www.w3schools.com/python/python_modules.asp)
 
-[← Previous: 2.4 Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next: 3.1 Lists →](../p3-data-structures/unit-3-1-lists.md)
+[← Previous:  Functional Constructs](unit-2-4-functional-constructs.md) | [Go back to TOC](../../README.md) | [Next:  Lists →](../p3-data-structures/unit-3-1-lists.md)
 
 ---
 
