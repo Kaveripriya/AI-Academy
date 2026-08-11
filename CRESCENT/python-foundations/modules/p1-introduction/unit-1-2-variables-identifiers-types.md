@@ -2,7 +2,7 @@
 
 ---
 
-[← Previous: 1.1 The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next: 1.3 Operators & Expressions →](unit-1-3-operators-expressions.md)
+[← Previous: The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next: Operators & Expressions →](unit-1-3-operators-expressions.md)
 
 ---
 
@@ -286,7 +286,7 @@ A: No. `=` assigns a value. `==` compares two values (covered in the next unit).
 - `print()` can take multiple values (comma-separated) and control spacing with `sep` and `end`.
 
 
-[← Previous: 1.1 The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next up: **1.3 Operators & Expressions** — combining and comparing the values you now know how to store. →](unit-1-3-operators-expressions.md)
+[← Previous:  The Python Environment](unit-1-1-python-environment.md) | [Go back to TOC](../../README.md) | [Next up: ** Operators & Expressions** — combining and comparing the values you now know how to store. →](unit-1-3-operators-expressions.md)
 
 ---
 
