@@ -1,4 +1,4 @@
-﻿# 1.2 Variables, Identifiers & Types
+﻿# Variables, Identifiers & Types
 
 ---
 
