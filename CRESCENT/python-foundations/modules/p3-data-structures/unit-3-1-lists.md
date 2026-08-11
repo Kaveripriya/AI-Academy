@@ -2,7 +2,7 @@
 
 ---
 
-[← Previous: 2.5 Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: 3.2 Tuples →](unit-3-2-tuples.md)
+[← Previous:  Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: Tuples →](unit-3-2-tuples.md)
 
 ---
 
@@ -423,7 +423,7 @@ A: No. `a + b` always returns a brand-new list, the originals are untouched. To 
 - [Real Python — Lists and Tuples in Python](https://realpython.com/python-lists-tuples/)
 - [W3Schools — Python Lists](https://www.w3schools.com/python/python_lists.asp)
 
-[← Previous: 2.5 Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: 3.2 Tuples →](unit-3-2-tuples.md)
+[← Previous: Modules, Packaging & Professional Tooling](../p2-control-structures-functions-tooling/unit-2-5-modules-packaging-tooling.md) | [Go back to TOC](../../README.md) | [Next: Tuples →](unit-3-2-tuples.md)
 
 ---
 
