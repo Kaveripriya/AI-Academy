@@ -1,4 +1,4 @@
-# 1.1 The Python Environment
+# The Python Environment
 
 ---
 
