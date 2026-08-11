@@ -2,10 +2,11 @@
 
 ---
 
-[← Previous: 1.4 Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: 2.2 Loops →](unit-2-2-loops.md)
+[← Previous: Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: Loops →](unit-2-2-loops.md)
 
 
 ---
+
 
 ## Why Conditionals?
 
@@ -123,7 +124,7 @@ Entry allowed with guardian.
 
 ## Boolean Expressions in Conditions
 
-You already met `and`, `or`, and `not` in Unit 1.3, conditionals are where they really earn their keep, combining multiple checks into one:
+You already met `and`, `or`, and `not` when we covered operators, conditionals are where they really earn their keep, combining multiple checks into one:
 
 ```python
 age = 20
@@ -159,7 +160,7 @@ if not is_banned:
 Access granted.
 ```
 
-Remember short-circuit evaluation from 1.3: in `age >= 18 and has_id`, if `age >= 18` is already `False`, Python never even checks `has_id`.
+Remember short-circuit evaluation from the Operators unit: in `age >= 18 and has_id`, if `age >= 18` is already `False`, Python never even checks `has_id`.
 
 ---
 
@@ -223,7 +224,7 @@ print(weather)
 
 - Forgetting the colon `:` at the end of `if`, `elif`, or `else`
 - Inconsistent indentation, mixing tabs and spaces, or misaligning lines within the same block
-- Using `=` instead of `==` inside a condition (from Unit 1.3, still the most common bug)
+- Using `=` instead of `==` inside a condition (still the most common bug from the Operators unit)
 - Writing `elif` after `else`, `else` must always come last
 - Over-nesting `if` statements when combining conditions with `and`/`or` would be clearer
 - Forgetting a ternary expression is a value, not a statement, `if age >= 18: status = "Adult"` alone doesn't work as a one-liner without `else`
@@ -255,6 +256,7 @@ A: For short, simple value assignments with exactly two outcomes. Anything more 
 - A ternary expression (`x if condition else y`) is a compact one-line if/else that produces a value.
 
 
+
 ##  Reference Links
 
 - [The Python Tutorial — More Control Flow Tools (if Statements)](https://docs.python.org/3/tutorial/controlflow.html#if-statements)
@@ -263,7 +265,7 @@ A: For short, simple value assignments with exactly two outcomes. Anything more 
 - [Real Python — Conditional Statements in Python](https://realpython.com/python-conditional-statements/)
 - [W3Schools — Python If...Else](https://www.w3schools.com/python/python_conditions.asp)
 
-[← Previous: 1.4 Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: 2.2 Loops →](unit-2-2-loops.md)
+[← Previous: Statements, Conversion & Output](../p1-introduction/unit-1-4-statements-conversion-output.md) | [Go back to TOC](../../README.md) | [Next: Loops →](unit-2-2-loops.md)
 
 ---
 
