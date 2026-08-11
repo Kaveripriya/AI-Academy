@@ -2,7 +2,7 @@
 
 ---
 
-[← Previous: 2.1 Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: 2.3 Functions →](unit-2-3-functions.md)
+[← Previous: Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: Functions →](unit-2-3-functions.md)
 
 ---
 
@@ -320,7 +320,7 @@ A: It stops as soon as the shorter one runs out, no error, the extra items in th
 - [W3Schools — Python For Loops](https://www.w3schools.com/python/python_for_loops.asp)
 - [W3Schools — Python While Loops](https://www.w3schools.com/python/python_while_loops.asp)
 
-[← Previous: 2.1 Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: 2.3 Functions →](unit-2-3-functions.md)
+[← Previous:  Conditionals](unit-2-1-conditionals.md) | [Go back to TOC](../../README.md) | [Next: Functions →](unit-2-3-functions.md)
 
 ---
 
