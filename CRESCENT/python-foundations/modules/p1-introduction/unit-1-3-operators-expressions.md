@@ -1,4 +1,4 @@
-﻿# 1.3 Operators & Expressions
+﻿# Operators & Expressions
 
 ---
 
